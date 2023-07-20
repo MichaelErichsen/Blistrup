@@ -1,0 +1,250 @@
+package net.myerichsen.blistrup.loaders;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.myerichsen.archivesearcher.util.Fonkod;
+
+/**
+ * Load dåbsdata fra grundtabellen ind i GEDCOM-tabeller
+ *
+ * @author michael
+ *
+ */
+public class DaabLoader {
+	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
+	private static final String DELETE1 = "DELETE FROM INDIVID";
+	private static final String DELETE2 = "DELETE FROM PERSONNAVN";
+	private static final String DELETE3 = "DELETE FROM INDIVIDBEGIVENHED";
+	private static final String DELETE4 = "DELETE FROM VIDNE";
+	private static final String DELETE5 = "DELETE FROM KILDE";
+	private static final String DELETE6 = "DELETE FROM FAMILIE";
+
+	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'A'";
+	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' AND BEGIV = ? ORDER BY PID";
+
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
+	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
+	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+
+	private static final String UPDATE = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+
+	private static final Fonkod fonkod = new Fonkod();
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try {
+			int taeller = new DaabLoader().load();
+			System.out.println(taeller + " dåbslinier indlæst");
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param input
+	 * @return
+	 */
+	private String afQ(String input) {
+		return input.replace("Qo", "ø").replace("Qe", "æ").replace("Qa", "a").trim();
+	}
+
+	/**
+	 * Forbind til databasen
+	 *
+	 * @return conn forbindelse
+	 * @throws SQLException
+	 */
+	private Connection connect() throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
+		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.execute();
+		conn.prepareStatement(DELETE1).executeUpdate();
+		conn.prepareStatement(DELETE2).executeUpdate();
+		conn.prepareStatement(DELETE3).executeUpdate();
+		conn.prepareStatement(DELETE4).executeUpdate();
+		conn.prepareStatement(DELETE5).executeUpdate();
+		conn.prepareStatement(DELETE6).executeUpdate();
+		return conn;
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	private int load() throws SQLException {
+		final Connection conn = connect();
+		final List<String> blistrupIdListe = new ArrayList<String>();
+		String rolle;
+		PreparedStatement statement2;
+		ResultSet generatedKeys;
+		int individId;
+		String fornvn = "";
+		String efternvn = "";
+		String dato = "";
+		String mm = "";
+		String dd = "";
+		int kildeId;
+		int individBegivenhedsId = 0;
+		int husfaderId;
+		int familieId;
+		int barnId = 0;
+		int taeller = 0;
+
+		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
+		ResultSet rs1 = statement1.executeQuery();
+
+		while (rs1.next()) {
+			blistrupIdListe.add(rs1.getString("BEGIV"));
+		}
+
+		for (final String blistrupId : blistrupIdListe) {
+			statement1 = conn.prepareStatement(SELECT2);
+			statement1.setString(1, blistrupId);
+			rs1 = statement1.executeQuery();
+
+			while (rs1.next()) {
+				rolle = rs1.getString("ROLLE").trim();
+
+				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+				statement2.setString(1, rs1.getString("SEX").trim());
+				statement2.setString(2, rs1.getString("PID").trim());
+				statement2.executeUpdate();
+				generatedKeys = statement2.getGeneratedKeys();
+
+				if (generatedKeys.next()) {
+					individId = generatedKeys.getInt(1);
+				} else {
+					individId = 0;
+				}
+				generatedKeys.close();
+
+				statement2 = conn.prepareStatement(INSERT2);
+				statement2.setInt(1, individId);
+				fornvn = afQ(rs1.getString("FORNVN"));
+				statement2.setString(2, fornvn);
+				efternvn = afQ(rs1.getString("EFTERNVN"));
+				statement2.setString(3, efternvn);
+				statement2.setString(4, "TRUE");
+				try {
+					statement2.setString(5, fonkod.generateKey(fornvn + " " + efternvn).trim());
+				} catch (final Exception e) {
+					statement2.setString(5, "");
+				}
+				statement2.executeUpdate();
+
+				taeller++;
+
+				if ("barn".equals(rolle)) {
+					barnId = individId;
+
+					statement2 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
+					statement2.setString(1, rs1.getString("KBNR").trim());
+					statement2.setString(2, rs1.getString("KILDE").trim());
+					statement2.setString(3, rs1.getString("KBDEL").trim());
+					statement2.setString(4, rs1.getString("TIFNR").trim());
+					statement2.setString(5, rs1.getString("OPSLAG").trim());
+					statement2.setString(6, rs1.getString("OPNR").trim());
+					statement2.executeUpdate();
+					generatedKeys = statement2.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						kildeId = generatedKeys.getInt(1);
+					} else {
+						kildeId = 0;
+					}
+					generatedKeys.close();
+
+					statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
+					statement2.setInt(1, individId);
+					statement2.setString(2, "0");
+					statement2.setString(3, "Daab");
+
+					try {
+						dato = rs1.getString("FQODTDATO").trim();
+						mm = dato.substring(4, 6);
+						dd = dato.substring(6, 8);
+						statement2.setString(4, dato.substring(0, 4) + "-" + ("00".equals(mm) ? "01" : mm) + "-"
+								+ ("00".equals(dd) ? "01" : dd));
+					} catch (final Exception e) {
+						statement2.setString(4, "0001-01-01");
+					}
+
+					statement2.setString(5, afQ(rs1.getString("FADER").trim() + " " + rs1.getString("MODER")));
+					statement2.setString(6, rolle);
+					statement2.setString(7, afQ(rs1.getString("BEGIV")));
+					statement2.setInt(8, kildeId);
+					statement2.executeUpdate();
+					generatedKeys = statement2.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						individBegivenhedsId = generatedKeys.getInt(1);
+					} else {
+						individBegivenhedsId = 0;
+					}
+					generatedKeys.close();
+				} else {
+					if ("far".equals(rolle)) {
+						statement2.close();
+						statement2 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
+						statement2.setInt(1, individId);
+						statement2.setString(2, rs1.getString("ROLLE").trim());
+						statement2.setInt(3, individBegivenhedsId);
+						statement2.executeUpdate();
+						generatedKeys.close();
+						generatedKeys = statement2.getGeneratedKeys();
+
+						if (generatedKeys.next()) {
+							husfaderId = generatedKeys.getInt(1);
+						} else {
+							husfaderId = 0;
+						}
+						generatedKeys.close();
+
+						statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
+						statement2.setInt(1, husfaderId);
+						statement2.executeUpdate();
+						generatedKeys = statement2.getGeneratedKeys();
+
+						if (generatedKeys.next()) {
+							familieId = generatedKeys.getInt(1);
+						} else {
+							familieId = 0;
+						}
+						generatedKeys.close();
+
+						statement2 = conn.prepareStatement(UPDATE);
+						statement2.setInt(1, familieId);
+						statement2.setInt(2, barnId);
+						statement2.executeUpdate();
+
+						statement2 = conn.prepareStatement(UPDATE);
+						statement2.setInt(1, familieId);
+						statement2.setInt(2, individId);
+					} else {
+						statement2.close();
+						statement2 = conn.prepareStatement(INSERT5);
+						statement2.setInt(1, individId);
+						statement2.setString(2, rs1.getString("ROLLE").trim());
+						statement2.setInt(3, individBegivenhedsId);
+					}
+					statement2.executeUpdate();
+				}
+				statement2.close();
+			}
+		}
+		conn.close();
+		return taeller;
+	}
+}
