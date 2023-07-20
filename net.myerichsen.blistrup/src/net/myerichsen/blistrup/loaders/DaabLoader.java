@@ -32,11 +32,13 @@ public class DaabLoader {
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
-	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
-	private static final String UPDATE = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+	private static final String UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
 
 	private static final Fonkod fonkod = new Fonkod();
 
@@ -45,8 +47,8 @@ public class DaabLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			int taeller = new DaabLoader().load();
-			System.out.println(taeller + " dåbslinier indlæst");
+			final int taeller = new DaabLoader().load();
+			System.out.println("Har indlæst " + taeller + " dåbslinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -101,6 +103,10 @@ public class DaabLoader {
 		int familieId;
 		int barnId = 0;
 		int taeller = 0;
+		StringBuilder sb;
+		String navn;
+		String fader;
+		String moder;
 
 		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		ResultSet rs1 = statement1.executeQuery();
@@ -110,12 +116,16 @@ public class DaabLoader {
 		}
 
 		for (final String blistrupId : blistrupIdListe) {
+			sb = new StringBuilder();
+
 			statement1 = conn.prepareStatement(SELECT2);
 			statement1.setString(1, blistrupId);
 			rs1 = statement1.executeQuery();
 
 			while (rs1.next()) {
 				rolle = rs1.getString("ROLLE").trim();
+				navn = rs1.getString("NAVN").trim();
+				sb.append(rolle + ": " + navn + "\r\n");
 
 				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 				statement2.setString(1, rs1.getString("SEX").trim());
@@ -181,10 +191,16 @@ public class DaabLoader {
 						statement2.setString(4, "0001-01-01");
 					}
 
-					statement2.setString(5, afQ(rs1.getString("FADER").trim() + " " + rs1.getString("MODER")));
+					fader = afQ(rs1.getString("FADER"));
+					fader = fader.length() > 0 ? "Fader: " + fader : "";
+					moder = afQ(rs1.getString("MODER"));
+					moder = moder.length() > 0 ? "Moder: " + moder : "";
+					statement2.setString(5, (fader + " " + moder).trim());
 					statement2.setString(6, rolle);
 					statement2.setString(7, afQ(rs1.getString("BEGIV")));
 					statement2.setInt(8, kildeId);
+					statement2.setString(9, afQ(rs1.getString("STEDNAVN")));
+					statement2.setString(10, afQ(rs1.getString("BEM")));
 					statement2.executeUpdate();
 					generatedKeys = statement2.getGeneratedKeys();
 
@@ -224,12 +240,12 @@ public class DaabLoader {
 						}
 						generatedKeys.close();
 
-						statement2 = conn.prepareStatement(UPDATE);
+						statement2 = conn.prepareStatement(UPDATE1);
 						statement2.setInt(1, familieId);
 						statement2.setInt(2, barnId);
 						statement2.executeUpdate();
 
-						statement2 = conn.prepareStatement(UPDATE);
+						statement2 = conn.prepareStatement(UPDATE1);
 						statement2.setInt(1, familieId);
 						statement2.setInt(2, individId);
 					} else {
@@ -241,7 +257,20 @@ public class DaabLoader {
 					}
 					statement2.executeUpdate();
 				}
-				statement2.close();
+
+				if (taeller % 1000 == 0) {
+					System.out.println("Har indlæst " + taeller + " dåbslinier");
+				}
+			}
+
+			statement2 = conn.prepareStatement(UPDATE2);
+			statement2.setString(1, afQ(sb.toString()));
+			statement2.setInt(2, individBegivenhedsId);
+			statement2.executeUpdate();
+			statement2.close();
+
+			if (taeller % 1000 == 0) {
+				System.out.println("Har indlæst " + taeller);
 			}
 		}
 		conn.close();
