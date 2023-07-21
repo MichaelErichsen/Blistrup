@@ -20,7 +20,7 @@ import net.myerichsen.blistrup.actions.AfslutAction;
 
 /**
  * Hovedvindue for Blistrup Lokalhistorie programmet
- * 
+ *
  * @author Michael Erichsen
  * @version 21. jul. 2023
  *
@@ -91,13 +91,13 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout(1, false));
 
-		Composite searchComposite = new Composite(container, SWT.NONE);
+		final Composite searchComposite = new Composite(container, SWT.NONE);
 		searchComposite.setLayout(new GridLayout(1, false));
 
-		Label lblNewLabel = new Label(searchComposite, SWT.NONE);
+		final Label lblNewLabel = new Label(searchComposite, SWT.NONE);
 		lblNewLabel.setText("S\u00F8g");
 
-		Composite tabComposite = new Composite(container, SWT.NONE);
+		final Composite tabComposite = new Composite(container, SWT.NONE);
 		tabComposite.setLayout(new GridLayout(1, false));
 
 		tabFolder = new TabFolder(tabComposite, SWT.NONE);

@@ -37,7 +37,7 @@ public class IndividView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		Composite filterComposite = new Composite(this, SWT.BORDER);
+		final Composite filterComposite = new Composite(this, SWT.BORDER);
 		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
@@ -137,11 +137,11 @@ public class IndividView extends Composite {
 		scroller.setContent(table);
 		scroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
-		String dbPath = "C:\\Users\\michael\\BlistrupDB";
+		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
 			tableViewer.setInput(IndividModel.load(dbPath));
 			blh.getStatusLineManager().setMessage("OK");
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}

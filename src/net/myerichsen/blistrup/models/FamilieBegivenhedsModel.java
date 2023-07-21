@@ -1,8 +1,8 @@
 package net.myerichsen.blistrup.models;
 
 /**
- * @author michael
- *
+ * @author Michael Erichsen
+ * @version 21. jul. 2023
  */
 public class FamilieBegivenhedsModel extends Begivenhedsmodel {
 	/**

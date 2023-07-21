@@ -27,11 +27,11 @@ class DaabAction extends Action {
 
 	@Override
 	public void run() {
-		DaabLoader loader = new DaabLoader();
+		final DaabLoader loader = new DaabLoader();
 		try {
-			int load = loader.load();
+			final int load = loader.load();
 			win.getStatusLineManager().setMessage(load + " dåbsregistreringer er indlæst");
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			win.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}

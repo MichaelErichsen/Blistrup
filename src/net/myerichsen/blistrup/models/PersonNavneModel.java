@@ -1,5 +1,10 @@
 package net.myerichsen.blistrup.models;
 
+/**
+ * @author Michael Erichsen
+ * @version 21. jul. 2023
+ *
+ */
 public class PersonNavneModel {
 	private int id;
 	private String individId;
@@ -19,10 +24,16 @@ public class PersonNavneModel {
 		return efternavn;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getEfternavnePrefix() {
 		return efternavnePrefix;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getEternavn() {
 		return efternavn;
 	}

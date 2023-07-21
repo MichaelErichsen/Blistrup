@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author michael
- *
+ * @author Michael Erichsen
+ * @version 21. jul. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID FETCH FIRST 200 ROWS ONLY";
@@ -22,7 +22,7 @@ public class IndividModel {
 	 */
 	public static IndividModel[] load(String dbPath) throws SQLException {
 		IndividModel model;
-		final List<IndividModel> liste = new ArrayList<IndividModel>();
+		final List<IndividModel> liste = new ArrayList<>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);

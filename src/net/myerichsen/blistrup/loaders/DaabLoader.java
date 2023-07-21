@@ -88,7 +88,7 @@ public class DaabLoader {
 	 */
 	public int load() throws SQLException {
 		final Connection conn = connect();
-		final List<String> blistrupIdListe = new ArrayList<String>();
+		final List<String> blistrupIdListe = new ArrayList<>();
 		String rolle;
 		PreparedStatement statement2;
 		ResultSet generatedKeys;

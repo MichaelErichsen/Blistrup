@@ -3,8 +3,8 @@ package net.myerichsen.blistrup.models;
 import java.sql.Date;
 
 /**
- * @author michael
- *
+ * @author Michael Erichsen
+ * @version 21. jul. 2023
  */
 public abstract class Begivenhedsmodel {
 	protected int id;
