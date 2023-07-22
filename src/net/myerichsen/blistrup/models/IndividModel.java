@@ -20,9 +20,9 @@ public class IndividModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IndividModel[] load(String dbPath) throws SQLException {
+	public static IndividModel[] getData(String dbPath) throws SQLException {
 		IndividModel model;
-		final List<IndividModel> liste = new ArrayList<>();
+		final List<IndividModel> liste = new ArrayList<IndividModel>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);

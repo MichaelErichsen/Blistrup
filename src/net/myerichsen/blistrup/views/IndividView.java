@@ -34,11 +34,11 @@ public class IndividView extends Composite {
 	 * @param style
 	 */
 	public IndividView(Composite parent, int style, BlistrupLokalhistorie blh) {
-		super(parent, style);
+		super(parent, SWT.NONE);
 		setLayout(new GridLayout(1, false));
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
-		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		final Label cLabel = new Label(filterComposite, SWT.NONE);
@@ -139,8 +139,8 @@ public class IndividView extends Composite {
 
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
-			tableViewer.setInput(IndividModel.load(dbPath));
-			blh.getStatusLineManager().setMessage("OK");
+			tableViewer.setInput(IndividModel.getData(dbPath));
+//			blh.getStatusLineManager().setMessage("OK");
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();

@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.actions.AfslutAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 22. jul. 2023
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
@@ -46,6 +46,10 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	private Action afslut;
 	private TabFolder tabFolder;
 	private IndividView individView;
+	private IndividBegivenhedView individBegivenhedView;
+	private FamilieBegivenhedView familieBegivenhedView;
+	private Action loadConfirmations;
+	private Action loadMarriages;
 
 	/**
 	 * Create the application window.
@@ -73,12 +77,13 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	 */
 	private void createActions() {
 		// Create the actions
-		{
-			afslut = new AfslutAction(this);
-			loadChristenings = new Action("D\u00E5b") {
-
-			};
-		}
+		afslut = new AfslutAction(this);
+		loadChristenings = new Action("D\u00E5b") {
+		};
+		loadConfirmations = new Action("Konfimationer") {
+		};
+		loadMarriages = new Action("Vielser") {
+		};
 	}
 
 	/**
@@ -88,7 +93,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
-		final Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		container.setLayout(new GridLayout(1, false));
 
 		final Composite searchComposite = new Composite(container, SWT.NONE);
@@ -97,7 +102,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		final Label lblNewLabel = new Label(searchComposite, SWT.NONE);
 		lblNewLabel.setText("S\u00F8g");
 
-		final Composite tabComposite = new Composite(container, SWT.NONE);
+		final Composite tabComposite = new Composite(container, SWT.H_SCROLL);
 		tabComposite.setLayout(new GridLayout(1, false));
 
 		tabFolder = new TabFolder(tabComposite, SWT.NONE);
@@ -107,6 +112,16 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		tbtmPerson.setText("&Person");
 		individView = new IndividView(tabFolder, SWT.NONE, this);
 		tbtmPerson.setControl(individView);
+
+		final TabItem tbtmIndividualEvent = new TabItem(tabFolder, SWT.NONE);
+		tbtmIndividualEvent.setText("&Individbegivenhed");
+		individBegivenhedView = new IndividBegivenhedView(tabFolder, SWT.NONE, this);
+		tbtmIndividualEvent.setControl(individBegivenhedView);
+
+		final TabItem tbtmFamilieEvent = new TabItem(tabFolder, SWT.NONE);
+		tbtmFamilieEvent.setText("&Familiebegivenhed");
+		familieBegivenhedView = new FamilieBegivenhedView(tabFolder, SWT.NONE, this);
+		tbtmFamilieEvent.setControl(familieBegivenhedView);
 
 		return container;
 	}
@@ -126,6 +141,8 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		final MenuManager loadMenu = new MenuManager("&Indl\u00E6s");
 		menuManager.add(loadMenu);
 		loadMenu.add(loadChristenings);
+		loadMenu.add(loadConfirmations);
+		loadMenu.add(loadMarriages);
 
 		return menuManager;
 	}

@@ -16,12 +16,45 @@ public class FamilieBegivenhedsModel extends Begivenhedsmodel {
 	private int familieId;
 	private int husfaderAlder;
 	private int husmoderAlder;
+	private int aar;
+	private String rolle;
+	private int gom;
+	private int brud;
+	private String gaard;
+
+	/**
+	 * @return the aar
+	 */
+	public int getAar() {
+		return aar;
+	}
+
+	/**
+	 * @return the brud
+	 */
+	public int getBrud() {
+		return brud;
+	}
 
 	/**
 	 * @return the familieId
 	 */
 	public int getFamilieId() {
 		return familieId;
+	}
+
+	/**
+	 * @return the gaard
+	 */
+	public String getGaard() {
+		return gaard;
+	}
+
+	/**
+	 * @return the gom
+	 */
+	public int getGom() {
+		return gom;
 	}
 
 	/**
@@ -39,10 +72,45 @@ public class FamilieBegivenhedsModel extends Begivenhedsmodel {
 	}
 
 	/**
+	 * @return the rolle
+	 */
+	public String getRolle() {
+		return rolle;
+	}
+
+	/**
+	 * @param aar the aar to set
+	 */
+	public void setAar(int aar) {
+		this.aar = aar;
+	}
+
+	/**
+	 * @param brud the brud to set
+	 */
+	public void setBrud(int brud) {
+		this.brud = brud;
+	}
+
+	/**
 	 * @param familieId the familieId to set
 	 */
 	public void setFamilieId(int familieId) {
 		this.familieId = familieId;
+	}
+
+	/**
+	 * @param gaard the gaard to set
+	 */
+	public void setGaard(String gaard) {
+		this.gaard = gaard;
+	}
+
+	/**
+	 * @param gom the gom to set
+	 */
+	public void setGom(int gom) {
+		this.gom = gom;
 	}
 
 	/**
@@ -59,15 +127,20 @@ public class FamilieBegivenhedsModel extends Begivenhedsmodel {
 		this.husmoderAlder = husmoderAlder;
 	}
 
+	/**
+	 * @param rolle the rolle to set
+	 */
+	public void setRolle(String rolle) {
+		this.rolle = rolle;
+	}
+
 	@Override
 	public String toString() {
-		return "FamilieBegivenhedsModel [familieId=" + familieId + ", husfaderAlder=" + husfaderAlder
-				+ ", husmoderAlder=" + husmoderAlder + ", id=" + id + ", "
-				+ (begType != null ? "begType=" + begType + ", " : "")
-				+ (underType != null ? "underType=" + underType + ", " : "")
-				+ (dato != null ? "dato=" + dato + ", " : "") + "kildeId=" + kildeId + ", "
-				+ (note != null ? "note=" + note + ", " : "") + (detaljer != null ? "detaljer=" + detaljer + ", " : "")
-				+ (blistrupId != null ? "blistrupId=" + blistrupId : "") + "]";
+		return familieId + ", " + husfaderAlder + ", " + husmoderAlder + ", " + aar + ", "
+				+ (rolle != null ? rolle + ", " : "") + gom + ", " + brud + ", " + (gaard != null ? gaard + ", " : "")
+				+ id + ", " + (begType != null ? begType + ", " : "") + (underType != null ? underType + ", " : "")
+				+ (dato != null ? dato + ", " : "") + kildeId + ", " + (note != null ? note + ", " : "")
+				+ (detaljer != null ? detaljer + ", " : "") + (blistrupId != null ? blistrupId : "");
 	}
 
 }

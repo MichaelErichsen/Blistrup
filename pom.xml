@@ -1,17 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Blistrup</groupId>
-	<artifactId>Blistrup</artifactId>
+	<artifactId>BlistrupLokalhistorie</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>BlistrupLokalhistorie</name>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<release>17</release>
+					<archive>
+						<manifest>
+							<mainClass>net.myerichsen.archivesearcher.views.ArchiveSearcher</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -58,8 +65,8 @@
 			<version>10.14.1.0</version>
 		</dependency>
 	</dependencies>
-		<scm>
-		<url>git:git://github.com/MichaelErichsen/Blistrup</url>
+	<scm>
+		<url>git://github.com/MichaelErichsen/Blistrup</url>
 	</scm>
 	<issueManagement>
 		<url>https://github.com/MichaelErichsen/Blistrup/issues</url>

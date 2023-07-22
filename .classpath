@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
@@ -16,16 +11,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/michael/.m2/repository/org/eclipse/platform/org.eclipse.jface/3.20.0/org.eclipse.jface-3.20.0.jar" sourcepath="C:/Users/michael/.m2/repository/org/eclipse/platform/org.eclipse.jface/3.20.0/org.eclipse.jface-3.20.0-sources.jar">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/michael/.m2/repository/org/eclipse/platform/org.eclipse.jface/3.20.0/org.eclipse.jface-3.20.0-javadoc.jar!/"/>
-			<attribute name="maven.groupId" value="org.eclipse.platform"/>
-			<attribute name="maven.artifactId" value="org.eclipse.jface"/>
-			<attribute name="maven.version" value="3.20.0"/>
-			<attribute name="maven.scope" value="compile"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="/VejbyGedcom"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BlistrupLokalhistorie
+Bundle-SymbolicName: net.myerichsen.blistrup
+Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: Michael Erichsen
+Automatic-Module-Name: net.myerichsen.blistrup.views.BlistrupLokalhistorie
+Bundle-RequiredExecutionEnvironment: JavaSE-17

@@ -12,13 +12,63 @@ import java.util.List;
 import net.myerichsen.blistrup.util.Fonkod;
 
 /**
- * Læs dåbsdata fra grundtabellen ind i GEDCOM-tabeller
+ * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
+ * 
+ * Read raw data type'C'
+ * 
+ * For hver begivenhedsid
+ * 
+ * Hvis gom
+ * 
+ * Insert individ
+ * 
+ * Insert familie
+ * 
+ * Update individ FAMC
+ * 
+ * Hvis fader findes
+ * 
+ * Insert familie med fader og barn
+ * 
+ * Hvis brud
+ * 
+ * Insert individ
+ * 
+ * Update familie
+ * 
+ * Hvis fader findes
+ * 
+ * Insert familie med fader og barn
+ * 
+ * Ellers er det en forlover
+ * 
+ * Insert individ
+ * 
+ * Insert vidne
+ * 
+ * Til sidste indsæt familiebegivenhed med note
  *
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 22. jul. 2023
  *
  */
-public class DaabLoader {
+public class VielseLoader {
+//	BEGIV
+//	PID
+//	TYPE
+//	AAR
+//	ROLLE
+//	HP
+//	STD_NAVN
+//  FADER	
+//	FQELLE
+//	KILDEID
+//	SEX
+//	ERHVERV
+//	FQODT
+//	FQodtDato
+//	GAARD
+
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
 	private static final String DELETE1 = "DELETE FROM INDIVID";
 	private static final String DELETE2 = "DELETE FROM PERSONNAVN";
@@ -27,8 +77,8 @@ public class DaabLoader {
 	private static final String DELETE5 = "DELETE FROM KILDE";
 	private static final String DELETE6 = "DELETE FROM FAMILIE";
 
-	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' FETCH FIRST 50 ROWS ONLY";
-	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' AND BEGIV = ? ORDER BY PID";
+	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' FETCH FIRST 50 ROWS ONLY";
+	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' AND BEGIV = ? ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
@@ -48,8 +98,8 @@ public class DaabLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			final int taeller = new DaabLoader().load();
-			System.out.println("Har indlæst " + taeller + " dåbslinier");
+			final int taeller = new VielseLoader().load();
+			System.out.println("Har indlæst " + taeller + " konfirmationslinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -180,7 +230,7 @@ public class DaabLoader {
 					statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, individId);
 					statement2.setString(2, "0");
-					statement2.setString(3, "Daab");
+					statement2.setString(3, "Konfirmation");
 
 					try {
 						dato = rs1.getString("FQODTDATO").trim();
