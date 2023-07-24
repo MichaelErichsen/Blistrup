@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID FETCH FIRST 200 ROWS ONLY";
@@ -22,7 +22,7 @@ public class IndividModel {
 	 */
 	public static IndividModel[] getData(String dbPath) throws SQLException {
 		IndividModel model;
-		final List<IndividModel> liste = new ArrayList<IndividModel>();
+		final List<IndividModel> liste = new ArrayList<>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
@@ -42,6 +42,7 @@ public class IndividModel {
 					model.setKoen(rs1.getString("KOEN").trim());
 					model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
 					model.setFamc(rs1.getInt("FAMC"));
+					model.setStdNavn(rs2.getString("STDNAVN"));
 					model.setFornavn(rs2.getString("FORNAVN").trim());
 					model.setEfternavn(rs2.getString("EFTERNAVN").trim());
 					model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());
@@ -66,6 +67,7 @@ public class IndividModel {
 	private String fornavn;
 	private String efternavn;
 	private String fonetiskNavn;
+	private String stdNavn;
 
 	/**
 	 * @return the blistrupId
@@ -118,6 +120,13 @@ public class IndividModel {
 	}
 
 	/**
+	 * @return the stdNavn
+	 */
+	public String getStdNavn() {
+		return stdNavn;
+	}
+
+	/**
 	 * @param blistrupId the blistrupId to set
 	 */
 	public void setBlistrupId(String blistrupId) {
@@ -167,13 +176,20 @@ public class IndividModel {
 		this.personNavneListe = personNavneListe;
 	}
 
+	/**
+	 * @param stdNavn the stdNavn to set
+	 */
+	public void setStdNavn(String stdNavn) {
+		this.stdNavn = stdNavn;
+	}
+
 	@Override
 	public String toString() {
-		return "IndividModel [id=" + id + ", famc=" + famc + ", " + (koen != null ? "koen=" + koen + ", " : "")
-				+ (BlistrupId != null ? "BlistrupId=" + BlistrupId + ", " : "")
-				+ (personNavneListe != null ? "personNavneListe=" + personNavneListe + ", " : "")
-				+ (fornavn != null ? "fornavn=" + fornavn + ", " : "")
-				+ (efternavn != null ? "efternavn=" + efternavn : "") + "]";
+		return id + ", " + famc + ", " + (koen != null ? koen + ", " : "")
+				+ (BlistrupId != null ? BlistrupId + ", " : "")
+				+ (personNavneListe != null ? personNavneListe + ", " : "") + (fornavn != null ? fornavn + ", " : "")
+				+ (efternavn != null ? efternavn + ", " : "") + (fonetiskNavn != null ? fonetiskNavn + ", " : "")
+				+ (stdNavn != null ? stdNavn : "");
 	}
 
 }

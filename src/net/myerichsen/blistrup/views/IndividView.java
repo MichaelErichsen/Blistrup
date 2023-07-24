@@ -20,7 +20,7 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 public class IndividView extends Composite {
@@ -81,23 +81,12 @@ public class IndividView extends Composite {
 
 		final TableViewerColumn tableViewerColumn2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFornavn = tableViewerColumn2.getColumn();
-		tblclmnFornavn.setWidth(200);
-		tblclmnFornavn.setText("Fornavn");
+		tblclmnFornavn.setWidth(300);
+		tblclmnFornavn.setText("Navn");
 		tableViewerColumn2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividModel) element).getFornavn();
-			}
-		});
-
-		final TableViewerColumn tableViewerColumn3 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnEfternavn = tableViewerColumn3.getColumn();
-		tblclmnEfternavn.setWidth(200);
-		tblclmnEfternavn.setText("Efternavn");
-		tableViewerColumn3.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return ((IndividModel) element).getEfternavn();
+				return ((IndividModel) element).getStdNavn();
 			}
 		});
 

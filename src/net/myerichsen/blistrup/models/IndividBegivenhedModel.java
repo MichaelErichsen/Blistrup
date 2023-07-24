@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 public class IndividBegivenhedModel {

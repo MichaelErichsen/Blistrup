@@ -9,7 +9,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 22. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 class KonfirmationAction extends Action {
@@ -27,9 +27,8 @@ class KonfirmationAction extends Action {
 
 	@Override
 	public void run() {
-		final KonfirmationLoader loader = new KonfirmationLoader();
 		try {
-			final int load = loader.load();
+			final int load = new KonfirmationLoader().load();
 			win.getStatusLineManager().setMessage(load + " konfirmationsregistreringer er indlæst");
 		} catch (final SQLException e) {
 			win.getStatusLineManager().setErrorMessage(e.getMessage());

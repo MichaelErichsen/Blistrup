@@ -17,11 +17,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import net.myerichsen.blistrup.models.IndividBegivenhedModel;
+import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 public class FamilieBegivenhedView extends Composite {
@@ -31,9 +31,9 @@ public class FamilieBegivenhedView extends Composite {
 	/**
 	 * Constructor
 	 *
-	 * @param tabFolder
-	 * @param none
-	 * @param blistrupLokalhistorie
+	 * @param parent
+	 * @param style
+	 * @param blh
 	 */
 	public FamilieBegivenhedView(Composite parent, int style, BlistrupLokalhistorie blh) {
 		super(parent, SWT.NONE);
@@ -66,116 +66,116 @@ public class FamilieBegivenhedView extends Composite {
 		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((IndividBegivenhedModel) element).getId());
+				return Integer.toString(((FamilieBegivenhedModel) element).getId());
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnIndividid = tableViewerColumn_1.getColumn();
-		tblclmnIndividid.setWidth(70);
-		tblclmnIndividid.setText("IndividId");
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnBegType = tableViewerColumn_1.getColumn();
+		tblclmnBegType.setWidth(70);
+		tblclmnBegType.setText("Type");
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((IndividBegivenhedModel) element).getId());
+				return ((FamilieBegivenhedModel) element).getBegType();
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnAlder = tableViewerColumn_2.getColumn();
-		tblclmnAlder.setWidth(70);
-		tblclmnAlder.setText("Alder");
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnSubType = tableViewerColumn_2.getColumn();
+		tblclmnSubType.setWidth(70);
+		tblclmnSubType.setText("Undertype");
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((IndividBegivenhedModel) element).getAlder());
+				return ((FamilieBegivenhedModel) element).getUnderType();
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnType = tableViewerColumn_3.getColumn();
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnType = tableViewerColumn_3.getColumn();
 		tblclmnType.setWidth(100);
-		tblclmnType.setText("Type");
+		tblclmnType.setText("Dato");
 		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getBegType();
+				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				return formatter.format(((FamilieBegivenhedModel) element).getDato());
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_3a = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnRolle = tableViewerColumn_3a.getColumn();
+		final TableViewerColumn tableViewerColumn_3a = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnRolle = tableViewerColumn_3a.getColumn();
 		tblclmnRolle.setWidth(100);
 		tblclmnRolle.setText("Rolle");
 		tableViewerColumn_3a.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getRolle();
+				return ((FamilieBegivenhedModel) element).getRolle();
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_3b = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnDato = tableViewerColumn_3b.getColumn();
-		tblclmnDato.setWidth(100);
-		tblclmnDato.setText("Dato");
+		final TableViewerColumn tableViewerColumn_3b = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnKildeId = tableViewerColumn_3b.getColumn();
+		tblclmnKildeId.setWidth(100);
+		tblclmnKildeId.setText("Kilde id");
 		tableViewerColumn_3b.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-				return formatter.format(((IndividBegivenhedModel) element).getDato());
+				return Integer.toString(((FamilieBegivenhedModel) element).getKildeId());
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnFdt = tableViewerColumn_4.getColumn();
-		tblclmnFdt.setWidth(100);
-		tblclmnFdt.setText("F\u00F8dt");
+		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnNote = tableViewerColumn_4.getColumn();
+		tblclmnNote.setWidth(100);
+		tblclmnNote.setText("Note");
 		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getFoedt();
+				return ((FamilieBegivenhedModel) element).getNote();
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnStedNavn = tableViewerColumn_5.getColumn();
+		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnStedNavn = tableViewerColumn_5.getColumn();
 		tblclmnStedNavn.setWidth(100);
-		tblclmnStedNavn.setText("Strednavn");
+		tblclmnStedNavn.setText("Detaljer");
 		tableViewerColumn_5.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getStedNavn();
+				return ((FamilieBegivenhedModel) element).getDetaljer();
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnNote = tableViewerColumn_6.getColumn();
-		tblclmnNote.setWidth(100);
-		tblclmnNote.setText("Note");
+		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnBlistrupId = tableViewerColumn_6.getColumn();
+		tblclmnBlistrupId.setWidth(100);
+		tblclmnBlistrupId.setText("Blistrup ID");
 		tableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getNote();
+				return ((FamilieBegivenhedModel) element).getBlistrupId();
 			}
 		});
-		TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnDetaljer = tableViewerColumn_7.getColumn();
+		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnDetaljer = tableViewerColumn_7.getColumn();
 		tblclmnDetaljer.setWidth(100);
-		tblclmnDetaljer.setText("Detaljer");
+		tblclmnDetaljer.setText("Stednavn");
 		tableViewerColumn_7.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getDetaljer();
+				return ((FamilieBegivenhedModel) element).getStedNavn();
 			}
 		});
-		TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnBem = tableViewerColumn_8.getColumn();
+		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnBem = tableViewerColumn_8.getColumn();
 		tblclmnBem.setWidth(100);
 		tblclmnBem.setText("Bemærkninger");
 		tableViewerColumn_8.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getBem();
+				return ((FamilieBegivenhedModel) element).getBem();
 			}
 		});
 		scroller.setContent(table);
@@ -183,7 +183,7 @@ public class FamilieBegivenhedView extends Composite {
 
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
-			tableViewer.setInput(IndividBegivenhedModel.getData(dbPath));
+			tableViewer.setInput(FamilieBegivenhedModel.getData(dbPath));
 //		blistrupLokalhistorie.getStatusLineManager().setMessage("OK");
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());

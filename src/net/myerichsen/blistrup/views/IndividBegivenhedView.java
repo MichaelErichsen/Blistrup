@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 public class IndividBegivenhedView extends Composite {
@@ -31,9 +31,9 @@ public class IndividBegivenhedView extends Composite {
 	/**
 	 * Constructor
 	 *
-	 * @param tabFolder
-	 * @param none
-	 * @param blistrupLokalhistorie
+	 * @param parent
+	 * @param style
+	 * @param blh
 	 */
 	public IndividBegivenhedView(Composite parent, int style, BlistrupLokalhistorie blh) {
 		super(parent, SWT.NONE);
@@ -70,8 +70,8 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnIndividid = tableViewerColumn_1.getColumn();
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnIndividid = tableViewerColumn_1.getColumn();
 		tblclmnIndividid.setWidth(70);
 		tblclmnIndividid.setText("IndividId");
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
@@ -81,8 +81,8 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnAlder = tableViewerColumn_2.getColumn();
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnAlder = tableViewerColumn_2.getColumn();
 		tblclmnAlder.setWidth(70);
 		tblclmnAlder.setText("Alder");
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
@@ -92,8 +92,8 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnType = tableViewerColumn_3.getColumn();
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnType = tableViewerColumn_3.getColumn();
 		tblclmnType.setWidth(100);
 		tblclmnType.setText("Type");
 		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
@@ -103,8 +103,8 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_3a = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnRolle = tableViewerColumn_3a.getColumn();
+		final TableViewerColumn tableViewerColumn_3a = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnRolle = tableViewerColumn_3a.getColumn();
 		tblclmnRolle.setWidth(100);
 		tblclmnRolle.setText("Rolle");
 		tableViewerColumn_3a.setLabelProvider(new ColumnLabelProvider() {
@@ -114,20 +114,20 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_3b = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnDato = tableViewerColumn_3b.getColumn();
+		final TableViewerColumn tableViewerColumn_3b = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnDato = tableViewerColumn_3b.getColumn();
 		tblclmnDato.setWidth(100);
 		tblclmnDato.setText("Dato");
 		tableViewerColumn_3b.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				return formatter.format(((IndividBegivenhedModel) element).getDato());
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnFdt = tableViewerColumn_4.getColumn();
+		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnFdt = tableViewerColumn_4.getColumn();
 		tblclmnFdt.setWidth(100);
 		tblclmnFdt.setText("F\u00F8dt");
 		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
@@ -137,10 +137,10 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnStedNavn = tableViewerColumn_5.getColumn();
+		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnStedNavn = tableViewerColumn_5.getColumn();
 		tblclmnStedNavn.setWidth(100);
-		tblclmnStedNavn.setText("Strednavn");
+		tblclmnStedNavn.setText("Stednavn");
 		tableViewerColumn_5.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -148,8 +148,8 @@ public class IndividBegivenhedView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnNote = tableViewerColumn_6.getColumn();
+		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnNote = tableViewerColumn_6.getColumn();
 		tblclmnNote.setWidth(100);
 		tblclmnNote.setText("Note");
 		tableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
@@ -158,8 +158,8 @@ public class IndividBegivenhedView extends Composite {
 				return ((IndividBegivenhedModel) element).getNote();
 			}
 		});
-		TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnDetaljer = tableViewerColumn_7.getColumn();
+		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnDetaljer = tableViewerColumn_7.getColumn();
 		tblclmnDetaljer.setWidth(100);
 		tblclmnDetaljer.setText("Detaljer");
 		tableViewerColumn_7.setLabelProvider(new ColumnLabelProvider() {
@@ -168,8 +168,8 @@ public class IndividBegivenhedView extends Composite {
 				return ((IndividBegivenhedModel) element).getDetaljer();
 			}
 		});
-		TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnBem = tableViewerColumn_8.getColumn();
+		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnBem = tableViewerColumn_8.getColumn();
 		tblclmnBem.setWidth(100);
 		tblclmnBem.setText("Bemærkninger");
 		tableViewerColumn_8.setLabelProvider(new ColumnLabelProvider() {

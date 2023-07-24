@@ -1,7 +1,5 @@
 package net.myerichsen.blistrup.actions;
 
-import java.sql.SQLException;
-
 import org.eclipse.jface.action.Action;
 
 import net.myerichsen.blistrup.loaders.VielseLoader;
@@ -9,7 +7,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 22. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 class VielseAction extends Action {
@@ -27,11 +25,10 @@ class VielseAction extends Action {
 
 	@Override
 	public void run() {
-		final VielseLoader loader = new VielseLoader();
 		try {
-			final int load = loader.load();
+			final int load = new VielseLoader().load();
 			win.getStatusLineManager().setMessage(load + " vielsesregistreringer er indlæst");
-		} catch (final SQLException e) {
+		} catch (final Exception e) {
 			win.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}

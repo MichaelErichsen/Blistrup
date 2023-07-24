@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 public class KonfirmationLoader {
@@ -31,7 +31,7 @@ public class KonfirmationLoader {
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' AND BEGIV = ? ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
-	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
 	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -88,7 +88,7 @@ public class KonfirmationLoader {
 	 */
 	public int load() throws SQLException {
 		final Connection conn = connect();
-		final List<String> blistrupIdListe = new ArrayList<String>();
+		final List<String> blistrupIdListe = new ArrayList<>();
 		String rolle;
 		PreparedStatement statement2;
 		ResultSet generatedKeys;
@@ -153,6 +153,7 @@ public class KonfirmationLoader {
 				} catch (final Exception e) {
 					statement2.setString(5, "");
 				}
+				statement2.setString(6, afQ(rs1.getString("STD_NAVN")));
 				statement2.executeUpdate();
 
 				taeller++;

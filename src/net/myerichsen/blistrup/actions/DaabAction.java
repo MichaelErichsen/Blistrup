@@ -9,7 +9,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 class DaabAction extends Action {
@@ -27,9 +27,8 @@ class DaabAction extends Action {
 
 	@Override
 	public void run() {
-		final DaabLoader loader = new DaabLoader();
 		try {
-			final int load = loader.load();
+			final int load = new DaabLoader().load();
 			win.getStatusLineManager().setMessage(load + " dåbsregistreringer er indlæst");
 		} catch (final SQLException e) {
 			win.getStatusLineManager().setErrorMessage(e.getMessage());

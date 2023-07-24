@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.actions.AfslutAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 22. jul. 2023
+ * @version 24. jul. 2023
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
@@ -44,12 +44,12 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 
 	private Action loadChristenings;
 	private Action afslut;
+	private Action loadConfirmations;
+	private Action loadMarriages;
 	private TabFolder tabFolder;
 	private IndividView individView;
 	private IndividBegivenhedView individBegivenhedView;
 	private FamilieBegivenhedView familieBegivenhedView;
-	private Action loadConfirmations;
-	private Action loadMarriages;
 
 	/**
 	 * Create the application window.
