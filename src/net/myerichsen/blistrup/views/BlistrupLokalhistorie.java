@@ -93,7 +93,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
-		final Composite container = new Composite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout(1, false));
 
 		final Composite searchComposite = new Composite(container, SWT.NONE);
@@ -102,10 +102,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		final Label lblNewLabel = new Label(searchComposite, SWT.NONE);
 		lblNewLabel.setText("S\u00F8g");
 
-		final Composite tabComposite = new Composite(container, SWT.H_SCROLL);
-		tabComposite.setLayout(new GridLayout(1, false));
-
-		tabFolder = new TabFolder(tabComposite, SWT.NONE);
+		tabFolder = new TabFolder(container, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		final TabItem tbtmPerson = new TabItem(tabFolder, SWT.NONE);

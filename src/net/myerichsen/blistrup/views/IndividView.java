@@ -42,10 +42,12 @@ public class IndividView extends Composite {
 		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		final Label cLabel = new Label(filterComposite, SWT.NONE);
-		cLabel.setText("Filtre: Fornavn");
+		cLabel.setText("Her kommer der filtre");
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		GridData gd_scroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_scroller.heightHint = 539;
+		scroller.setLayoutData(gd_scroller);
 		scroller.setExpandHorizontal(true);
 		scroller.setExpandVertical(true);
 

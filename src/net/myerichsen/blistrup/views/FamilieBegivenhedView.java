@@ -36,7 +36,7 @@ public class FamilieBegivenhedView extends Composite {
 	 * @param blh
 	 */
 	public FamilieBegivenhedView(Composite parent, int style, BlistrupLokalhistorie blh) {
-		super(parent, SWT.NONE);
+		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		setLayout(new GridLayout(1, false));
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
