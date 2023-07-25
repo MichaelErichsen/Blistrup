@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class FamilieBegivenhedView extends Composite {
@@ -36,7 +36,7 @@ public class FamilieBegivenhedView extends Composite {
 	 * @param blh
 	 */
 	public FamilieBegivenhedView(Composite parent, int style, BlistrupLokalhistorie blh) {
-		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);

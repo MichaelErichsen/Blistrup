@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID FETCH FIRST 200 ROWS ONLY";
@@ -42,7 +42,7 @@ public class IndividModel {
 					model.setKoen(rs1.getString("KOEN").trim());
 					model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
 					model.setFamc(rs1.getInt("FAMC"));
-					model.setStdNavn(rs2.getString("STDNAVN"));
+					model.setStdNavn(rs2.getString("STDNAVN").trim());
 					model.setFornavn(rs2.getString("FORNAVN").trim());
 					model.setEfternavn(rs2.getString("EFTERNAVN").trim());
 					model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());

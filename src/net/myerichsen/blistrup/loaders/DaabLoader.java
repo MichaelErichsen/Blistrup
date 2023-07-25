@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Læs dåbsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class DaabLoader {
@@ -214,25 +214,19 @@ public class DaabLoader {
 					generatedKeys.close();
 				} else {
 					if ("far".equals(rolle)) {
+						husfaderId = individId;
+
 						statement2.close();
-						statement2 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
+						statement2 = conn.prepareStatement(INSERT5);
 						statement2.setInt(1, individId);
 						statement2.setString(2, rs1.getString("ROLLE").trim());
 						statement2.setInt(3, individBegivenhedsId);
 						statement2.executeUpdate();
-						generatedKeys.close();
-						generatedKeys = statement2.getGeneratedKeys();
-
-						if (generatedKeys.next()) {
-							husfaderId = generatedKeys.getInt(1);
-						} else {
-							husfaderId = 0;
-						}
-						generatedKeys.close();
 
 						statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
 						statement2.setInt(1, husfaderId);
 						statement2.executeUpdate();
+						generatedKeys.close();
 						generatedKeys = statement2.getGeneratedKeys();
 
 						if (generatedKeys.next()) {
@@ -246,11 +240,8 @@ public class DaabLoader {
 						statement2.setInt(1, familieId);
 						statement2.setInt(2, barnId);
 						statement2.executeUpdate();
-
-						statement2 = conn.prepareStatement(UPDATE1);
-						statement2.setInt(1, familieId);
-						statement2.setInt(2, individId);
 					} else {
+						// "gud" or "f1", "f2, etc.
 						statement2.close();
 						statement2 = conn.prepareStatement(INSERT5);
 						statement2.setInt(1, individId);

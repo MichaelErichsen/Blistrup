@@ -22,7 +22,7 @@ public class VielseLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
 	private static final String DELETE1 = "DELETE FROM INDIVID";
 	private static final String DELETE2 = "DELETE FROM PERSONNAVN";
-	private static final String DELETE3 = "DELETE FROM INDIVIDBEGIVENHED";
+	private static final String DELETE3 = "DELETE FROM FAMILIEBEGIVENHED";
 	private static final String DELETE4 = "DELETE FROM VIDNE";
 	private static final String DELETE5 = "DELETE FROM KILDE";
 	private static final String DELETE6 = "DELETE FROM FAMILIE";
@@ -34,7 +34,7 @@ public class VielseLoader {
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
 	private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
-	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
+	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -95,11 +95,9 @@ public class VielseLoader {
 		int individId = 0;
 		String fornvn = "";
 		String efternvn = "";
-		String dato = "";
-		String mm = "";
-		String dd = "";
+		String aar = "";
 		int kildeId = 0;
-		final int individBegivenhedsId = 0;
+		int familieBegivenhedsId = 0;
 		int familieId = 0;
 		int taeller = 0;
 		StringBuilder sb;
@@ -244,6 +242,33 @@ public class VielseLoader {
 					statement2.setInt(1, faderFamilieId);
 					statement2.setInt(2, faderId);
 
+//					private static final String INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
+//					+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+					statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
+					statement2.setInt(1, familieId);
+					statement2.setString(2, "Vielse");
+
+					try {
+						aar = rs1.getString("AAR").trim();
+						statement2.setString(3, aar + "-01-01");
+					} catch (final Exception e) {
+						statement2.setString(3, "0001-01-01");
+					}
+
+					statement2.setString(4, afQ(rs1.getString("BEGIV")));
+					statement2.setInt(5, kildeId);
+					statement2.setString(6, afQ(rs1.getString("STEDNAVN")));
+					statement2.setString(7, afQ(rs1.getString("BEM")));
+					statement2.executeUpdate();
+					generatedKeys = statement2.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						familieBegivenhedsId = generatedKeys.getInt(1);
+					} else {
+						familieBegivenhedsId = 0;
+					}
+					generatedKeys.close();
 				} else if ("brud".equals(rolle)) {
 					brud = individId;
 
@@ -295,36 +320,13 @@ public class VielseLoader {
 
 				} else {
 					// Forlover
-//					String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
+//					String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 					statement2.close();
 					statement2 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, individId);
 					statement2.setString(2, rs1.getString("ROLLE").trim());
-					statement2.setInt(3, individBegivenhedsId);
+					statement2.setInt(3, familieBegivenhedsId);
 				}
-				statement2.executeUpdate();
-
-//				private static final String INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
-//						+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-				statement2 = conn.prepareStatement(INSERT6);
-				statement2.setInt(1, familieId);
-				statement2.setString(2, "Vielse");
-
-				try {
-					dato = rs1.getString("FQODTDATO").trim();
-					mm = dato.substring(4, 6);
-					dd = dato.substring(6, 8);
-					statement2.setString(3, dato.substring(0, 4) + "-" + ("00".equals(mm) ? "01" : mm) + "-"
-							+ ("00".equals(dd) ? "01" : dd));
-				} catch (final Exception e) {
-					statement2.setString(3, "0001-01-01");
-				}
-
-				statement2.setString(4, afQ(rs1.getString("BEGIV")));
-				statement2.setInt(5, kildeId);
-				statement2.setString(6, afQ(rs1.getString("STEDNAVN")));
-				statement2.setString(7, afQ(rs1.getString("BEM")));
 				statement2.executeUpdate();
 
 			}

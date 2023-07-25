@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class IndividBegivenhedView extends Composite {
@@ -36,7 +36,7 @@ public class IndividBegivenhedView extends Composite {
 	 * @param blh
 	 */
 	public IndividBegivenhedView(Composite parent, int style, BlistrupLokalhistorie blh) {
-		super(parent, SWT.NONE);
+		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);

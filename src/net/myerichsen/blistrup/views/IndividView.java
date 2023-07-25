@@ -20,7 +20,7 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class IndividView extends Composite {
@@ -34,7 +34,7 @@ public class IndividView extends Composite {
 	 * @param style
 	 */
 	public IndividView(Composite parent, int style, BlistrupLokalhistorie blh) {
-		super(parent, SWT.NONE);
+		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);

@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.actions.AfslutAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
@@ -48,6 +48,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	private Action loadMarriages;
 	private TabFolder tabFolder;
 	private IndividView individView;
+	private FamilieView familieView;
 	private IndividBegivenhedView individBegivenhedView;
 	private FamilieBegivenhedView familieBegivenhedView;
 
@@ -110,13 +111,18 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		individView = new IndividView(tabFolder, SWT.NONE, this);
 		tbtmPerson.setControl(individView);
 
+		final TabItem tbtmFamilie = new TabItem(tabFolder, SWT.NONE);
+		tbtmFamilie.setText("&Familie");
+		familieView = new FamilieView(tabFolder, SWT.NONE, this);
+		tbtmFamilie.setControl(familieView);
+
 		final TabItem tbtmIndividualEvent = new TabItem(tabFolder, SWT.NONE);
 		tbtmIndividualEvent.setText("&Individbegivenhed");
 		individBegivenhedView = new IndividBegivenhedView(tabFolder, SWT.NONE, this);
 		tbtmIndividualEvent.setControl(individBegivenhedView);
 
 		final TabItem tbtmFamilieEvent = new TabItem(tabFolder, SWT.NONE);
-		tbtmFamilieEvent.setText("&Familiebegivenhed");
+		tbtmFamilieEvent.setText("F&amiliebegivenhed");
 		familieBegivenhedView = new FamilieBegivenhedView(tabFolder, SWT.NONE, this);
 		tbtmFamilieEvent.setControl(familieBegivenhedView);
 
