@@ -20,12 +20,6 @@ import net.myerichsen.blistrup.util.Fonkod;
  */
 public class DaabLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
-	private static final String DELETE1 = "DELETE FROM INDIVID";
-	private static final String DELETE2 = "DELETE FROM PERSONNAVN";
-	private static final String DELETE3 = "DELETE FROM INDIVIDBEGIVENHED";
-	private static final String DELETE4 = "DELETE FROM VIDNE";
-	private static final String DELETE5 = "DELETE FROM KILDE";
-	private static final String DELETE6 = "DELETE FROM FAMILIE";
 
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' FETCH FIRST 50 ROWS ONLY";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' AND BEGIV = ? ORDER BY PID";
@@ -33,8 +27,8 @@ public class DaabLoader {
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
-	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
@@ -73,12 +67,6 @@ public class DaabLoader {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.execute();
-		conn.prepareStatement(DELETE1).executeUpdate();
-		conn.prepareStatement(DELETE2).executeUpdate();
-		conn.prepareStatement(DELETE3).executeUpdate();
-		conn.prepareStatement(DELETE4).executeUpdate();
-		conn.prepareStatement(DELETE5).executeUpdate();
-		conn.prepareStatement(DELETE6).executeUpdate();
 		return conn;
 	}
 
@@ -89,26 +77,28 @@ public class DaabLoader {
 	public int load() throws SQLException {
 		final Connection conn = connect();
 		final List<String> blistrupIdListe = new ArrayList<>();
-		String rolle;
+		String rolle = "";
 		PreparedStatement statement2;
 		ResultSet generatedKeys;
-		int individId;
+		int individId = 0;
 		String fornvn = "";
 		String efternvn = "";
 		String dato = "";
 		String mm = "";
 		String dd = "";
-		int kildeId;
+		int kildeId = 0;
 		int individBegivenhedsId = 0;
 		int husfaderId;
 		int familieId;
 		int barnId = 0;
 		int taeller = 0;
 		StringBuilder sb;
-		String navn;
-		String fader;
-		String moder;
+		String navn = "";
+		String fader = "";
+		String moder = "";
+		String stdnavn = "";
 
+		// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'A'
 		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		ResultSet rs1 = statement1.executeQuery();
 
@@ -119,6 +109,9 @@ public class DaabLoader {
 		for (final String blistrupId : blistrupIdListe) {
 			sb = new StringBuilder();
 
+			// SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' AND BEGIV = ?
+			// ORDER BY PID";
+
 			statement1 = conn.prepareStatement(SELECT2);
 			statement1.setString(1, blistrupId);
 			rs1 = statement1.executeQuery();
@@ -127,6 +120,8 @@ public class DaabLoader {
 				rolle = rs1.getString("ROLLE").trim();
 				navn = rs1.getString("NAVN").trim();
 				sb.append(rolle + ": " + navn + "\r\n");
+
+				// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 				statement2.setString(1, rs1.getString("SEX").trim());
@@ -141,6 +136,9 @@ public class DaabLoader {
 				}
 				generatedKeys.close();
 
+				// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN,
+				// PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
+
 				statement2 = conn.prepareStatement(INSERT2);
 				statement2.setInt(1, individId);
 				fornvn = afQ(rs1.getString("FORNVN"));
@@ -148,18 +146,23 @@ public class DaabLoader {
 				efternvn = afQ(rs1.getString("EFTERNVN"));
 				statement2.setString(3, efternvn);
 				statement2.setString(4, "TRUE");
+				stdnavn = afQ(rs1.getString("STD_NAVN"));
+
 				try {
-					statement2.setString(5, fonkod.generateKey(fornvn + " " + efternvn).trim());
+					statement2.setString(5, fonkod.generateKey(stdnavn).trim());
 				} catch (final Exception e) {
 					statement2.setString(5, "");
 				}
-				statement2.setString(6, afQ(rs1.getString("STD_NAVN")));
+
+				statement2.setString(6, stdnavn);
 				statement2.executeUpdate();
 
 				taeller++;
 
 				if ("barn".equals(rolle)) {
 					barnId = individId;
+
+					// INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR)
 
 					statement2 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
 					statement2.setString(1, rs1.getString("KBNR").trim());
@@ -177,6 +180,9 @@ public class DaabLoader {
 						kildeId = 0;
 					}
 					generatedKeys.close();
+
+					// INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
+					// NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
 
 					statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, individId);
@@ -203,6 +209,7 @@ public class DaabLoader {
 					statement2.setInt(8, kildeId);
 					statement2.setString(9, afQ(rs1.getString("STEDNAVN")));
 					statement2.setString(10, afQ(rs1.getString("BEM")));
+					statement2.setString(11, rs1.getString("FQODT").trim());
 					statement2.executeUpdate();
 					generatedKeys = statement2.getGeneratedKeys();
 
@@ -216,12 +223,16 @@ public class DaabLoader {
 					if ("far".equals(rolle)) {
 						husfaderId = individId;
 
+						// INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES
+
 						statement2.close();
 						statement2 = conn.prepareStatement(INSERT5);
 						statement2.setInt(1, individId);
 						statement2.setString(2, rs1.getString("ROLLE").trim());
 						statement2.setInt(3, individBegivenhedsId);
 						statement2.executeUpdate();
+
+						// INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 						statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
 						statement2.setInt(1, husfaderId);
@@ -236,12 +247,16 @@ public class DaabLoader {
 						}
 						generatedKeys.close();
 
+						// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+
 						statement2 = conn.prepareStatement(UPDATE1);
 						statement2.setInt(1, familieId);
 						statement2.setInt(2, barnId);
 						statement2.executeUpdate();
 					} else {
 						// "gud" or "f1", "f2, etc.
+						// INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES
+
 						statement2.close();
 						statement2 = conn.prepareStatement(INSERT5);
 						statement2.setInt(1, individId);
@@ -251,6 +266,8 @@ public class DaabLoader {
 					statement2.executeUpdate();
 				}
 			}
+
+			// UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
 
 			statement2 = conn.prepareStatement(UPDATE2);
 			statement2.setString(1, afQ(sb.toString()));

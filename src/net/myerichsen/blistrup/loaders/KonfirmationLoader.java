@@ -15,17 +15,11 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class KonfirmationLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
-	private static final String DELETE1 = "DELETE FROM INDIVID";
-	private static final String DELETE2 = "DELETE FROM PERSONNAVN";
-	private static final String DELETE3 = "DELETE FROM INDIVIDBEGIVENHED";
-	private static final String DELETE4 = "DELETE FROM VIDNE";
-	private static final String DELETE5 = "DELETE FROM KILDE";
-	private static final String DELETE6 = "DELETE FROM FAMILIE";
 
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' FETCH FIRST 50 ROWS ONLY";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' AND BEGIV = ? ORDER BY PID";
@@ -73,12 +67,6 @@ public class KonfirmationLoader {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.execute();
-		conn.prepareStatement(DELETE1).executeUpdate();
-		conn.prepareStatement(DELETE2).executeUpdate();
-		conn.prepareStatement(DELETE3).executeUpdate();
-		conn.prepareStatement(DELETE4).executeUpdate();
-		conn.prepareStatement(DELETE5).executeUpdate();
-		conn.prepareStatement(DELETE6).executeUpdate();
 		return conn;
 	}
 
@@ -89,25 +77,24 @@ public class KonfirmationLoader {
 	public int load() throws SQLException {
 		final Connection conn = connect();
 		final List<String> blistrupIdListe = new ArrayList<>();
-		String rolle;
+		String rolle = "";
 		PreparedStatement statement2;
 		ResultSet generatedKeys;
-		int individId;
-		String fornvn = "";
-		String efternvn = "";
+		int individId = 0;
 		String dato = "";
 		String mm = "";
 		String dd = "";
-		int kildeId;
+		int kildeId = 0;
 		int individBegivenhedsId = 0;
-		int husfaderId;
-		int familieId;
+		int husfaderId = 0;
+		int familieId = 0;
 		int barnId = 0;
 		int taeller = 0;
 		StringBuilder sb;
-		String navn;
-		String fader;
-		String moder;
+		String navn = "";
+		String fader = "";
+		String moder = "";
+		String stdnavn = "";
 
 		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		ResultSet rs1 = statement1.executeQuery();
@@ -143,17 +130,18 @@ public class KonfirmationLoader {
 
 				statement2 = conn.prepareStatement(INSERT2);
 				statement2.setInt(1, individId);
-				fornvn = afQ(rs1.getString("FORNVN"));
-				statement2.setString(2, fornvn);
-				efternvn = afQ(rs1.getString("EFTERNVN"));
-				statement2.setString(3, efternvn);
+				statement2.setString(2, afQ(rs1.getString("FORNVN")));
+				statement2.setString(3, afQ(rs1.getString("EFTERNVN")));
 				statement2.setString(4, "TRUE");
+				stdnavn = afQ(rs1.getString("STD_NAVN"));
+
 				try {
-					statement2.setString(5, fonkod.generateKey(fornvn + " " + efternvn).trim());
+					statement2.setString(5, fonkod.generateKey(stdnavn).trim());
 				} catch (final Exception e) {
 					statement2.setString(5, "");
 				}
-				statement2.setString(6, afQ(rs1.getString("STD_NAVN")));
+
+				statement2.setString(6, stdnavn);
 				statement2.executeUpdate();
 
 				taeller++;

@@ -43,8 +43,6 @@ public class IndividModel {
 					model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
 					model.setFamc(rs1.getInt("FAMC"));
 					model.setStdNavn(rs2.getString("STDNAVN").trim());
-					model.setFornavn(rs2.getString("FORNAVN").trim());
-					model.setEfternavn(rs2.getString("EFTERNAVN").trim());
 					model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());
 					liste.add(model);
 				}
@@ -59,25 +57,19 @@ public class IndividModel {
 		return array;
 	}
 
-	private int id;
-	private int famc;
-	private String koen;
-	private String BlistrupId;
+	private int id = 0;
+	private int famc = 0;
+	private String koen = "";
+	private String BlistrupId = "";
 	private List<PersonNavneModel> personNavneListe;
-	private String fornavn;
-	private String efternavn;
-	private String fonetiskNavn;
-	private String stdNavn;
+	private String fonetiskNavn = "";
+	private String stdNavn = "";
 
 	/**
 	 * @return the blistrupId
 	 */
 	public String getBlistrupId() {
 		return BlistrupId;
-	}
-
-	public String getEfternavn() {
-		return efternavn;
 	}
 
 	/**
@@ -92,10 +84,6 @@ public class IndividModel {
 	 */
 	public String getFonetiskNavn() {
 		return fonetiskNavn;
-	}
-
-	public String getFornavn() {
-		return fornavn;
 	}
 
 	/**
@@ -133,10 +121,6 @@ public class IndividModel {
 		BlistrupId = blistrupId;
 	}
 
-	public void setEfternavn(String efternavn) {
-		this.efternavn = efternavn;
-	}
-
 	/**
 	 * @param i the famc to set
 	 */
@@ -149,10 +133,6 @@ public class IndividModel {
 	 */
 	public void setFonetiskNavn(String fonetiskNavn) {
 		this.fonetiskNavn = fonetiskNavn;
-	}
-
-	public void setFornavn(String fornavn) {
-		this.fornavn = fornavn;
 	}
 
 	/**
@@ -187,9 +167,8 @@ public class IndividModel {
 	public String toString() {
 		return id + ", " + famc + ", " + (koen != null ? koen + ", " : "")
 				+ (BlistrupId != null ? BlistrupId + ", " : "")
-				+ (personNavneListe != null ? personNavneListe + ", " : "") + (fornavn != null ? fornavn + ", " : "")
-				+ (efternavn != null ? efternavn + ", " : "") + (fonetiskNavn != null ? fonetiskNavn + ", " : "")
-				+ (stdNavn != null ? stdNavn : "");
+				+ (personNavneListe != null ? personNavneListe + ", " : "")
+				+ (fonetiskNavn != null ? fonetiskNavn + ", " : "") + (stdNavn != null ? stdNavn + ", " : "");
 	}
 
 }

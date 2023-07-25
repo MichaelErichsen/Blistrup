@@ -9,29 +9,32 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
-class DaabAction extends Action {
-	BlistrupLokalhistorie win;
+public class DaabAction extends Action {
+	/**
+	 * 
+	 */
+	private final BlistrupLokalhistorie blh;
 
 	/**
 	 * Constructor
 	 *
-	 * @param aWin
+	 * @param blh
 	 */
-	public DaabAction(BlistrupLokalhistorie aWin) {
-		super("Daab", AS_PUSH_BUTTON);
-		this.win = aWin;
+	public DaabAction(BlistrupLokalhistorie blh) {
+		super("Dåb", AS_PUSH_BUTTON);
+		this.blh = blh;
 	}
 
 	@Override
 	public void run() {
 		try {
 			final int load = new DaabLoader().load();
-			win.getStatusLineManager().setMessage(load + " dåbsregistreringer er indlæst");
+			blh.getStatusLineManager().setMessage(load + " dåbsregistreringer er indlæst");
 		} catch (final SQLException e) {
-			win.getStatusLineManager().setErrorMessage(e.getMessage());
+			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
 	}

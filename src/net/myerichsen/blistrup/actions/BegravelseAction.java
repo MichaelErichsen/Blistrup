@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import org.eclipse.jface.action.Action;
 
-import net.myerichsen.blistrup.loaders.KonfirmationLoader;
+import net.myerichsen.blistrup.loaders.BegravelseLoader;
 import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
  * @version 25. jul. 2023
  *
  */
-public class KonfirmationAction extends Action {
+public class BegravelseAction extends Action {
 
 	private final BlistrupLokalhistorie blistrupLokalhistorie;
 
@@ -21,20 +21,19 @@ public class KonfirmationAction extends Action {
 	 *
 	 * @param blistrupLokalhistorie
 	 */
-	public KonfirmationAction(BlistrupLokalhistorie blistrupLokalhistorie) {
-		super("Konfirmation", AS_PUSH_BUTTON);
+	public BegravelseAction(BlistrupLokalhistorie blistrupLokalhistorie) {
+		super("Begravelser", AS_PUSH_BUTTON);
 		this.blistrupLokalhistorie = blistrupLokalhistorie;
 	}
 
 	@Override
 	public void run() {
 		try {
-			final int load = new KonfirmationLoader().load();
-			blistrupLokalhistorie.getStatusLineManager().setMessage(load + " konfirmationsregistreringer er indlæst");
+			final int load = new BegravelseLoader().load();
+			blistrupLokalhistorie.getStatusLineManager().setMessage(load + " begravelser er indlæst");
 		} catch (final SQLException e) {
 			blistrupLokalhistorie.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
 	}
-
 }

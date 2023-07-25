@@ -44,7 +44,7 @@ public class IndividBegivenhedView extends Composite {
 		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		final Label cLabel = new Label(filterComposite, SWT.NONE);
-		cLabel.setText("Filtre: Fornavn");
+		cLabel.setText("Her kommer der filtre");
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -77,7 +77,18 @@ public class IndividBegivenhedView extends Composite {
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((IndividBegivenhedModel) element).getId());
+				return Integer.toString(((IndividBegivenhedModel) element).getIndividId());
+			}
+		});
+
+		final TableViewerColumn tableViewerColumn_1a = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnIndividNavn = tableViewerColumn_1a.getColumn();
+		tblclmnIndividNavn.setWidth(200);
+		tblclmnIndividNavn.setText("Navn");
+		tableViewerColumn_1a.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((IndividBegivenhedModel) element).getStdNavn();
 			}
 		});
 

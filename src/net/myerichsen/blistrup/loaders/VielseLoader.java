@@ -15,17 +15,11 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class VielseLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
-	private static final String DELETE1 = "DELETE FROM INDIVID";
-	private static final String DELETE2 = "DELETE FROM PERSONNAVN";
-	private static final String DELETE3 = "DELETE FROM FAMILIEBEGIVENHED";
-	private static final String DELETE4 = "DELETE FROM VIDNE";
-	private static final String DELETE5 = "DELETE FROM KILDE";
-	private static final String DELETE6 = "DELETE FROM FAMILIE";
 
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' FETCH FIRST 100 ROWS ONLY";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
@@ -73,12 +67,6 @@ public class VielseLoader {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.execute();
-		conn.prepareStatement(DELETE1).executeUpdate();
-		conn.prepareStatement(DELETE2).executeUpdate();
-		conn.prepareStatement(DELETE3).executeUpdate();
-		conn.prepareStatement(DELETE4).executeUpdate();
-		conn.prepareStatement(DELETE5).executeUpdate();
-		conn.prepareStatement(DELETE6).executeUpdate();
 		return conn;
 	}
 
@@ -93,8 +81,6 @@ public class VielseLoader {
 		PreparedStatement statement2 = null;
 		ResultSet generatedKeys = null;
 		int individId = 0;
-		String fornvn = "";
-		String efternvn = "";
 		String aar = "";
 		int kildeId = 0;
 		int familieBegivenhedsId = 0;
@@ -107,10 +93,11 @@ public class VielseLoader {
 		int brud = 0;
 		int faderId = 0;
 		int faderFamilieId = 0;
+		String stdnavn = "";
 
 		final Connection conn = connect();
 
-//		private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' FETCH FIRST 50 ROWS ONLY";
+// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' FETCH FIRST 50 ROWS ONLY";
 
 		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		ResultSet rs1 = statement1.executeQuery();
@@ -119,7 +106,7 @@ public class VielseLoader {
 			blistrupIdListe.add(rs1.getString("BEGIV"));
 		}
 
-//		private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
+// SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
 
 		for (final String blistrupId : blistrupIdListe) {
 			sb = new StringBuilder();
@@ -128,7 +115,7 @@ public class VielseLoader {
 			statement1.setString(1, blistrupId);
 			rs1 = statement1.executeQuery();
 
-//			private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 			while (rs1.next()) {
 				rolle = rs1.getString("ROLLE").trim();
@@ -149,21 +136,22 @@ public class VielseLoader {
 				}
 				generatedKeys.close();
 
-//				private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
+// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
 
 				statement2 = conn.prepareStatement(INSERT2);
 				statement2.setInt(1, individId);
-				fornvn = afQ(rs1.getString("FORNVN"));
-				statement2.setString(2, fornvn);
-				efternvn = afQ(rs1.getString("EFTERNVN"));
-				statement2.setString(3, efternvn);
+				statement2.setString(2, afQ(rs1.getString("FORNVN")));
+				statement2.setString(3, afQ(rs1.getString("EFTERNVN")));
 				statement2.setString(4, "TRUE");
+				stdnavn = afQ(rs1.getString("STD_NAVN"));
+
 				try {
-					statement2.setString(5, fonkod.generateKey(fornvn + " " + efternvn).trim());
+					statement2.setString(5, fonkod.generateKey(stdnavn).trim());
 				} catch (final Exception e) {
 					statement2.setString(5, "");
 				}
-				statement2.setString(6, afQ(rs1.getString("STD_NAVN")));
+
+				statement2.setString(6, stdnavn);
 				statement2.executeUpdate();
 				statement2.close();
 
@@ -172,7 +160,7 @@ public class VielseLoader {
 				if ("gom".equals(rolle)) {
 					gom = individId;
 
-//					private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
+// INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
 
 					statement2 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
 					statement2.setString(1, rs1.getString("KBNR").trim());
@@ -191,7 +179,7 @@ public class VielseLoader {
 					}
 					generatedKeys.close();
 
-//					private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+// INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 					statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, gom);
@@ -206,7 +194,7 @@ public class VielseLoader {
 					generatedKeys.close();
 
 					if (fader != null && !fader.isBlank()) {
-//						private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 						statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 						statement2.setString(1, rs1.getString("SEX").trim());
@@ -221,7 +209,7 @@ public class VielseLoader {
 						}
 						generatedKeys.close();
 
-//						private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+// INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 						statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 						statement2.setInt(1, faderId);
@@ -236,14 +224,13 @@ public class VielseLoader {
 						generatedKeys.close();
 					}
 
-//					private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
 					statement2 = conn.prepareStatement(UPDATE1);
 					statement2.setInt(1, faderFamilieId);
 					statement2.setInt(2, faderId);
 
-//					private static final String INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
-//					+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+// INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
 
 					statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, familieId);
@@ -272,7 +259,7 @@ public class VielseLoader {
 				} else if ("brud".equals(rolle)) {
 					brud = individId;
 
-//					String UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
+// UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
 
 					statement2.close();
 					statement2 = conn.prepareStatement(UPDATE2);
@@ -281,7 +268,7 @@ public class VielseLoader {
 					statement2.executeUpdate();
 
 					if (fader != null && !fader.isBlank()) {
-//						private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 						statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 						statement2.setString(1, rs1.getString("SEX").trim());
@@ -297,7 +284,7 @@ public class VielseLoader {
 						}
 						generatedKeys.close();
 
-//						private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+// INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 						statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 						statement2.setInt(1, faderId);
@@ -312,7 +299,7 @@ public class VielseLoader {
 						generatedKeys.close();
 					}
 
-//					private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
 					statement2 = conn.prepareStatement(UPDATE1);
 					statement2.setInt(1, faderFamilieId);
@@ -320,7 +307,7 @@ public class VielseLoader {
 
 				} else {
 					// Forlover
-//					String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
+// INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 					statement2.close();
 					statement2 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, individId);

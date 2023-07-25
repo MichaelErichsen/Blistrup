@@ -11,11 +11,12 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class IndividBegivenhedModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED FETCH FIRST 200 ROWS ONLY";
+	private static final String SELECT2 = "SELECT STDNAVN FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 
 	/**
 	 * @param dbPath
@@ -26,33 +27,45 @@ public class IndividBegivenhedModel {
 		IndividBegivenhedModel model;
 		final List<IndividBegivenhedModel> liste = new ArrayList<>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		final PreparedStatement statement = conn.prepareStatement(SELECT1);
-		final ResultSet rs = statement.executeQuery();
+		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
+		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
+		final ResultSet rs1 = statement1.executeQuery();
+		ResultSet rs2;
+		int individId;
 
-		while (rs.next()) {
+		while (rs1.next()) {
 			model = new IndividBegivenhedModel();
-			model.setId(rs.getInt("ID"));
-			model.setIndividId(rs.getInt("INDIVIDID"));
-			model.setAlder(rs.getInt("ALDER"));
-			model.setKildeId(rs.getInt("KILDEID"));
-			model.setBegType(rs.getString("BEGTYPE").trim());
-			if (rs.getString("UNDERTYPE") != null) {
-				model.setUnderType(rs.getString("UNDERTYPE").trim());
+			model.setId(rs1.getInt("ID"));
+			individId = rs1.getInt("INDIVIDID");
+			model.setIndividId(individId);
+			model.setAlder(rs1.getInt("ALDER"));
+			model.setKildeId(rs1.getInt("KILDEID"));
+			model.setBegType(rs1.getString("BEGTYPE").trim());
+			if (rs1.getString("UNDERTYPE") != null) {
+				model.setUnderType(rs1.getString("UNDERTYPE").trim());
 			} else {
 				model.setUnderType("");
 			}
-			model.setDato(rs.getDate("DATO"));
-			model.setNote(rs.getString("NOTE").trim());
-			model.setDetaljer(rs.getString("DETALJER").trim());
-			model.setBlistrupId(rs.getString("BLISTRUPID").trim());
-			model.setRolle(rs.getString("ROLLE").trim());
-			if (rs.getString("FOEDT") != null) {
-				model.setFoedt(rs.getString("FOEDT").trim());
+			model.setDato(rs1.getDate("DATO"));
+			model.setNote(rs1.getString("NOTE").trim());
+			model.setDetaljer(rs1.getString("DETALJER").trim());
+			model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
+			model.setRolle(rs1.getString("ROLLE").trim());
+			if (rs1.getString("FOEDT") != null) {
+				model.setFoedt(rs1.getString("FOEDT").trim());
 			} else {
 				model.setFoedt("");
 			}
-			model.setStedNavn(rs.getString("STEDNAVN").trim());
-			model.setBem(rs.getString("BEM").trim());
+			model.setStedNavn(rs1.getString("STEDNAVN").trim());
+			model.setBem(rs1.getString("BEM").trim());
+
+			statement2.setInt(1, individId);
+			rs2 = statement2.executeQuery();
+
+			if (rs2.next()) {
+				model.setStdNavn(rs2.getString("STDNAVN").trim());
+			}
+
 			liste.add(model);
 		}
 
@@ -67,6 +80,7 @@ public class IndividBegivenhedModel {
 
 	private int id;
 	private int individId;
+	private String stdNavn;
 	private int alder;
 	private int kildeId;
 	private String begType;
@@ -162,6 +176,13 @@ public class IndividBegivenhedModel {
 	 */
 	public String getRolle() {
 		return rolle;
+	}
+
+	/**
+	 * @return the stdNavn
+	 */
+	public String getStdNavn() {
+		return stdNavn;
 	}
 
 	/**
@@ -263,6 +284,13 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
+	 * @param stdNavn the stdNavn to set
+	 */
+	public void setStdNavn(String stdNavn) {
+		this.stdNavn = stdNavn;
+	}
+
+	/**
 	 * @param stedNavn the stedNavn to set
 	 */
 	public void setStedNavn(String stedNavn) {
@@ -278,12 +306,12 @@ public class IndividBegivenhedModel {
 
 	@Override
 	public String toString() {
-		return id + ", " + individId + ", " + alder + ", " + kildeId + ", " + (begType != null ? begType + ", " : "")
-				+ (underType != null ? underType + ", " : "") + (dato != null ? dato + ", " : "")
-				+ (note != null ? note + ", " : "") + (detaljer != null ? detaljer + ", " : "")
-				+ (blistrupId != null ? blistrupId + ", " : "") + (rolle != null ? rolle + ", " : "")
-				+ (foedt != null ? foedt + ", " : "") + (stedNavn != null ? stedNavn + ", " : "")
-				+ (bem != null ? bem : "");
+		return id + ", " + individId + ", " + (stdNavn != null ? stdNavn + ", " : "") + alder + ", " + kildeId + ", "
+				+ (begType != null ? begType + ", " : "") + (underType != null ? underType + ", " : "")
+				+ (dato != null ? dato + ", " : "") + (note != null ? note + ", " : "")
+				+ (detaljer != null ? detaljer + ", " : "") + (blistrupId != null ? blistrupId + ", " : "")
+				+ (rolle != null ? rolle + ", " : "") + (foedt != null ? foedt + ", " : "")
+				+ (stedNavn != null ? stedNavn + ", " : "") + (bem != null ? bem : "");
 	}
 
 }

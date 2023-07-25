@@ -17,6 +17,10 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import net.myerichsen.blistrup.actions.AfslutAction;
+import net.myerichsen.blistrup.actions.BegravelseAction;
+import net.myerichsen.blistrup.actions.DaabAction;
+import net.myerichsen.blistrup.actions.KonfirmationAction;
+import net.myerichsen.blistrup.actions.VielseAction;
 
 /**
  * Hovedvindue for Blistrup Lokalhistorie programmet
@@ -42,10 +46,10 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		}
 	}
 
-	private Action loadChristenings;
 	private Action afslut;
 	private Action loadConfirmations;
 	private Action loadMarriages;
+	private Action loadBurials;
 	private TabFolder tabFolder;
 	private IndividView individView;
 	private FamilieView familieView;
@@ -79,12 +83,6 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	private void createActions() {
 		// Create the actions
 		afslut = new AfslutAction(this);
-		loadChristenings = new Action("D\u00E5b") {
-		};
-		loadConfirmations = new Action("Konfimationer") {
-		};
-		loadMarriages = new Action("Vielser") {
-		};
 	}
 
 	/**
@@ -136,18 +134,21 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	 */
 	@Override
 	protected MenuManager createMenuManager() {
-		final MenuManager menuManager = new MenuManager();
+		final MenuManager mainMenu = new MenuManager();
 		final MenuManager fileMenu = new MenuManager("&Filer");
-		menuManager.add(fileMenu);
+		final MenuManager loadMenu = new MenuManager("&Indl\u00E6s");
+
 		fileMenu.add(afslut);
 
-		final MenuManager loadMenu = new MenuManager("&Indl\u00E6s");
-		menuManager.add(loadMenu);
-		loadMenu.add(loadChristenings);
-		loadMenu.add(loadConfirmations);
-		loadMenu.add(loadMarriages);
+		loadMenu.add(new DaabAction(this));
+		loadMenu.add(new KonfirmationAction(this));
+		loadMenu.add(new VielseAction(this));
+		loadMenu.add(new BegravelseAction(this));
 
-		return menuManager;
+		mainMenu.add(fileMenu);
+		mainMenu.add(loadMenu);
+
+		return mainMenu;
 	}
 
 	/**

@@ -7,30 +7,32 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 25. jul. 2023
  *
  */
-class VielseAction extends Action {
-	BlistrupLokalhistorie win;
+public class VielseAction extends Action {
+
+	private final BlistrupLokalhistorie blistrupLokalhistorie;
 
 	/**
 	 * Constructor
 	 *
-	 * @param aWin
+	 * @param blistrupLokalhistorie
 	 */
-	public VielseAction(BlistrupLokalhistorie aWin) {
+	public VielseAction(BlistrupLokalhistorie blistrupLokalhistorie) {
 		super("Vielse", AS_PUSH_BUTTON);
-		this.win = aWin;
+		this.blistrupLokalhistorie = blistrupLokalhistorie;
 	}
 
 	@Override
 	public void run() {
 		try {
 			final int load = new VielseLoader().load();
-			win.getStatusLineManager().setMessage(load + " vielsesregistreringer er indlæst");
+			blistrupLokalhistorie.getStatusLineManager().setMessage(load + " vielsesregistreringer er indlæst");
 		} catch (final Exception e) {
-			win.getStatusLineManager().setErrorMessage(e.getMessage());
+			blistrupLokalhistorie.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
 	}
+
 }

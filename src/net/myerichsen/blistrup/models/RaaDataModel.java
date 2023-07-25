@@ -10,17 +10,12 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 22. jul. 2023
+ * @version 25. jul. 2023
  *
  */
 public class RaaDataModel {
-	private static final String SELECTALL = "SELECT * FROM BLISTRUP.F9PERSONFAMILIEQ ORDER BY BEGIV, PID FETCH FIRST 30 ROWS ONLY";
 	private static final String SELECTTYP = "SELECT * FROM BLISTRUP.F9PERSONFAMILIEQ "
-			+ "WHERE TYPE = 'C' AND AAR > '1860' ORDER BY BEGIV, PID FETCH FIRST 10 ROWS ONLY";
-	private static final String SELECTBEG = "SELECT * FROM BLISTRUP.F9PERSONFAMILIEQ "
-			+ "WHERE BEGIV = ? ORDER BY BEGIV, PID FETCH FIRST 10 ROWS ONLY";
-	private static final String SELECTIND = "SELECT * FROM BLISTRUP.F9PERSONFAMILIEQ "
-			+ "WHERE PID = ? ORDER BY BEGIV, PID FETCH FIRST 10 ROWS ONLY";
+			+ "WHERE TYPE = 'D' ORDER BY BEGIV, PID FETCH FIRST 10 ROWS ONLY";
 
 	/**
 	 * @param args
