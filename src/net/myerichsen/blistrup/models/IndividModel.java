@@ -112,8 +112,14 @@ public class IndividModel {
 	private String noter = "";
 	private Date foedt;
 	private Date doebt;
+
 	private Date doed;
+
 	private Date begravet;
+
+	private String fam = "";
+
+	private String slgt = "";
 
 	/**
 	 * @return the begivenheder
@@ -148,6 +154,13 @@ public class IndividModel {
 	 */
 	public Date getDoed() {
 		return doed;
+	}
+
+	/**
+	 * @return the fam
+	 */
+	public String getFam() {
+		return fam;
 	}
 
 	/**
@@ -207,6 +220,13 @@ public class IndividModel {
 	}
 
 	/**
+	 * @return the slgt
+	 */
+	public String getSlgt() {
+		return slgt;
+	}
+
+	/**
 	 * @return the spouseNames
 	 */
 	public List<String> getSpouseNames() {
@@ -253,6 +273,13 @@ public class IndividModel {
 	 */
 	public void setDoed(Date doed) {
 		this.doed = doed;
+	}
+
+	/**
+	 * @param fam the fam to set
+	 */
+	public void setFam(String fam) {
+		this.fam = fam;
 	}
 
 	/**
@@ -309,6 +336,13 @@ public class IndividModel {
 	 */
 	public void setPersonNavneListe(List<PersonNavneModel> personNavneListe) {
 		this.personNavneListe = personNavneListe;
+	}
+
+	/**
+	 * @param slgt the slgt to set
+	 */
+	public void setSlgt(String slgt) {
+		this.slgt = slgt;
 	}
 
 	/**
@@ -397,6 +431,14 @@ public class IndividModel {
 		}
 		if (begravet != null) {
 			builder.append(begravet);
+			builder.append(", ");
+		}
+		if (fam != null) {
+			builder.append(fam);
+			builder.append(", ");
+		}
+		if (slgt != null) {
+			builder.append(slgt);
 		}
 		return builder.toString();
 	}

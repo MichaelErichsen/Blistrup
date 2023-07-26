@@ -47,14 +47,22 @@ public class IndividBegivenhedModel {
 				model.setUnderType("");
 			}
 			model.setDato(rs1.getDate("DATO"));
-			model.setNote(rs1.getString("NOTE").trim());
+			if (rs1.getString("NOTE") != null) {
+				model.setNote(dbPath);
+			} else {
+				model.setNote("");
+			}
 			if (rs1.getString("DETALJER") != null) {
 				model.setDetaljer(rs1.getString("DETALJER").trim());
 			} else {
 				model.setDetaljer("");
 			}
 			model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
-			model.setRolle(rs1.getString("ROLLE").trim());
+			if (rs1.getString("ROLLE") != null) {
+				model.setRolle(rs1.getString("ROLLE").trim());
+			} else {
+				model.setRolle("");
+			}
 			if (rs1.getString("FOEDT") != null) {
 				model.setFoedt(rs1.getString("FOEDT").trim());
 			} else {

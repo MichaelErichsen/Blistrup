@@ -23,6 +23,7 @@ import net.myerichsen.blistrup.actions.AfslutAction;
 import net.myerichsen.blistrup.actions.BegravelseAction;
 import net.myerichsen.blistrup.actions.DaabAction;
 import net.myerichsen.blistrup.actions.KonfirmationAction;
+import net.myerichsen.blistrup.actions.OederAction;
 import net.myerichsen.blistrup.actions.TabelRydningAction;
 import net.myerichsen.blistrup.actions.VielseAction;
 
@@ -34,6 +35,8 @@ import net.myerichsen.blistrup.actions.VielseAction;
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
+	private static final String dbPath = "C:\\Users\\michael\\BlistrupDB";
+
 	/**
 	 * Launch the application.
 	 *
@@ -145,6 +148,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		loadMenu.add(new KonfirmationAction(this));
 		loadMenu.add(new VielseAction(this));
 		loadMenu.add(new BegravelseAction(this));
+		loadMenu.add(new OederAction(this));
 		loadMenu.add(new Separator());
 		loadMenu.add(new TabelRydningAction(this));
 
@@ -183,7 +187,6 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	 */
 	public void refresh() {
 		try {
-			final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 			individView.refresh(dbPath);
 			familieView.refresh(dbPath);
 			individBegivenhedView.refresh(dbPath);
