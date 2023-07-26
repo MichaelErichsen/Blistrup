@@ -1,21 +1,24 @@
 package net.myerichsen.blistrup.models;
 
 /**
+ * Personnavne
+ * 
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class PersonNavneModel {
-	private int id;
-	private String individId;
-	private String prefix;
-	private String fornavn;
-	private String kaelenavn;
-	private String efternavnePrefix;
-	private String efternavn;
-	private String suffix;
+	private int id = 0;
+	private String individId = "";
+	private String prefix = "";
+	private String fornavn = "";
+	private String kaelenavn = "";
+	private String efternavnePrefix = "";
+	private String efternavn = "";
+	private String suffix = "";
 	private boolean primaerNavn = false;
-	private String fonetiskNavn;
+	private String fonetiskNavn = "";
+	private String noter = "";
 
 	/**
 	 * @return the efternavn
@@ -46,12 +49,26 @@ public class PersonNavneModel {
 		return fornavn;
 	}
 
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
 	public String getIndividId() {
 		return individId;
 	}
 
 	public String getKaelenavn() {
 		return kaelenavn;
+	}
+
+	/**
+	 * @return the noter
+	 */
+	public String getNoter() {
+		return noter;
 	}
 
 	public String getPrefix() {
@@ -104,6 +121,13 @@ public class PersonNavneModel {
 		this.kaelenavn = kaelenavn;
 	}
 
+	/**
+	 * @param noter the noter to set
+	 */
+	public void setNoter(String noter) {
+		this.noter = noter;
+	}
+
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
 	}
@@ -118,13 +142,10 @@ public class PersonNavneModel {
 
 	@Override
 	public String toString() {
-		return "PersonNavneModel [id=" + id + ", " + (individId != null ? "individId=" + individId + ", " : "")
-				+ (prefix != null ? "prefix=" + prefix + ", " : "")
-				+ (fornavn != null ? "fornavn=" + fornavn + ", " : "")
-				+ (kaelenavn != null ? "kaelenavn=" + kaelenavn + ", " : "")
-				+ (efternavnePrefix != null ? "efternavnePrefix=" + efternavnePrefix + ", " : "")
-				+ (efternavn != null ? "efternavn=" + efternavn + ", " : "")
-				+ (suffix != null ? "suffix=" + suffix + ", " : "") + "primaerNavn=" + primaerNavn + ", "
-				+ (fonetiskNavn != null ? "fonetiskNavn=" + fonetiskNavn : "") + "]";
+		return id + ", " + (individId != null ? individId + ", " : "") + (prefix != null ? prefix + ", " : "")
+				+ (fornavn != null ? fornavn + ", " : "") + (kaelenavn != null ? kaelenavn + ", " : "")
+				+ (efternavnePrefix != null ? efternavnePrefix + ", " : "")
+				+ (efternavn != null ? efternavn + ", " : "") + (suffix != null ? suffix + ", " : "") + primaerNavn
+				+ ", " + (fonetiskNavn != null ? fonetiskNavn + ", " : "") + (noter != null ? noter : "");
 	}
 }

@@ -14,29 +14,6 @@ import net.myerichsen.blistrup.util.Fonkod;
 /**
  * Indlæs begravelser
  * 
- * SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'D';
- * 
- * For hver BEGIV
- * 
- * SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' AND BEGIV = ?
- * ORDER BY PID";
- * 
- * For hver PID heri
- * 
- * INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
- * 
- * INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN,
- * PRIMAERNAVN)
- * 
- * Hvis rolle er død, er det primærpersonen
- * 
- * INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR)
- * 
- * INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
- * NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM),
- * 
- * hvor BEGTYPE er Begravelse
- * 
  * @author Michael Erichsen
  * @version 25. jul. 2023
  *

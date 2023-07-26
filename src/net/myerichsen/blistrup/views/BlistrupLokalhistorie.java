@@ -47,9 +47,6 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	}
 
 	private Action afslut;
-	private Action loadConfirmations;
-	private Action loadMarriages;
-	private Action loadBurials;
 	private TabFolder tabFolder;
 	private IndividView individView;
 	private FamilieView familieView;

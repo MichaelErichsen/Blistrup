@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class FamilieModel {
@@ -28,28 +28,28 @@ public class FamilieModel {
 		final ResultSet rs1 = statement1.executeQuery();
 		ResultSet rs2;
 		ResultSet rs3;
-		int familieId;
-		int husFaderId;
-		int husModerId;
-		int barnId;
+		int familieId = 0;
+		int husFaderId = 0;
+		int husModerId = 0;
+		int barnId = 0;
 		IndividModel individModel;
-		List<IndividModel> boern;
+		final List<IndividModel> boern = new ArrayList<>();
 
 		while (rs1.next()) {
 			model = new FamilieModel();
 			familieId = rs1.getInt("ID");
 			model.setId(familieId);
 			husFaderId = rs1.getInt("HUSFADER");
-			model.setHusFader(husFaderId);
+			model.setFader(husFaderId);
 			husModerId = rs1.getInt("HUSMODER");
-			model.setHusModer(husModerId);
+			model.setModer(husModerId);
 
 			// Husfaders navn
 			statement2.setInt(1, husFaderId);
 			rs2 = statement2.executeQuery();
 
 			if (rs2.next()) {
-				model.setHusFaderNavn(rs2.getString("STDNAVN").trim());
+				model.setFaderNavn(rs2.getString("STDNAVN").trim());
 			}
 
 			// Husmoders navn
@@ -57,11 +57,11 @@ public class FamilieModel {
 			rs2 = statement2.executeQuery();
 
 			if (rs2.next()) {
-				model.setHusModerNavn(rs2.getString("STDNAVN").trim());
+				model.setModerNavn(rs2.getString("STDNAVN").trim());
 			}
 
 			// Børn
-			boern = new ArrayList<>();
+			boern.clear();
 
 			statement3.setInt(1, familieId);
 			rs3 = statement3.executeQuery();
@@ -114,11 +114,20 @@ public class FamilieModel {
 	}
 
 	private int id = 0;
-	private int husFader = 0;
-	private int husModer = 0;
-	private String husFaderNavn = "";
-	private String husModerNavn = "";
+	private int fader = 0;
+	private int moder = 0;
+	private String faderNavn = "";
+	private String moderNavn = "";
 	private List<IndividModel> boern = new ArrayList<>();
+	private List<FamilieBegivenhedModel> begivenheder = new ArrayList<>();
+	private String noter = "";
+
+	/**
+	 * @return the begivenheder
+	 */
+	public List<FamilieBegivenhedModel> getBegivenheder() {
+		return begivenheder;
+	}
 
 	/**
 	 * @return the boern
@@ -128,31 +137,17 @@ public class FamilieModel {
 	}
 
 	/**
-	 * @return the husFader
+	 * @return the fader
 	 */
-	public int getHusFader() {
-		return husFader;
+	public int getFader() {
+		return fader;
 	}
 
 	/**
-	 * @return the husFaderNavn
+	 * @return the faderNavn
 	 */
-	public String getHusFaderNavn() {
-		return husFaderNavn;
-	}
-
-	/**
-	 * @return the husModer
-	 */
-	public int getHusModer() {
-		return husModer;
-	}
-
-	/**
-	 * @return the husModerNavn
-	 */
-	public String getHusModerNavn() {
-		return husModerNavn;
+	public String getFaderNavn() {
+		return faderNavn;
 	}
 
 	/**
@@ -163,6 +158,34 @@ public class FamilieModel {
 	}
 
 	/**
+	 * @return the moder
+	 */
+	public int getModer() {
+		return moder;
+	}
+
+	/**
+	 * @return the moderNavn
+	 */
+	public String getModerNavn() {
+		return moderNavn;
+	}
+
+	/**
+	 * @return the noter
+	 */
+	public String getNoter() {
+		return noter;
+	}
+
+	/**
+	 * @param begivenheder the begivenheder to set
+	 */
+	public void setBegivenheder(List<FamilieBegivenhedModel> begivenheder) {
+		this.begivenheder = begivenheder;
+	}
+
+	/**
 	 * @param boern the boern to set
 	 */
 	public void setBoern(List<IndividModel> boern) {
@@ -170,31 +193,17 @@ public class FamilieModel {
 	}
 
 	/**
-	 * @param husFader the husFader to set
+	 * @param fader the fader to set
 	 */
-	public void setHusFader(int husFader) {
-		this.husFader = husFader;
+	public void setFader(int fader) {
+		this.fader = fader;
 	}
 
 	/**
-	 * @param husFaderNavn the husFaderNavn to set
+	 * @param faderNavn the faderNavn to set
 	 */
-	public void setHusFaderNavn(String husFaderNavn) {
-		this.husFaderNavn = husFaderNavn;
-	}
-
-	/**
-	 * @param husModer the husModer to set
-	 */
-	public void setHusModer(int husModer) {
-		this.husModer = husModer;
-	}
-
-	/**
-	 * @param husModerNavn the husModerNavn to set
-	 */
-	public void setHusModerNavn(String husModerNavn) {
-		this.husModerNavn = husModerNavn;
+	public void setFaderNavn(String faderNavn) {
+		this.faderNavn = faderNavn;
 	}
 
 	/**
@@ -204,30 +213,65 @@ public class FamilieModel {
 		this.id = id;
 	}
 
+	/**
+	 * @param moder the moder to set
+	 */
+	public void setModer(int moder) {
+		this.moder = moder;
+	}
+
+	/**
+	 * @param moderNavn the moderNavn to set
+	 */
+	public void setModerNavn(String moderNavn) {
+		this.moderNavn = moderNavn;
+	}
+
+	/**
+	 * @param noter the noter to set
+	 */
+	public void setNoter(String noter) {
+		this.noter = noter;
+	}
+
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append(id);
+		builder.append(", \r\n");
+		builder.append(fader);
 		builder.append(", ");
-		builder.append(husFader);
-		builder.append(", ");
-		builder.append(husModer);
-		builder.append(", ");
-		if (husFaderNavn != null) {
-			builder.append(husFaderNavn);
+		if (faderNavn != null) {
+			builder.append(faderNavn);
 			builder.append(", ");
 		}
-		if (husModerNavn != null) {
-			builder.append(husModerNavn);
+		builder.append("\r\n" + moder);
+		builder.append(", ");
+		if (moderNavn != null) {
+			builder.append(moderNavn);
 			builder.append(", ");
 		}
-		if (boern != null)
+		if (boern.size() > 0) {
 			builder.append("\r\nBørn:\r\n");
 
-		for (IndividModel individModel : boern) {
-			builder.append(individModel.getId() + ", " + individModel.getStdNavn());
+			for (final IndividModel barn : boern) {
+				builder.append(barn.toString());
+				builder.append(", ");
+			}
+
 		}
-		builder.append(boern);
+		if (begivenheder.size() > 0) {
+			builder.append("\r\nBegivenheder:\r\n");
+
+			for (final FamilieBegivenhedModel begivenhed : begivenheder) {
+				builder.append(begivenhed.toString());
+				builder.append(", ");
+			}
+
+		}
+		if (noter != null) {
+			builder.append(noter);
+		}
 		return builder.toString();
 	}
 

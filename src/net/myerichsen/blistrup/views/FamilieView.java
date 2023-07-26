@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.FamilieModel;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class FamilieView extends Composite {
@@ -81,7 +81,7 @@ public class FamilieView extends Composite {
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((FamilieModel) element).getHusFader());
+				return Integer.toString(((FamilieModel) element).getFader());
 			}
 		});
 
@@ -92,7 +92,7 @@ public class FamilieView extends Composite {
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((FamilieModel) element).getHusFaderNavn();
+				return ((FamilieModel) element).getFaderNavn();
 			}
 		});
 
@@ -103,7 +103,7 @@ public class FamilieView extends Composite {
 		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((FamilieModel) element).getHusModer());
+				return Integer.toString(((FamilieModel) element).getModer());
 			}
 		});
 
@@ -114,7 +114,7 @@ public class FamilieView extends Composite {
 		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((FamilieModel) element).getHusModerNavn();
+				return ((FamilieModel) element).getModerNavn();
 			}
 		});
 

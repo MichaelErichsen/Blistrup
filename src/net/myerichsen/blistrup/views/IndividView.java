@@ -1,6 +1,9 @@
 package net.myerichsen.blistrup.views;
 
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -20,12 +23,13 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class IndividView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
+	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
 	/**
 	 * Constructor
@@ -45,7 +49,7 @@ public class IndividView extends Composite {
 		cLabel.setText("Her kommer der filtre");
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		GridData gd_scroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		final GridData gd_scroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_scroller.heightHint = 539;
 		scroller.setLayoutData(gd_scroller);
 		scroller.setExpandHorizontal(true);
@@ -105,7 +109,7 @@ public class IndividView extends Composite {
 
 		final TableViewerColumn tableViewerColumn5 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFon = tableViewerColumn5.getColumn();
-		tblclmnFon.setWidth(200);
+		tblclmnFon.setWidth(150);
 		tblclmnFon.setText("Fonetisk navn");
 		tableViewerColumn5.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -122,6 +126,40 @@ public class IndividView extends Composite {
 			@Override
 			public String getText(Object element) {
 				return Integer.toString(((IndividModel) element).getFamc());
+			}
+		});
+
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmngteflle = tableViewerColumn_1.getColumn();
+		tblclmngteflle.setWidth(166);
+		tblclmngteflle.setText("\u00C6gtef\u00E6lle");
+		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				final List<String> liste = ((IndividModel) element).getSpouseNames();
+
+				if (liste.size() > 0) {
+					return liste.get(0);
+				}
+				return "";
+			}
+		});
+
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnFdt = tableViewerColumn_2.getColumn();
+		tblclmnFdt.setWidth(62);
+		tblclmnFdt.setText("F\u00F8dt");
+		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Date foedt = ((IndividModel) element).getFoedt();
+
+				if (foedt != null) {
+
+					return formatter.format(foedt);
+				} else
+					return "";
+
 			}
 		});
 
