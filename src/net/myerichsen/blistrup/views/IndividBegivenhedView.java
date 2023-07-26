@@ -7,8 +7,11 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -16,7 +19,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
+import net.myerichsen.blistrup.filters.IndividBegivenhedNavneFilter;
 import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 
 /**
@@ -27,6 +33,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 public class IndividBegivenhedView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
+	private Text navneFiltertext;
 
 	/**
 	 * Constructor
@@ -44,7 +51,21 @@ public class IndividBegivenhedView extends Composite {
 		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		final Label cLabel = new Label(filterComposite, SWT.NONE);
-		cLabel.setText("Her kommer der filtre");
+		cLabel.setText("Filtre: Navn");
+
+		navneFiltertext = new Text(filterComposite, SWT.BORDER);
+		navneFiltertext.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (navneFiltertext.getText().length() > 0) {
+					navneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					navneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				IndividBegivenhedNavneFilter.getInstance().setSearchText(navneFiltertext.getText());
+				tableViewer.refresh();
+			}
+		});
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -54,6 +75,9 @@ public class IndividBegivenhedView extends Composite {
 		tableViewer = new TableViewer(scroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		final ViewerFilter[] filters = new ViewerFilter[1];
+		filters[0] = IndividBegivenhedNavneFilter.getInstance();
+		tableViewer.setFilters(filters);
 
 		table = tableViewer.getTable();
 		table.setHeaderVisible(true);

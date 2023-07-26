@@ -7,8 +7,11 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -17,7 +20,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
+import net.myerichsen.blistrup.filters.FamilieFaderNavneFilter;
+import net.myerichsen.blistrup.filters.FamilieModerNavneFilter;
 import net.myerichsen.blistrup.models.FamilieModel;
 
 /**
@@ -29,6 +36,8 @@ public class FamilieView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
 	private BlistrupLokalhistorie blh;
+	private Text faderNavneFiltertext;
+	private Text moderNavneFiltertext;
 
 	/**
 	 * Constructor
@@ -46,7 +55,38 @@ public class FamilieView extends Composite {
 		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		final Label cLabel = new Label(filterComposite, SWT.NONE);
-		cLabel.setText("Her kommer der filtre");
+		cLabel.setText("Filtre: Fadernavn");
+
+		faderNavneFiltertext = new Text(filterComposite, SWT.BORDER);
+		faderNavneFiltertext.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (faderNavneFiltertext.getText().length() > 0) {
+					faderNavneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					faderNavneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				FamilieFaderNavneFilter.getInstance().setSearchText(faderNavneFiltertext.getText());
+				tableViewer.refresh();
+			}
+		});
+
+		final Label dLabel = new Label(filterComposite, SWT.NONE);
+		dLabel.setText("Modernavn");
+
+		moderNavneFiltertext = new Text(filterComposite, SWT.BORDER);
+		moderNavneFiltertext.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (moderNavneFiltertext.getText().length() > 0) {
+					moderNavneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					moderNavneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				FamilieModerNavneFilter.getInstance().setSearchText(moderNavneFiltertext.getText());
+				tableViewer.refresh();
+			}
+		});
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		final GridData gd_scroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
@@ -59,6 +99,10 @@ public class FamilieView extends Composite {
 		tableViewer.setUseHashlookup(true);
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		tableViewer.addDoubleClickListener(event -> displayPopup());
+		final ViewerFilter[] filters = new ViewerFilter[2];
+		filters[0] = FamilieFaderNavneFilter.getInstance();
+		filters[1] = FamilieModerNavneFilter.getInstance();
+		tableViewer.setFilters(filters);
 
 		table = tableViewer.getTable();
 		table.setHeaderVisible(true);
