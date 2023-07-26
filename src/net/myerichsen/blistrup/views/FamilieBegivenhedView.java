@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class FamilieBegivenhedView extends Composite {
@@ -183,11 +183,19 @@ public class FamilieBegivenhedView extends Composite {
 
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
-			tableViewer.setInput(FamilieBegivenhedModel.getData(dbPath));
-//		blistrupLokalhistorie.getStatusLineManager().setMessage("OK");
+			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	public void refresh(String dbPath) throws SQLException {
+		tableViewer.setInput(FamilieBegivenhedModel.getData(dbPath));
+
 	}
 }

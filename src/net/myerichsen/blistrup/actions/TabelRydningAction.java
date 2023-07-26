@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import org.eclipse.jface.action.Action;
 
-import net.myerichsen.blistrup.loaders.KonfirmationLoader;
+import net.myerichsen.blistrup.loaders.ClearTables;
 import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
  * @version 26. jul. 2023
  *
  */
-public class KonfirmationAction extends Action {
+public class TabelRydningAction extends Action {
 
 	private final BlistrupLokalhistorie blistrupLokalhistorie;
 
@@ -21,21 +21,20 @@ public class KonfirmationAction extends Action {
 	 *
 	 * @param blistrupLokalhistorie
 	 */
-	public KonfirmationAction(BlistrupLokalhistorie blistrupLokalhistorie) {
-		super("Konfirmationer", AS_PUSH_BUTTON);
+	public TabelRydningAction(BlistrupLokalhistorie blistrupLokalhistorie) {
+		super("Ryd tabellerne", AS_PUSH_BUTTON);
 		this.blistrupLokalhistorie = blistrupLokalhistorie;
 	}
 
 	@Override
 	public void run() {
 		try {
-			final int load = new KonfirmationLoader().load();
+			new ClearTables().clear();
 			blistrupLokalhistorie.refresh();
-			blistrupLokalhistorie.getStatusLineManager().setMessage(load + " konfirmationsregistreringer er indlæst");
+			blistrupLokalhistorie.getStatusLineManager().setMessage("Tabellerne er ryddet");
 		} catch (final SQLException e) {
 			blistrupLokalhistorie.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
 	}
-
 }

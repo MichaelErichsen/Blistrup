@@ -152,13 +152,13 @@ public class IndividView extends Composite {
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				Date foedt = ((IndividModel) element).getFoedt();
+				final Date foedt = ((IndividModel) element).getFoedt();
 
 				if (foedt != null) {
 
 					return formatter.format(foedt);
-				} else
-					return "";
+				}
+				return "";
 
 			}
 		});
@@ -168,11 +168,19 @@ public class IndividView extends Composite {
 
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
-			tableViewer.setInput(IndividModel.getData(dbPath));
-//			blh.getStatusLineManager().setMessage("OK");
+			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	public void refresh(String dbPath) throws SQLException {
+		tableViewer.setInput(IndividModel.getData(dbPath));
+
 	}
 }

@@ -2,7 +2,7 @@ package net.myerichsen.blistrup.models;
 
 /**
  * Personnavne
- * 
+ *
  * @author Michael Erichsen
  * @version 26. jul. 2023
  *

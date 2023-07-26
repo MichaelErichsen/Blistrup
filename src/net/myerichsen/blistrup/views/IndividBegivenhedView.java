@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class IndividBegivenhedView extends Composite {
@@ -194,11 +194,19 @@ public class IndividBegivenhedView extends Composite {
 
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
-			tableViewer.setInput(IndividBegivenhedModel.getData(dbPath));
-//		blistrupLokalhistorie.getStatusLineManager().setMessage("OK");
+			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	public void refresh(String dbPath) throws SQLException {
+		tableViewer.setInput(IndividBegivenhedModel.getData(dbPath));
+
 	}
 }

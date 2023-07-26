@@ -27,8 +27,8 @@ import net.myerichsen.blistrup.models.FamilieModel;
  */
 public class FamilieView extends Composite {
 	private TableViewer tableViewer;
-
 	private Table table;
+	private BlistrupLokalhistorie blh;
 
 	/**
 	 * Constructor
@@ -38,6 +38,7 @@ public class FamilieView extends Composite {
 	 */
 	public FamilieView(Composite parent, int style, BlistrupLokalhistorie blh) {
 		super(parent, style);
+		this.blh = blh;
 		setLayout(new GridLayout(1, false));
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
@@ -123,11 +124,9 @@ public class FamilieView extends Composite {
 
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
-			tableViewer.setInput(FamilieModel.getData(dbPath));
-			blh.getStatusLineManager().setMessage("OK");
+			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -138,8 +137,7 @@ public class FamilieView extends Composite {
 		try {
 			popup();
 		} catch (final SQLException e1) {
-			// TODO ((BlistrupLokalhistorie) ((TabFolder)
-			// getParent()).getParent()).setMessage(e1.getMessage());
+			blh.getStatusLineManager().setErrorMessage(e1.getMessage());
 		}
 	}
 
@@ -154,11 +152,20 @@ public class FamilieView extends Composite {
 		final StringBuilder sb = new StringBuilder(model.toString());
 		sb.append("\n\n");
 
-		String[] buttonArray = new String[] { "OK" };
+		final String[] buttonArray = new String[] { "OK" };
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Familier", null, sb.toString(),
 				MessageDialog.INFORMATION, buttonArray, 0);
 		dialog.open();
+
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	public void refresh(String dbPath) throws SQLException {
+		tableViewer.setInput(FamilieModel.getData(dbPath));
 
 	}
 

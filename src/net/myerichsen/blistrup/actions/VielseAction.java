@@ -7,7 +7,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class VielseAction extends Action {
@@ -20,7 +20,7 @@ public class VielseAction extends Action {
 	 * @param blistrupLokalhistorie
 	 */
 	public VielseAction(BlistrupLokalhistorie blistrupLokalhistorie) {
-		super("Vielse", AS_PUSH_BUTTON);
+		super("Vielser", AS_PUSH_BUTTON);
 		this.blistrupLokalhistorie = blistrupLokalhistorie;
 	}
 
@@ -28,6 +28,7 @@ public class VielseAction extends Action {
 	public void run() {
 		try {
 			final int load = new VielseLoader().load();
+			blistrupLokalhistorie.refresh();
 			blistrupLokalhistorie.getStatusLineManager().setMessage(load + " vielsesregistreringer er indlæst");
 		} catch (final Exception e) {
 			blistrupLokalhistorie.getStatusLineManager().setErrorMessage(e.getMessage());

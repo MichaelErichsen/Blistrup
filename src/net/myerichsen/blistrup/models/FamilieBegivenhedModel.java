@@ -36,29 +36,29 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 			model.setBegType(rs.getString("BEGTYPE").trim());
 			try {
 				model.setUnderType(rs.getString("UNDERTYPE").trim());
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 			}
 			model.setDato(rs.getDate("DATO"));
 			try {
-				model.setNote((rs.getString("NOTE")));
-			} catch (Exception e) {
+				model.setNote(rs.getString("NOTE"));
+			} catch (final Exception e) {
 			}
 			try {
 				model.setDetaljer(rs.getString("DETALJER").trim());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 			model.setBlistrupId(rs.getString("BLISTRUPID").trim());
 			try {
 				model.setRolle(rs.getString("ROLLE").trim());
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 			}
 			try {
 				model.setStedNavn(rs.getString("STEDNAVN").trim());
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 			}
 			try {
 				model.setBem(rs.getString("BEM").trim());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 			liste.add(model);
 		}

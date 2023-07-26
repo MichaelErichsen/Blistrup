@@ -1,7 +1,10 @@
 package net.myerichsen.blistrup.views;
 
+import java.sql.SQLException;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
@@ -20,13 +23,14 @@ import net.myerichsen.blistrup.actions.AfslutAction;
 import net.myerichsen.blistrup.actions.BegravelseAction;
 import net.myerichsen.blistrup.actions.DaabAction;
 import net.myerichsen.blistrup.actions.KonfirmationAction;
+import net.myerichsen.blistrup.actions.TabelRydningAction;
 import net.myerichsen.blistrup.actions.VielseAction;
 
 /**
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
@@ -141,6 +145,8 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		loadMenu.add(new KonfirmationAction(this));
 		loadMenu.add(new VielseAction(this));
 		loadMenu.add(new BegravelseAction(this));
+		loadMenu.add(new Separator());
+		loadMenu.add(new TabelRydningAction(this));
 
 		mainMenu.add(fileMenu);
 		mainMenu.add(loadMenu);
@@ -170,5 +176,20 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	@Override
 	public StatusLineManager getStatusLineManager() {
 		return super.getStatusLineManager();
+	}
+
+	/**
+	 *
+	 */
+	public void refresh() {
+		try {
+			final String dbPath = "C:\\Users\\michael\\BlistrupDB";
+			individView.refresh(dbPath);
+			familieView.refresh(dbPath);
+			individBegivenhedView.refresh(dbPath);
+			familieBegivenhedView.refresh(dbPath);
+		} catch (final SQLException e) {
+		}
+
 	}
 }

@@ -48,7 +48,11 @@ public class IndividBegivenhedModel {
 			}
 			model.setDato(rs1.getDate("DATO"));
 			model.setNote(rs1.getString("NOTE").trim());
-			model.setDetaljer(rs1.getString("DETALJER").trim());
+			if (rs1.getString("DETALJER") != null) {
+				model.setDetaljer(rs1.getString("DETALJER").trim());
+			} else {
+				model.setDetaljer("");
+			}
 			model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
 			model.setRolle(rs1.getString("ROLLE").trim());
 			if (rs1.getString("FOEDT") != null) {

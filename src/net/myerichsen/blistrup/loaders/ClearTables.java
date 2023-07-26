@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * Ryd alle tabeller
  *
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class ClearTables {
@@ -27,7 +27,7 @@ public class ClearTables {
 	 */
 	public static void main(String[] args) {
 		try {
-			new ClearTables().load();
+			new ClearTables().clear();
 			System.out.println("Tabeller er ryddet");
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -38,7 +38,7 @@ public class ClearTables {
 	 * @return
 	 * @throws SQLException
 	 */
-	public void load() throws SQLException {
+	public void clear() throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.execute();
