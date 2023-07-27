@@ -13,7 +13,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>net.myerichsen.archivesearcher.views.ArchiveSearcher</mainClass>
+							<mainClass>net.myerichsen.blistrup.views.BlistrupLokalhistorie</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
@@ -73,5 +73,7 @@
 	</issueManagement>
 	<properties>
 		<project.build.sourceEncoding>windows-1252</project.build.sourceEncoding>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
 	</properties>
 </project>
