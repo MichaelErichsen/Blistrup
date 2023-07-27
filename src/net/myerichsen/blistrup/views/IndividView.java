@@ -14,9 +14,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
@@ -31,10 +34,11 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 27. jul. 2023
  *
  */
 public class IndividView extends Composite {
+	final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 	private TableViewer tableViewer;
 	private Table table;
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -72,7 +76,7 @@ public class IndividView extends Composite {
 			}
 		});
 
-		Label lblgteflle = new Label(filterComposite, SWT.NONE);
+		final Label lblgteflle = new Label(filterComposite, SWT.NONE);
 		lblgteflle.setText("\u00C6gtef\u00E6lle");
 
 		aegtefaelleFilterText = new Text(filterComposite, SWT.BORDER);
@@ -89,7 +93,7 @@ public class IndividView extends Composite {
 			}
 		});
 
-		Label lblFdt = new Label(filterComposite, SWT.NONE);
+		final Label lblFdt = new Label(filterComposite, SWT.NONE);
 		lblFdt.setText("F\u00F8dt");
 
 		foedtFilterText = new Text(filterComposite, SWT.BORDER);
@@ -105,6 +109,15 @@ public class IndividView extends Composite {
 				tableViewer.refresh();
 			}
 		});
+
+		final Button btnRydFelterne = new Button(filterComposite, SWT.NONE);
+		btnRydFelterne.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				clearFilters();
+			}
+		});
+		btnRydFelterne.setText("Ryd felterne");
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		final GridData gd_scroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
@@ -229,13 +242,30 @@ public class IndividView extends Composite {
 		scroller.setContent(table);
 		scroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
-		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
 			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Clear filters
+	 *
+	 * @throws SQLException
+	 */
+	protected void clearFilters() {
+		IndividAegtefaelleFilter.getInstance().setSearchText("");
+		IndividFoedtFilter.getInstance().setSearchText("");
+		IndividNavneFilter.getInstance().setSearchText("");
+		navneFiltertext.setText("");
+		aegtefaelleFilterText.setText("");
+		foedtFilterText.setText("");
+		navneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		aegtefaelleFilterText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		foedtFilterText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		tableViewer.refresh();
 	}
 
 	/**

@@ -49,7 +49,7 @@ public class SWTResourceManager {
 	// Color
 	//
 	////////////////////////////////////////////////////////////////////////////
-	private static Map<RGB, Color> m_colorMap = new HashMap<RGB, Color>();
+	private static Map<RGB, Color> m_colorMap = new HashMap<>();
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// Image
@@ -58,7 +58,7 @@ public class SWTResourceManager {
 	/**
 	 * Maps image paths to images.
 	 */
-	private static Map<String, Image> m_imageMap = new HashMap<String, Image>();
+	private static Map<String, Image> m_imageMap = new HashMap<>();
 	private static final int MISSING_IMAGE_SIZE = 10;
 	/**
 	 * Style constant for placing decorator image in top left corner of base image.
@@ -95,11 +95,11 @@ public class SWTResourceManager {
 	/**
 	 * Maps font names to fonts.
 	 */
-	private static Map<String, Font> m_fontMap = new HashMap<String, Font>();
+	private static Map<String, Font> m_fontMap = new HashMap<>();
 	/**
 	 * Maps fonts to their bold versions.
 	 */
-	private static Map<Font, Font> m_fontToBoldFontMap = new HashMap<Font, Font>();
+	private static Map<Font, Font> m_fontToBoldFontMap = new HashMap<>();
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// Cursor
@@ -108,7 +108,7 @@ public class SWTResourceManager {
 	/**
 	 * Maps IDs to cursors.
 	 */
-	private static Map<Integer, Cursor> m_idToCursorMap = new HashMap<Integer, Cursor>();
+	private static Map<Integer, Cursor> m_idToCursorMap = new HashMap<>();
 
 	/**
 	 * Returns an {@link Image} composed of a base image decorated by another image.
@@ -135,12 +135,12 @@ public class SWTResourceManager {
 		}
 		Map<Image, Map<Image, Image>> cornerDecoratedImageMap = m_decoratedImageMap[corner];
 		if (cornerDecoratedImageMap == null) {
-			cornerDecoratedImageMap = new HashMap<Image, Map<Image, Image>>();
+			cornerDecoratedImageMap = new HashMap<>();
 			m_decoratedImageMap[corner] = cornerDecoratedImageMap;
 		}
 		Map<Image, Image> decoratedMap = cornerDecoratedImageMap.get(baseImage);
 		if (decoratedMap == null) {
-			decoratedMap = new HashMap<Image, Image>();
+			decoratedMap = new HashMap<>();
 			cornerDecoratedImageMap.put(baseImage, decoratedMap);
 		}
 		//

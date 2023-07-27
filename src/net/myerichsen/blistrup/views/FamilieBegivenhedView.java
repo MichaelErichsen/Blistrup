@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 27. jul. 2023
  *
  */
 public class FamilieBegivenhedView extends Composite {

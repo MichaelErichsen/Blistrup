@@ -10,13 +10,14 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 27. jul. 2023
  *
  */
 public class FamilieModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE"; // FETCH FIRST 50 ROWS ONLY";
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
+	private static final String SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
 
 	public static FamilieModel[] getData(String dbPath) throws SQLException {
 		FamilieModel model;
@@ -25,15 +26,17 @@ public class FamilieModel {
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
 		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
+		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
 		final ResultSet rs1 = statement1.executeQuery();
-		ResultSet rs2;
-		ResultSet rs3;
+		ResultSet rs2, rs3, rs4;
 		int familieId = 0;
 		int husFaderId = 0;
 		int husModerId = 0;
 		int barnId = 0;
 		IndividModel individModel;
 		final List<IndividModel> boern = new ArrayList<>();
+
+		// SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE"; // FETCH FIRST 50 ROWS ONLY";
 
 		while (rs1.next()) {
 			model = new FamilieModel();
@@ -45,6 +48,8 @@ public class FamilieModel {
 			model.setModer(husModerId);
 
 			// Husfaders navn
+			// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
 			statement2.setInt(1, husFaderId);
 			rs2 = statement2.executeQuery();
 
@@ -52,7 +57,19 @@ public class FamilieModel {
 				model.setFaderNavn(rs2.getString("STDNAVN").trim());
 			}
 
+			// Husfaders fødsel
+			// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
+
+			statement4.setInt(1, husFaderId);
+			rs4 = statement4.executeQuery();
+
+			if (rs4.next()) {
+				model.setFaderFoedt(rs4.getString("FOEDT").trim());
+			}
+
 			// Husmoders navn
+			// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
 			statement2.setInt(1, husModerId);
 			rs2 = statement2.executeQuery();
 
@@ -60,8 +77,20 @@ public class FamilieModel {
 				model.setModerNavn(rs2.getString("STDNAVN").trim());
 			}
 
+			// Husmoders fødsel
+			// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
+
+			statement4.setInt(1, husModerId);
+			rs4 = statement4.executeQuery();
+
+			if (rs4.next()) {
+				model.setModerFoedt(rs4.getString("FOEDT").trim());
+			}
+
 			// Børn
 			boern.clear();
+
+			// SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 
 			statement3.setInt(1, familieId);
 			rs3 = statement3.executeQuery();
@@ -72,6 +101,8 @@ public class FamilieModel {
 				individModel.setId(barnId);
 
 				// Barns navn
+				// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
 				statement2.setInt(1, barnId);
 				rs2 = statement2.executeQuery();
 
@@ -121,6 +152,8 @@ public class FamilieModel {
 	private List<IndividModel> boern = new ArrayList<>();
 	private List<FamilieBegivenhedModel> begivenheder = new ArrayList<>();
 	private String noter = "";
+	private String faderFoedt = "";
+	private String moderFoedt = "";
 
 	/**
 	 * @return the begivenheder
@@ -144,6 +177,13 @@ public class FamilieModel {
 	}
 
 	/**
+	 * @return the faderFoedt
+	 */
+	public String getFaderFoedt() {
+		return faderFoedt;
+	}
+
+	/**
 	 * @return the faderNavn
 	 */
 	public String getFaderNavn() {
@@ -162,6 +202,13 @@ public class FamilieModel {
 	 */
 	public int getModer() {
 		return moder;
+	}
+
+	/**
+	 * @return the moderFoedt
+	 */
+	public String getModerFoedt() {
+		return moderFoedt;
 	}
 
 	/**
@@ -200,6 +247,13 @@ public class FamilieModel {
 	}
 
 	/**
+	 * @param faderFoedt the faderFoedt to set
+	 */
+	public void setFaderFoedt(String faderFoedt) {
+		this.faderFoedt = faderFoedt;
+	}
+
+	/**
 	 * @param faderNavn the faderNavn to set
 	 */
 	public void setFaderNavn(String faderNavn) {
@@ -218,6 +272,13 @@ public class FamilieModel {
 	 */
 	public void setModer(int moder) {
 		this.moder = moder;
+	}
+
+	/**
+	 * @param moderFoedt the moderFoedt to set
+	 */
+	public void setModerFoedt(String moderFoedt) {
+		this.moderFoedt = moderFoedt;
 	}
 
 	/**
@@ -245,10 +306,18 @@ public class FamilieModel {
 			builder.append(faderNavn);
 			builder.append(", ");
 		}
+		if (faderFoedt != null) {
+			builder.append(faderFoedt);
+			builder.append(", ");
+		}
 		builder.append("\r\n" + moder);
 		builder.append(", ");
 		if (moderNavn != null) {
 			builder.append(moderNavn);
+			builder.append(", ");
+		}
+		if (moderFoedt != null) {
+			builder.append(moderFoedt);
 			builder.append(", ");
 		}
 		if (boern.size() > 0) {

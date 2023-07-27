@@ -12,9 +12,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
@@ -29,10 +32,11 @@ import net.myerichsen.blistrup.models.FamilieModel;
 
 /**
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 27. jul. 2023
  *
  */
 public class FamilieView extends Composite {
+	private static final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 	private TableViewer tableViewer;
 	private Table table;
 	private BlistrupLokalhistorie blh;
@@ -88,6 +92,15 @@ public class FamilieView extends Composite {
 			}
 		});
 
+		final Button btnRydFelterne = new Button(filterComposite, SWT.NONE);
+		btnRydFelterne.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				clearFilters();
+			}
+		});
+		btnRydFelterne.setText("Ryd felterne");
+
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		final GridData gd_scroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_scroller.heightHint = 539;
@@ -133,11 +146,22 @@ public class FamilieView extends Composite {
 		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnHusfadernavn = tableViewerColumn_2.getColumn();
 		tblclmnHusfadernavn.setWidth(200);
-		tblclmnHusfadernavn.setText("Husfadernavn");
+		tblclmnHusfadernavn.setText("Navn");
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				return ((FamilieModel) element).getFaderNavn();
+			}
+		});
+
+		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnHusfaderFoedt = tableViewerColumn_5.getColumn();
+		tblclmnHusfaderFoedt.setWidth(100);
+		tblclmnHusfaderFoedt.setText("F\u00F8dt");
+		tableViewerColumn_5.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((FamilieModel) element).getFaderFoedt();
 			}
 		});
 
@@ -155,7 +179,7 @@ public class FamilieView extends Composite {
 		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnHusmodernavn = tableViewerColumn_4.getColumn();
 		tblclmnHusmodernavn.setWidth(200);
-		tblclmnHusmodernavn.setText("Husmodernavn");
+		tblclmnHusmodernavn.setText("Navn");
 		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -163,15 +187,40 @@ public class FamilieView extends Composite {
 			}
 		});
 
+		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnHusmoderFoedt = tableViewerColumn_6.getColumn();
+		tblclmnHusmoderFoedt.setWidth(100);
+		tblclmnHusmoderFoedt.setText("F\u00F8dt");
+		tableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((FamilieModel) element).getModerFoedt();
+			}
+		});
+
 		scroller.setContent(table);
 		scroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
-		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 		try {
 			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 		}
+	}
+
+	/**
+	 * Clear filters
+	 *
+	 * @throws SQLException
+	 */
+	protected void clearFilters() {
+		FamilieFaderNavneFilter.getInstance().setSearchText("");
+		FamilieModerNavneFilter.getInstance().setSearchText("");
+		faderNavneFiltertext.setText("");
+		moderNavneFiltertext.setText("");
+		faderNavneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		moderNavneFiltertext.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		tableViewer.refresh();
 	}
 
 	/**

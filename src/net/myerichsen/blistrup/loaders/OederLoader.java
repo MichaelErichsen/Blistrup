@@ -72,7 +72,7 @@ public class OederLoader {
 	public int load() throws SQLException {
 		final Connection conn = connect();
 		final List<String> blistrupIdListe = new ArrayList<>();
-		String rolle = "";
+		final String rolle = "";
 		PreparedStatement statement2;
 		ResultSet generatedKeys;
 		int individId = 0;
