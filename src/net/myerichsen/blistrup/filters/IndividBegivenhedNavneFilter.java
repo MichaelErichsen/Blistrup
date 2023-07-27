@@ -52,7 +52,11 @@ public class IndividBegivenhedNavneFilter extends ViewerFilter {
 	}
 
 	public void setSearchText(String s) {
-		this.searchString = ".*" + s.toLowerCase() + ".*";
+		if (s.isBlank()) {
+			this.searchString = "";
+		} else {
+			this.searchString = ".*" + s.toLowerCase() + ".*";
+		}
 	}
 
 }

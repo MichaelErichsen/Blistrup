@@ -231,7 +231,6 @@ public class IndividView extends Composite {
 				final Date foedt = ((IndividModel) element).getFoedt();
 
 				if (foedt != null) {
-
 					return formatter.format(foedt);
 				}
 				return "";
@@ -246,7 +245,6 @@ public class IndividView extends Composite {
 			refresh(dbPath);
 		} catch (final SQLException e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
