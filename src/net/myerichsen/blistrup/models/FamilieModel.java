@@ -10,11 +10,11 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 27. jul. 2023
+ * @version 28. jul. 2023
  *
  */
 public class FamilieModel {
-	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE"; // FETCH FIRST 50 ROWS ONLY";
+	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";

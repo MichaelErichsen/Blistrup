@@ -11,10 +11,10 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 24. jul. 2023
+ * @version 28. jul. 2023
  */
 public class FamilieBegivenhedModel extends Begivenhedsmodel {
-	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED FETCH FIRST 200 ROWS ONLY";
+	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED";
 
 	/**
 	 * @param dbPath

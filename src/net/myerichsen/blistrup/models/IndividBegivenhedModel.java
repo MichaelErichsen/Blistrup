@@ -11,11 +11,11 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 28. jul. 2023
  *
  */
 public class IndividBegivenhedModel {
-	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED FETCH FIRST 200 ROWS ONLY";
+	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED";
 	private static final String SELECT2 = "SELECT STDNAVN FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 
 	/**
@@ -48,7 +48,7 @@ public class IndividBegivenhedModel {
 			}
 			model.setDato(rs1.getDate("DATO"));
 			if (rs1.getString("NOTE") != null) {
-				model.setNote(dbPath);
+				model.setNote(rs1.getString("NOTE"));
 			} else {
 				model.setNote("");
 			}

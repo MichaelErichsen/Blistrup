@@ -34,7 +34,7 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 27. jul. 2023
+ * @version 28. jul. 2023
  *
  */
 public class IndividView extends Composite {
@@ -201,7 +201,15 @@ public class IndividView extends Composite {
 		tableViewerColumn6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Integer.toString(((IndividModel) element).getFamc());
+				IndividModel model = ((IndividModel) element);
+				int famc = model.getFamc();
+
+				if (famc > 0) {
+					return Integer.toString(model.getFamc());
+				} else if (model.getFams().size() > 0) {
+					return Integer.toString(model.getFams().get(0));
+				} else
+					return "0";
 			}
 		});
 
@@ -210,6 +218,7 @@ public class IndividView extends Composite {
 		tblclmngteflle.setWidth(166);
 		tblclmngteflle.setText("\u00C6gtef\u00E6lle");
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
+
 			@Override
 			public String getText(Object element) {
 				final List<String> liste = ((IndividModel) element).getSpouseNames();

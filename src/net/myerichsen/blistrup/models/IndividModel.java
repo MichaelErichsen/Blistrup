@@ -11,10 +11,10 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 28. jul. 2023
  */
 public class IndividModel {
-	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID FETCH FIRST 200 ROWS ONLY";
+	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.FAMILIE WHERE HUSFADER = ? OR HUSMODER = ?";
 
@@ -73,6 +73,7 @@ public class IndividModel {
 
 						if (rs3.next()) {
 							model.getSpouseNames().add(rs3.getString("STDNAVN").trim());
+
 						}
 					}
 
@@ -112,13 +113,9 @@ public class IndividModel {
 	private String noter = "";
 	private Date foedt;
 	private Date doebt;
-
 	private Date doed;
-
 	private Date begravet;
-
 	private String fam = "";
-
 	private String slgt = "";
 
 	/**
