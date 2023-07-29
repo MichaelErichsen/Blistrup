@@ -23,7 +23,7 @@ public class FolketaellingLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
 
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'F'"
-			+ " FETCH FIRST 200 ROWS ONLY";
+			+ " FETCH FIRST 500 ROWS ONLY";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'F' AND BEGIV = ? ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAMC) VALUES (?, ?, ?, ?)";
@@ -32,10 +32,10 @@ public class FolketaellingLoader {
 	private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER, HUSMODER) VALUES(?, ?)";
 	private static final String INSERT5 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, HUSFADERALDER, HUSMODERALDER, KILDEID, "
 			+ "BEGTYPE, DATO, NOTE, BLISTRUPID, STEDNAVN, BEM) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-//	private static final String INSERT6 = "INSERT INTO INDIVID (KOEN, FAMC) VALUES (?, ?)";
-//	private static final String INSERT7 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
+	private static final String INSERT6 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+	private static final String UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
 
 	private static final Fonkod fonkod = new Fonkod();
 
@@ -106,13 +106,13 @@ public class FolketaellingLoader {
 	 * INSERT4 = "INSERT INTO FAMILIE (HUSFADER, HUSMODER)
 	 *
 	 * @param statement
-	 * @param rs1
+	 * @param rs
 	 * @param koen
 	 * @param headId
 	 * @return
 	 * @throws SQLException
 	 */
-	private int insertFamilie(PreparedStatement statement, ResultSet rs1, String koen, int headId) throws SQLException {
+	private int insertFamilie(PreparedStatement statement, ResultSet rs, String koen, int headId) throws SQLException {
 		int familieId = 0;
 
 		if ("m".equals(koen)) {
@@ -139,21 +139,21 @@ public class FolketaellingLoader {
 	 * HUSMODERALDER, KILDEID, BEGTYPE, DATO, NOTE, BLISTRUPID, STEDNAVN, BEM)
 	 *
 	 * @param statement
-	 * @param rs1
+	 * @param rs
 	 * @param familieId
 	 * @param koen
 	 * @param kildeId
 	 * @return
 	 * @throws SQLException
 	 */
-	private int insertFamilieBegivenhed(PreparedStatement statement, ResultSet rs1, int familieId, String koen,
+	private int insertFamilieBegivenhed(PreparedStatement statement, ResultSet rs, int familieId, String koen,
 			int kildeId) throws SQLException {
 
 		int familieBegivenhedId = 0;
 
 		statement.setInt(1, familieId);
 
-		final String alder = rs1.getString("ALDER").trim();
+		final String alder = rs.getString("ALDER").trim();
 		if (alder == null || alder.length() == 0) {
 			statement.setInt(2, 0);
 			statement.setInt(3, 0);
@@ -171,15 +171,15 @@ public class FolketaellingLoader {
 		statement.setInt(4, kildeId);
 		statement.setString(5, "Folketælling");
 
-		final int iAar = Integer.parseInt(rs1.getString("AAR").trim());
+		final int iAar = Integer.parseInt(rs.getString("AAR").trim());
 
 		statement.setDate(6, ftAarToDate(iAar));
 		statement.setString(7, ""); // Note
-		statement.setString(8, afQ(rs1.getString("BEGIV")));
-		statement.setString(9, afQ(rs1.getString("STEDNAVN")));
+		statement.setString(8, afQ(rs.getString("BEGIV")));
+		statement.setString(9, afQ(rs.getString("STEDNAVN")));
 
-		if (rs1.getString("BEM") != null) {
-			statement.setString(10, afQ(rs1.getString("BEM")));
+		if (rs.getString("BEM") != null) {
+			statement.setString(10, afQ(rs.getString("BEM")));
 		} else {
 			statement.setString(10, "");
 		}
@@ -199,13 +199,13 @@ public class FolketaellingLoader {
 	 * INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT)
 	 *
 	 * @param statement
-	 * @param rs1
+	 * @param rs
 	 * @param koen
 	 * @param familieId
 	 * @return
 	 * @throws SQLException
 	 */
-	private int insertIndivid(PreparedStatement statement, ResultSet rs1, String koen, int familieId)
+	private int insertIndivid(PreparedStatement statement, ResultSet rs, String koen, int familieId)
 			throws SQLException {
 		int individId = 0;
 
@@ -216,8 +216,8 @@ public class FolketaellingLoader {
 		// Fra sønnesøn
 
 		statement.setString(1, koen);
-		statement.setString(2, rs1.getString("PID").trim());
-		statement.setString(3, rs1.getString("FQODT").trim());
+		statement.setString(2, rs.getString("PID").trim());
+		statement.setString(3, rs.getString("FQODT").trim());
 		statement.setInt(4, familieId);
 		statement.executeUpdate();
 		final ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -234,19 +234,19 @@ public class FolketaellingLoader {
 	 * INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR)
 	 *
 	 * @param statement
-	 * @param rs1
+	 * @param rs
 	 * @return
 	 * @throws SQLException
 	 */
-	private int insertKilde(PreparedStatement statement, ResultSet rs1) throws SQLException {
+	private int insertKilde(PreparedStatement statement, ResultSet rs) throws SQLException {
 		int kildeId = 0;
 
-		statement.setString(1, rs1.getString("KBNR").trim());
-		statement.setString(2, rs1.getString("KILDE").trim());
-		statement.setString(3, rs1.getString("KBDEL").trim());
-		statement.setString(4, rs1.getString("TIFNR").trim());
-		statement.setString(5, rs1.getString("OPSLAG").trim());
-		statement.setString(6, rs1.getString("OPNR").trim());
+		statement.setString(1, rs.getString("KBNR").trim());
+		statement.setString(2, rs.getString("KILDE").trim());
+		statement.setString(3, rs.getString("KBDEL").trim());
+		statement.setString(4, rs.getString("TIFNR").trim());
+		statement.setString(5, rs.getString("OPSLAG").trim());
+		statement.setString(6, rs.getString("OPNR").trim());
 		statement.executeUpdate();
 		final ResultSet generatedKeys = statement.getGeneratedKeys();
 
@@ -263,18 +263,18 @@ public class FolketaellingLoader {
 	 * PRIMAERNAVN, FONETISKNAVN, STDNAVN)
 	 *
 	 * @param statement
-	 * @param rs1
+	 * @param rs
 	 * @param individId
 	 * @return
 	 * @throws SQLException
 	 */
-	private String insertPersonNavn(PreparedStatement statement, ResultSet rs1, int individId) throws SQLException {
+	private String insertPersonNavn(PreparedStatement statement, ResultSet rs, int individId) throws SQLException {
 		statement.setInt(1, individId);
-		final String fornvn = afQ(rs1.getString("FORNVN"));
+		final String fornvn = afQ(rs.getString("FORNVN"));
 		statement.setString(2, fornvn);
-		statement.setString(3, afQ(rs1.getString("EFTERNVN")));
+		statement.setString(3, afQ(rs.getString("EFTERNVN")));
 		statement.setString(4, "TRUE");
-		final String stdnavn = afQ(rs1.getString("STD_NAVN"));
+		final String stdnavn = afQ(rs.getString("STD_NAVN"));
 
 		try {
 			statement.setString(5, fonkod.generateKey(stdnavn).trim());
@@ -286,6 +286,54 @@ public class FolketaellingLoader {
 		statement.executeUpdate();
 
 		return fornvn;
+	}
+
+	/**
+	 * INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN,
+	 * PRIMAERNAVN, FONETISKNAVN, STDNAVN)
+	 *
+	 * @param statement
+	 * @param rs1
+	 * @param soenId
+	 * @param fornvn
+	 * @param efternvn
+	 * @throws SQLException
+	 */
+	private void insertPersonNavn(PreparedStatement statement, ResultSet rs1, int soenId, String fornvn,
+			String efternvn) throws SQLException {
+
+		statement.setInt(1, soenId);
+		statement.setString(2, fornvn);
+		statement.setString(3, efternvn);
+		statement.setString(4, "TRUE");
+		final String stdnavn = fornvn + " " + efternvn;
+
+		try {
+			statement.setString(5, fonkod.generateKey(stdnavn).trim());
+		} catch (final Exception e) {
+			statement.setString(5, "");
+		}
+
+		statement.setString(6, stdnavn);
+		statement.executeUpdate();
+
+	}
+
+	/**
+	 * INSERT7 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID)
+	 *
+	 * @param statement
+	 * @param individId
+	 * @param rolle
+	 * @param familieBegivenhedId
+	 * @throws SQLException
+	 */
+	private void insertVidne(PreparedStatement statement, int individId, String rolle, int familieBegivenhedId)
+			throws SQLException {
+		statement.setInt(1, individId);
+		statement.setString(2, rolle);
+		statement.setInt(3, familieBegivenhedId);
+		statement.executeUpdate();
 	}
 
 	/**
@@ -302,9 +350,9 @@ public class FolketaellingLoader {
 		int taeller = 0;
 		StringBuilder sb;
 		String navn = "";
-//		final String stdnavn = "";
 		boolean husfader = false;
 		String koen = "";
+		final String fornvn = "";
 
 		final Connection conn = connect();
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
@@ -314,9 +362,9 @@ public class FolketaellingLoader {
 		final PreparedStatement statementi3 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statementi4 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statementi5 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
-//		final PreparedStatement statementi6 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
-//		final PreparedStatement statementi7 = conn.prepareStatement(INSERT7);
+		final PreparedStatement statementi6 = conn.prepareStatement(INSERT6);
 		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
+		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 
 		// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'F'
 
@@ -342,23 +390,16 @@ public class FolketaellingLoader {
 				koen = rs1.getString("SEX").trim();
 				sb.append(rolle + ": " + navn + ", \r\n");
 
-				// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";
-
 				individId = insertIndivid(statementi1, rs1, koen, 0);
-
-				// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN,
-				// PRIMAERNAVN, FONETISKNAVN, STDNAVN)
 
 				insertPersonNavn(statementi2, rs1, individId);
 
 				taeller++;
 
-				// Handle roles
+				// Behandling af roller
 				if (husfader || "Husfader".equals(rolle) || rolle.contains("Husfader ") || rolle.contains("Husfader, ")
 						|| rolle.contains("Husfader. ") || rolle.contains("Huusbonde")) {
 					headId = individId;
-
-					// INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR)
 
 					kildeId = insertKilde(statementi3, rs1);
 
@@ -372,129 +413,81 @@ public class FolketaellingLoader {
 					insertFamilieBegivenhed(statementi5, rs1, familieId, koen, kildeId);
 
 					husfader = false;
+				} else if (rolle.contains("Konens ")) {
+					// Ignoreres, behandles senere
+
+				} else if (rolle.contains("Hustru") || rolle.contains("Kone") || rolle.contains("Husmoder")
+						|| rolle.contains("Familiemoder") || rolle.contains("Gaardmandskone")
+						|| rolle.contains("Husbondinde") || rolle.contains("Hosbondinde")) {
+					updateFamilie(statementu2, individId, familieId);
+
 				} else if (rolle.contains("Sønnesøn")) {
-//					// (Søn) + fornvn + sen
-//					// INSERT6 = "INSERT INTO INDIVID (KOEN, FAMC)
-//
-//					insertIndivid(statementi6, rs1, "m", familieId);
-//
-//					// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN,
-//					// PRIMAERNAVN, FONETISKNAVN, STDNAVN) 
-//
-//					statementi2.setInt(1, individId);
-//					statementi2.setString(2, "(Søn)");
-//					statementi2.setString(3, fornvn + "sen");
-//					statementi2.setString(4, "TRUE");
-//					statementi2.setString(5, "");
-//					statementi2.setString(6, "(Søn) " + fornvn + "sen");
-//					statementi2.executeUpdate();
-//
-//					// INSERT4 = "INSERT INTO FAMILIE (HUSFADER, HUSMODER) 
-//
-//					if (rolle.contains("SQonnesQon")) {
-//						statementi4.setInt(1, headId);
-//						statementi4.setInt(2, 0);
-//					} else {
-//						statementi4.setInt(1, 0);
-//						statementi4.setInt(2, headId);
-//					}
-//
-//					statementi4.executeUpdate();
-//					generatedKeys = statementi4.getGeneratedKeys();
-//
-//					if (generatedKeys.next()) {
-//						familieId2 = generatedKeys.getInt(1);
-//					} else {
-//						familieId2 = 0;
-//					}
-//					generatedKeys.close();
-//
-//					// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
-//
-//					updateIndivid(statementu1, familieId2, individId);
-//
-//					// INSERT7 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) 
-//
-//					statementi7.setInt(1, individId);
-//					statementi7.setString(2, rolle);
-//					statementi7.setInt(3, familieBegivenhedId);
-//					statementi7.executeUpdate();
+					// Indsæt beregnet søn
+
+					final int soenId = insertIndivid(statementi1, rs1, "m", familieId);
+					final String efternavn = fornvn + "sen";
+					insertPersonNavn(statementi2, rs1, soenId, "(Søn)", efternavn.replace("ss", "s"));
+
+					// Indsæt næste generation familie
+
+					final int familieId2 = insertFamilie(statementi4, rs1, "m", soenId);
+
+					// Indsæt sønnesøn
+
+					updateIndivid(statementu1, familieId2, individId);
+					insertVidne(statementi6, individId, rolle, familieId2);
 
 				} else if (rolle.contains("Datter Datter") || rolle.contains("Datterdatter")
-						|| rolle.contains("Børnebørn") || rolle.contains("Barnebarn")) {
+						|| rolle.contains("Børnebørn") || rolle.contains("Barnebarn")
+						|| rolle.contains("Datters uægte søn")) {
+					// DatterbQorn
+					// Dattersøn
+					// SQosterdatter
+					// SQosterdatter
+					// SQostersQon
 
-//					// Mellemperson
-//// (Datter) + fornvn + sdatter etc.
-//					// INSERT6 = "INSERT INTO INDIVID (KOEN, FAMC) 
-//					// INSERT4 = "INSERT INTO FAMILIE (HUSFADER, HUSMODER)
-//
-//					// TODO private int insertFamilie(PreparedStatement statement, ResultSet rs1,
-//					// String koen, int headId) throws SQLException {
-//
-//					statementi6.setString(1, "k");
-//					statementi6.setInt(2, familieId);
-//					statementi6.executeUpdate();
-//					generatedKeys.close();
-//					generatedKeys = statementi6.getGeneratedKeys();
-//
-//					if (generatedKeys.next()) {
-//						generatedKeys.getInt(1);
-//					} else {
-//					}
-//					generatedKeys.close();
-//
-//					// INSERT4 = "INSERT INTO FAMILIE (HUSFADER, HUSMODER) 
-//
-//					// TODO private int insertFamilie(PreparedStatement statement, ResultSet rs1,
-//					// String koen, int headId) throws SQLException {
-//
-//					statementi4.setInt(1, 0);
-//					statementi4.setInt(2, headId);
-//
-//					statementi4.executeUpdate();
-//					generatedKeys = statementi4.getGeneratedKeys();
-//
-//					if (generatedKeys.next()) {
-//						familieId2 = generatedKeys.getInt(1);
-//					} else {
-//						familieId2 = 0;
-//					}
-//					generatedKeys.close();
-//
-//					// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
-//
-//					updateIndivid(statementu1, familieId2, individId);
 				} else if ((rolle.contains("Svigersøn") || rolle.contains("Svigerdatter")
-						|| rolle.contains("Sviger-Søn")) || rolle.contains("Søn")) {
-					// Anonymt individ med FAMC
-					// Nyt individ
-					// Ny FAMS med begge
+						|| rolle.contains("Sviger-Søn")) || rolle.contains("Stifdatter")) {
 
-					//
-					//
+				} else if (rolle.contains("Søn") || rolle.contains("Datter") || rolle.contains("Døttre")
+						|| rolle.contains("Barn") || rolle.contains("Børn")) {
+					insertVidne(statementi6, individId, rolle, familieId);
+					updateIndivid(statementu1, familieId, individId);
+
 				} else {
 
-					// Other roles
 				}
 
-				// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
-
-				updateIndivid(statementu1, familieId, individId);
 			}
 		}
 		return taeller;
+
+	}
+
+	/**
+	 * UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?
+	 *
+	 * @param statement
+	 * @param individId
+	 * @param familieId
+	 * @throws SQLException
+	 */
+	private void updateFamilie(PreparedStatement statement, int individId, int familieId) throws SQLException {
+		statement.setInt(1, individId);
+		statement.setInt(2, familieId);
+		statement.executeUpdate();
 	}
 
 	/**
 	 * UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?
 	 *
 	 * @param statement
-	 * @param familieId2
+	 * @param familieId
 	 * @param individId
 	 * @throws SQLException
 	 */
-	private void updateIndivid(PreparedStatement statement, int familieId2, int individId) throws SQLException {
-		statement.setInt(1, familieId2);
+	private void updateIndivid(PreparedStatement statement, int familieId, int individId) throws SQLException {
+		statement.setInt(1, familieId);
 		statement.setInt(2, individId);
 		statement.executeUpdate();
 	}

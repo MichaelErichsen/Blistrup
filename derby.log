@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Sat Jul 29 16:10:14 CEST 2023:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-0189-a1fc-4e7d-00000e984ce8 
+Sat Jul 29 17:23:08 CEST 2023:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-0189-a23f-0b33-00000e95af50 
 on database directory C:\Users\michael\BlistrupDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@73d16e93 
 Loaded from file:/C:/Users/michael/.m2/repository/org/apache/derby/derby/10.14.1.0/derby-10.14.1.0.jar
 java.vendor=Oracle Corporation
