@@ -73,7 +73,6 @@ public class IndividModel {
 
 						if (rs3.next()) {
 							model.getSpouseNames().add(rs3.getString("STDNAVN").trim());
-
 						}
 					}
 

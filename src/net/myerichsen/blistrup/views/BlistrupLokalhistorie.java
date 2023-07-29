@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.TabItem;
 import net.myerichsen.blistrup.actions.AfslutAction;
 import net.myerichsen.blistrup.actions.BegravelseAction;
 import net.myerichsen.blistrup.actions.DaabAction;
+import net.myerichsen.blistrup.actions.FolketaellingAction;
 import net.myerichsen.blistrup.actions.KonfirmationAction;
 import net.myerichsen.blistrup.actions.OederAction;
 import net.myerichsen.blistrup.actions.TabelRydningAction;
@@ -31,7 +32,7 @@ import net.myerichsen.blistrup.actions.VielseAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 28. jul. 2023
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
@@ -85,7 +86,6 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 	 * Create the actions.
 	 */
 	private void createActions() {
-		// Create the actions
 		afslut = new AfslutAction(this);
 	}
 
@@ -149,6 +149,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		loadMenu.add(new VielseAction(this));
 		loadMenu.add(new BegravelseAction(this));
 		loadMenu.add(new OederAction(this));
+		loadMenu.add(new FolketaellingAction(this));
 		loadMenu.add(new Separator());
 		loadMenu.add(new TabelRydningAction(this));
 

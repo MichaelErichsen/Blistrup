@@ -27,16 +27,18 @@ public class FamilieModel {
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
 		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
 		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
-		final ResultSet rs1 = statement1.executeQuery();
+
 		ResultSet rs2, rs3, rs4;
 		int familieId = 0;
 		int husFaderId = 0;
 		int husModerId = 0;
 		int barnId = 0;
 		IndividModel individModel;
-		final List<IndividModel> boern = new ArrayList<>();
+		List<IndividModel> boern = new ArrayList<>();
 
-		// SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE"; // FETCH FIRST 50 ROWS ONLY";
+		// SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE";
+
+		final ResultSet rs1 = statement1.executeQuery();
 
 		while (rs1.next()) {
 			model = new FamilieModel();
@@ -88,7 +90,7 @@ public class FamilieModel {
 			}
 
 			// Børn
-			boern.clear();
+			boern = new ArrayList<IndividModel>();
 
 			// SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 

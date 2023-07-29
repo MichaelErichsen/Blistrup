@@ -29,6 +29,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import net.myerichsen.blistrup.filters.FamilieFaderNavneFilter;
 import net.myerichsen.blistrup.filters.FamilieModerNavneFilter;
 import net.myerichsen.blistrup.models.FamilieModel;
+import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
@@ -195,6 +196,23 @@ public class FamilieView extends Composite {
 			@Override
 			public String getText(Object element) {
 				return ((FamilieModel) element).getModerFoedt();
+			}
+		});
+
+		TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnBrn = tableViewerColumn_7.getColumn();
+		tblclmnBrn.setWidth(300);
+		tblclmnBrn.setText("B\u00F8rn");
+		tableViewerColumn_7.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				FamilieModel model = (FamilieModel) element;
+				StringBuffer sb = new StringBuffer();
+
+				for (IndividModel iModel : model.getBoern()) {
+					sb.append(iModel.getStdNavn() + ", ");
+				}
+				return sb.toString();
 			}
 		});
 
