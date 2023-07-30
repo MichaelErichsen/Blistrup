@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Læs folketællingsdata fra grundtabellen ind i GEDCOM tabeller
  *
  * @author Michael Erichsen
- * @version 29. jul. 2023
+ * @version 30. jul. 2023
  *
  */
 public class FolketaellingLoader {
@@ -268,11 +268,14 @@ public class FolketaellingLoader {
 	 * @return
 	 * @throws SQLException
 	 */
-	private String insertPersonNavn(PreparedStatement statement, ResultSet rs, int individId) throws SQLException {
+	private String[] insertPersonNavn(PreparedStatement statement, ResultSet rs, int individId) throws SQLException {
 		statement.setInt(1, individId);
-		final String fornvn = afQ(rs.getString("FORNVN"));
-		statement.setString(2, fornvn);
-		statement.setString(3, afQ(rs.getString("EFTERNVN")));
+		String[] navne = new String[2];
+
+		navne[0] = afQ(rs.getString("FORNVN"));
+		statement.setString(2, navne[0]);
+		navne[1] = afQ(rs.getString("EFTERNVN"));
+		statement.setString(3, navne[1]);
 		statement.setString(4, "TRUE");
 		final String stdnavn = afQ(rs.getString("STD_NAVN"));
 
@@ -285,7 +288,7 @@ public class FolketaellingLoader {
 		statement.setString(6, stdnavn);
 		statement.executeUpdate();
 
-		return fornvn;
+		return navne;
 	}
 
 	/**
@@ -352,7 +355,8 @@ public class FolketaellingLoader {
 		String navn = "";
 		boolean husfader = false;
 		String koen = "";
-		final String fornvn = "";
+		String[] navne;
+		String husfaderFornvn = "";
 
 		final Connection conn = connect();
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
@@ -366,20 +370,18 @@ public class FolketaellingLoader {
 		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
 		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 
-		// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'F'
-
+		// Hent alle husstande
 		ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
 			blistrupIdListe.add(rs1.getString("BEGIV"));
 		}
 
+		// For hver husstand
 		for (final String blistrupId : blistrupIdListe) {
 			sb = new StringBuilder();
 			husfader = true;
 
-			// SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'F' AND BEGIV = ?
-			// ORDER BY PID";
 			statements2.setString(1, blistrupId);
 			rs1 = statements2.executeQuery();
 
@@ -392,7 +394,7 @@ public class FolketaellingLoader {
 
 				individId = insertIndivid(statementi1, rs1, koen, 0);
 
-				insertPersonNavn(statementi2, rs1, individId);
+				navne = insertPersonNavn(statementi2, rs1, individId);
 
 				taeller++;
 
@@ -400,21 +402,15 @@ public class FolketaellingLoader {
 				if (husfader || "Husfader".equals(rolle) || rolle.contains("Husfader ") || rolle.contains("Husfader, ")
 						|| rolle.contains("Husfader. ") || rolle.contains("Huusbonde")) {
 					headId = individId;
+					husfaderFornvn = navne[0];
 
 					kildeId = insertKilde(statementi3, rs1);
-
-					// INSERT4 = "INSERT INTO FAMILIE (HUSFADER, HUSMODER)
-
 					familieId = insertFamilie(statementi4, rs1, koen, headId);
-
-					// INSERT5 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, HUSFADERALDER,
-					// HUSMODERALDER, KILDEID, BEGTYPE, DATO, NOTE, BLISTRUPID, STEDNAVN, BEM) "
-
 					insertFamilieBegivenhed(statementi5, rs1, familieId, koen, kildeId);
 
 					husfader = false;
+
 				} else if (rolle.contains("Konens ")) {
-					// Ignoreres, behandles senere
 
 				} else if (rolle.contains("Hustru") || rolle.contains("Kone") || rolle.contains("Husmoder")
 						|| rolle.contains("Familiemoder") || rolle.contains("Gaardmandskone")
@@ -424,9 +420,12 @@ public class FolketaellingLoader {
 				} else if (rolle.contains("Sønnesøn")) {
 					// Indsæt beregnet søn
 
+					String mellemfornvn = navne[1].replace("sen", "");
+
 					final int soenId = insertIndivid(statementi1, rs1, "m", familieId);
-					final String efternavn = fornvn + "sen";
-					insertPersonNavn(statementi2, rs1, soenId, "(Søn)", efternavn.replace("ss", "s"));
+					final String efternavn = husfaderFornvn + "sen";
+					insertPersonNavn(statementi2, rs1, soenId, mellemfornvn, efternavn.replace("ss", "s"));
+					insertVidne(statementi6, soenId, "Søn", familieId);
 
 					// Indsæt næste generation familie
 
@@ -439,15 +438,27 @@ public class FolketaellingLoader {
 
 				} else if (rolle.contains("Datter Datter") || rolle.contains("Datterdatter")
 						|| rolle.contains("Børnebørn") || rolle.contains("Barnebarn")
-						|| rolle.contains("Datters uægte søn")) {
-					// DatterbQorn
-					// Dattersøn
-					// SQosterdatter
-					// SQosterdatter
-					// SQostersQon
+						|| rolle.contains("Datters uægte søn") || rolle.contains("Datterbørn")
+						|| rolle.contains("Dattersøn")) {
+					// Indsæt beregnet datter
+					String mellemfornvn = navne[1].replace("sdatter", "").replace("datter", "");
 
-				} else if ((rolle.contains("Svigersøn") || rolle.contains("Svigerdatter")
-						|| rolle.contains("Sviger-Søn")) || rolle.contains("Stifdatter")) {
+					final int datterId = insertIndivid(statementi1, rs1, "k", familieId);
+					final String efternavn = husfaderFornvn + "sdatter";
+					insertPersonNavn(statementi2, rs1, datterId, mellemfornvn, efternavn.replace("ss", "s"));
+					insertVidne(statementi6, datterId, "Datter", familieId);
+
+					// Indsæt næste generation familie
+
+					final int familieId2 = insertFamilie(statementi4, rs1, "k", datterId);
+
+					// Indsæt datterbarn
+
+					updateIndivid(statementu1, familieId2, individId);
+					insertVidne(statementi6, individId, rolle, familieId2);
+
+				} else if (rolle.contains("Svigersøn") || rolle.contains("Svigerdatter") || rolle.contains("Sviger-Søn")
+						|| rolle.contains("Stifdatter")) {
 
 				} else if (rolle.contains("Søn") || rolle.contains("Datter") || rolle.contains("Døttre")
 						|| rolle.contains("Barn") || rolle.contains("Børn")) {
