@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 28. jul. 2023
+ * @version 20. aug. 2023
  *
  */
 public class IndividBegivenhedModel {
@@ -80,6 +80,9 @@ public class IndividBegivenhedModel {
 
 			liste.add(model);
 		}
+
+		statement1.close();
+		statement2.close();
 
 		final IndividBegivenhedModel[] array = new IndividBegivenhedModel[liste.size()];
 

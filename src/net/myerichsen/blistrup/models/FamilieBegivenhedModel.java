@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 28. jul. 2023
+ * @version 20.aug. 2023
  */
 public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED";
@@ -62,6 +62,8 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 			}
 			liste.add(model);
 		}
+
+		statement.close();
 
 		final FamilieBegivenhedModel[] array = new FamilieBegivenhedModel[liste.size()];
 

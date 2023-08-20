@@ -10,12 +10,12 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 20. aug. 2023
  *
  */
 public class RaaDataModel {
 	private static final String SELECTTYP = "SELECT * FROM BLISTRUP.F9PERSONFAMILIEQ "
-			+ "WHERE TYPE = 'D' ORDER BY BEGIV, PID FETCH FIRST 10 ROWS ONLY";
+			+ "WHERE TYPE = 'D' ORDER BY BEGIV, PID";
 
 	/**
 	 * @param args
@@ -136,6 +136,8 @@ public class RaaDataModel {
 			model.setKildekommentar(rs.getString(96));
 			liste.add(model);
 		}
+
+		statement.close();
 
 		for (final RaaDataModel raaDataModel : liste) {
 			System.out.println(raaDataModel);

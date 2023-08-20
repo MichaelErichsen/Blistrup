@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.util.Fonkod;
 public class KonfirmationLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
 
-	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' FETCH FIRST 50 ROWS ONLY";
+	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'B'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' AND BEGIV = ? ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";

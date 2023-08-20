@@ -23,6 +23,7 @@ import net.myerichsen.blistrup.actions.AfslutAction;
 import net.myerichsen.blistrup.actions.BegravelseAction;
 import net.myerichsen.blistrup.actions.DaabAction;
 import net.myerichsen.blistrup.actions.FolketaellingAction;
+import net.myerichsen.blistrup.actions.GedcomSaveAction;
 import net.myerichsen.blistrup.actions.KonfirmationAction;
 import net.myerichsen.blistrup.actions.OederAction;
 import net.myerichsen.blistrup.actions.TabelRydningAction;
@@ -32,7 +33,7 @@ import net.myerichsen.blistrup.actions.VielseAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 28. jul. 2023
+ * @version 20. aug. 2023
  *
  */
 public class BlistrupLokalhistorie extends ApplicationWindow {
@@ -141,6 +142,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		final MenuManager mainMenu = new MenuManager();
 		final MenuManager fileMenu = new MenuManager("&Filer");
 		final MenuManager loadMenu = new MenuManager("&Indl\u00E6s");
+		final MenuManager saveMenu = new MenuManager("&Gem");
 
 		fileMenu.add(afslut);
 
@@ -153,8 +155,11 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		loadMenu.add(new Separator());
 		loadMenu.add(new TabelRydningAction(this));
 
+		saveMenu.add(new GedcomSaveAction(this));
+
 		mainMenu.add(fileMenu);
 		mainMenu.add(loadMenu);
+		mainMenu.add(saveMenu);
 
 		return mainMenu;
 	}

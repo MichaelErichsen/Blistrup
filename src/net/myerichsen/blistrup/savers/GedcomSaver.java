@@ -28,7 +28,7 @@ public class GedcomSaver {
 	public static void main(String[] args) {
 		final GedcomSaver gs = new GedcomSaver();
 
-		gs.execute(args);
+		gs.save();
 
 	}
 
@@ -39,7 +39,7 @@ public class GedcomSaver {
 	 *
 	 * @param args
 	 */
-	private void execute(String[] args) {
+	public void save() {
 		final String filename = "C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Test.ged";
 		final String submitterName = "Michael Erichsen";
 		final String dbPath = "C:\\Users\\michael\\BlistrupDB";

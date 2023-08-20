@@ -15,13 +15,13 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Indlæs begravelser
  *
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 20. aug. 2023
  *
  */
 public class BegravelseLoader {
 	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
 
-	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' FETCH FIRST 50 ROWS ONLY";
+	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'D'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' AND BEGIV = ? ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";
@@ -36,7 +36,7 @@ public class BegravelseLoader {
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 	private static final String UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
-	private static final String UPDATE3 = "UPDATE FAMILY SET WIFE = ? WHERE ID = ?";
+	private static final String UPDATE3 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
 
 	private static final Fonkod fonkod = new Fonkod();
 
@@ -312,7 +312,7 @@ public class BegravelseLoader {
 						statement2.setInt(2, doedId);
 					} else {
 
-						// UPDATE3 = "UPDATE FAMILY SET WIFE = ? WHERE ID = ?";
+						// UPDATE3 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
 
 						statement2.close();
 						statement2 = conn.prepareStatement(UPDATE3);

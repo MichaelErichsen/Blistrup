@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 28. jul. 2023
+ * @version 20. aug. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
@@ -28,7 +28,7 @@ public class IndividModel {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
-		PreparedStatement statement3;
+		PreparedStatement statement3 = null;
 		final ResultSet rs1 = statement1.executeQuery();
 		ResultSet rs2, rs3;
 		int id = 0;
@@ -90,6 +90,11 @@ public class IndividModel {
 				}
 			}
 		}
+
+		statement1.close();
+		statement2.close();
+		statement3.close();
+
 		final IndividModel[] array = new IndividModel[liste.size()];
 
 		for (int i = 0; i < liste.size(); i++) {
