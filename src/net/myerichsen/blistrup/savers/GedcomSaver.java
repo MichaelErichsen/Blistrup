@@ -202,12 +202,11 @@ public class GedcomSaver {
 		// Første del kan være numerisk før komma eller AFG, HM HMD
 
 		/**
-		 * Ammendrup Bannebjerg Ludshøj Fjellenstrup Esrum Esbønderup Frederiksborg
-		 * Gilleleje Gillemølle Græsted Haagendrup Hemmingstrup Hulerød Huseby Maarum
-		 * Græsted_Overdrev Orne Paarup præstegaard Søborg Tibirke Tikøb Maarum_Tinghuse
 		 * Hesselbjerg Bakkebjerg Raageleje Smidstrup Udsholt Unnerup Kolsbæk Højelt
 		 * Str.Esbø præstegaarden Taagerup Vejby Blidstrup Blistrup Aggebo Alme Alume
-		 * Tisvilde Tuelstrup Tulstrup Valby Villingerød
+		 * Ammendrup Bannebjerg Ludshøj Fjellenstrup Esrum Esbønderup Frederiksborg
+		 * Gilleleje Gillemølle Græsted Haagendrup Hemmingstrup Hulerød Huseby Maarum
+		 * Græsted_Overdrev Orne Paarup præstegaard
 		 */
 
 		while (rs1.next()) {
