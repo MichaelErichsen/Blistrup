@@ -17,7 +17,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * familieforhold så vidt muligt
  *
  * @author Michael Erichsen
- * @version 30. jul. 2023
+ * @version 22.aug. 2023
  *
  */
 public class FolketaellingLoader {
@@ -227,6 +227,7 @@ public class FolketaellingLoader {
 		if (generatedKeys.next()) {
 			individId = generatedKeys.getInt(1);
 		}
+
 		generatedKeys.close();
 
 		return individId;
@@ -272,7 +273,7 @@ public class FolketaellingLoader {
 	 */
 	private String[] insertPersonNavn(PreparedStatement statement, ResultSet rs, int individId) throws SQLException {
 		statement.setInt(1, individId);
-		String[] navne = new String[2];
+		final String[] navne = new String[2];
 
 		navne[0] = afQ(rs.getString("FORNVN"));
 		statement.setString(2, navne[0]);
@@ -359,6 +360,13 @@ public class FolketaellingLoader {
 		String koen = "";
 		String[] navne;
 		String husfaderFornvn = "";
+		int soenId = 0;
+		String efternavn = "";
+		int familieId2 = 0;
+		String mellemfornvn = "";
+		int datterId = 0;
+		int faderfamilie = 0;
+		int moderfamilie = 0;
 
 		final Connection conn = connect();
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
@@ -424,14 +432,9 @@ public class FolketaellingLoader {
 					/**
 					 * Ignorer plejebørn
 					 */
-				} else if (rolle.toLowerCase().contains("pleye") || rolle.toLowerCase().contains("leye")) {
+				} else if ((rolle.toLowerCase().contains("pleye") || rolle.toLowerCase().contains("leye")) || rolle.contains("Konens ")) {
 					// Ignore
 
-				} else if (rolle.contains("Konens ")) {
-
-					/**
-					 * Husmoder
-					 */
 				} else if (rolle.contains("Hustru") || rolle.contains("Kone") || rolle.contains("Husmoder")
 						|| rolle.contains("Familiemoder") || rolle.contains("Gaardmandskone")
 						|| rolle.contains("Husbondinde") || rolle.contains("Hosbondinde")) {
@@ -444,16 +447,16 @@ public class FolketaellingLoader {
 				} else if (rolle.contains("Sønnesøn")) {
 					// Indsæt beregnet søn
 
-					String mellemfornvn = navne[1].replace("sen", "");
+					mellemfornvn = navne[1].replace("sen", "");
 
-					final int soenId = insertIndivid(statementi1, rs1, "m", familieId);
-					final String efternavn = husfaderFornvn + "sen";
+					soenId = insertIndivid(statementi1, rs1, "m", familieId);
+					efternavn = husfaderFornvn + "sen";
 					insertPersonNavn(statementi2, rs1, soenId, mellemfornvn, efternavn.replace("ss", "s"));
 					insertVidne(statementi6, soenId, "Søn", familieId);
 
 					// Indsæt næste generation familie
 
-					final int familieId2 = insertFamilie(statementi4, rs1, "m", soenId);
+					familieId2 = insertFamilie(statementi4, rs1, "m", soenId);
 
 					// Indsæt sønnesøn
 
@@ -468,16 +471,16 @@ public class FolketaellingLoader {
 						|| rolle.contains("Datters uægte søn") || rolle.contains("Datterbørn")
 						|| rolle.contains("Dattersøn")) {
 					// Indsæt beregnet datter
-					String mellemfornvn = navne[1].replace("sdatter", "").replace("datter", "");
+					mellemfornvn = navne[1].replace("sdatter", "").replace("datter", "");
 
-					final int datterId = insertIndivid(statementi1, rs1, "k", familieId);
-					final String efternavn = husfaderFornvn + "sdatter";
+					datterId = insertIndivid(statementi1, rs1, "k", familieId);
+					efternavn = husfaderFornvn + "sdatter";
 					insertPersonNavn(statementi2, rs1, datterId, mellemfornvn, efternavn.replace("ss", "s"));
 					insertVidne(statementi6, datterId, "Datter", familieId);
 
 					// Indsæt næste generation familie
 
-					final int familieId2 = insertFamilie(statementi4, rs1, "k", datterId);
+					familieId2 = insertFamilie(statementi4, rs1, "k", datterId);
 
 					// Indsæt datterbarn
 
@@ -511,7 +514,7 @@ public class FolketaellingLoader {
 				} else if (rolle.contains("Fader") || rolle.contains("far") || rolle.contains("forsørges af Sønnen")
 						|| rolle.contains("husfader")) {
 					// Indsæt ny familie med ind. som husfader on head som barn
-					int faderfamilie = insertFamilie(statementi4, rs1, "m", individId);
+					faderfamilie = insertFamilie(statementi4, rs1, "m", individId);
 					updateFamilie(statementu2, headId, faderfamilie);
 					insertVidne(statementi6, individId, rolle, familieId);
 
@@ -526,7 +529,7 @@ public class FolketaellingLoader {
 					 */
 				} else if (rolle.contains("Moder") || rolle.contains("mor") || rolle.contains("moder")) {
 					// Indsæt ny familie med ind. som husmoder on head som barn
-					int moderfamilie = insertFamilie(statementi4, rs1, "k", individId);
+					moderfamilie = insertFamilie(statementi4, rs1, "k", individId);
 					updateFamilie(statementu2, headId, moderfamilie);
 					insertVidne(statementi6, individId, rolle, familieId);
 

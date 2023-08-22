@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Indlæs begravelser
  *
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 22. aug. 2023
  *
  */
 public class BegravelseLoader {
@@ -28,7 +28,7 @@ public class BegravelseLoader {
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
 	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // Begravelse, død, fødsel, dåb
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 	private static final String INSERT7 = "INSERT INTO FAMILIE (HUSMODER) VALUES(?)";
@@ -51,27 +51,6 @@ public class BegravelseLoader {
 			e.printStackTrace();
 		}
 	}
-
-//	BEGIV INDBEG
-//	PID IND
-//	TYPE Begravelse INDBEG
-//	ROLLE: død, æfælle, far, mor, barn INDBEG
-//	STDNAVN INDNAVN
-//	FADER
-//	MODER
-//	FAELLE
-//	KILDE
-//	SEX
-//	ERHVERV
-//	ALDER
-//	FØDT (Aar)
-//	FØDESTED
-//	FØDTDATO
-//	DØBTSTED
-//	DØD (DATO)
-//	BEGR (DATO)
-//	STEDNAVN (DØD)
-//	BEM
 
 	/**
 	 * @param input
@@ -162,6 +141,7 @@ public class BegravelseLoader {
 				} else {
 					individId = 0;
 				}
+
 				generatedKeys.close();
 
 				// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN,

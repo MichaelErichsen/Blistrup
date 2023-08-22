@@ -1,8 +1,6 @@
 package net.myerichsen.blistrup.views;
 
-import java.sql.Date;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -34,14 +32,14 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 28. jul. 2023
+ * @version 22. aug. 2023
  *
  */
 public class IndividView extends Composite {
 	final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 	private TableViewer tableViewer;
 	private Table table;
-	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	private Text navneFiltertext;
 	private Text aegtefaelleFilterText;
 	private Text foedtFilterText;
@@ -237,10 +235,11 @@ public class IndividView extends Composite {
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final Date foedt = ((IndividModel) element).getFoedt();
+				final String foedt = ((IndividModel) element).getFoedt();
 
 				if (foedt != null) {
-					return formatter.format(foedt);
+					return foedt.trim();
+//					return formatter.format(foedt);
 				}
 				return "";
 
