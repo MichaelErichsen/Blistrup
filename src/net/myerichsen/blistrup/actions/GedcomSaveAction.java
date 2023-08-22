@@ -7,7 +7,7 @@ import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 22. aug. 2023
  *
  */
 public class GedcomSaveAction extends Action {
@@ -28,8 +28,16 @@ public class GedcomSaveAction extends Action {
 
 	@Override
 	public void run() {
-		new GedcomSaver().save();
-		blh.refresh();
-		blh.getStatusLineManager().setMessage("GEDCOM er gemt");
+		String[] args = new String[] { "C:\\Users\\michael\\BlistrupDB",
+				"C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Test.ged", "Alex Hvidberg" };
+
+		try {
+			new GedcomSaver().save(args);
+			blh.refresh();
+			blh.getStatusLineManager().setMessage("GEDCOM er gemt");
+		} catch (Exception e) {
+			blh.getStatusLineManager().setErrorMessage(e.getMessage());
+		}
+
 	}
 }

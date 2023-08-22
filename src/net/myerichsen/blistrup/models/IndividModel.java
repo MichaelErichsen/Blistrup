@@ -1,7 +1,6 @@
 package net.myerichsen.blistrup.models;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,14 +10,90 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 22. aug. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.FAMILIE WHERE HUSFADER = ? OR HUSMODER = ?";
+	private static final String SELECT4 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 
 	/**
+	 * Get a model from an SQL result set
+	 *
+	 * @return
+	 * @throws SQLException
+	 */
+	public static IndividModel getData(Connection conn, ResultSet rs1) throws SQLException {
+		IndividModel model = new IndividModel();
+		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
+		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
+		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
+		ResultSet rs2, rs3, rs4;
+		int husfader = 0;
+		int husmoder = 0;
+		String koen = "";
+
+		final int id = rs1.getInt("ID");
+		statement2.setInt(1, id);
+		rs2 = statement2.executeQuery();
+
+		while (rs2.next()) {
+			if ("TRUE".equals(rs2.getString("PRIMAERNAVN").trim())) {
+				husfader = 0;
+				husmoder = 0;
+
+				model = new IndividModel();
+				model.setId(id);
+				koen = rs1.getString("KOEN").trim();
+				model.setKoen(koen);
+				model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
+				model.setFamc(rs1.getInt("FAMC"));
+				model.setFoedt(rs1.getString("FOEDT").trim());
+
+				model.setStdNavn(rs2.getString("STDNAVN").trim());
+				model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());
+
+				statement3.setInt(1, id);
+				statement3.setInt(2, id);
+				rs3 = statement3.executeQuery();
+
+				if (rs3.next()) {
+					model.getFams().add(rs3.getInt("ID"));
+					husfader = rs3.getInt("HUSFADER");
+					husmoder = rs3.getInt("HUSMODER");
+				}
+
+				if ("k".equals(koen) && husfader > 0) {
+					statement4.setInt(1, husfader);
+					rs4 = statement4.executeQuery();
+
+					if (rs4.next()) {
+						model.getSpouseNames().add(rs4.getString("STDNAVN").trim());
+					}
+				}
+
+				if ("m".equals(koen) && husmoder > 0) {
+					statement4.setInt(1, husmoder);
+					rs4 = statement4.executeQuery();
+
+					if (rs4.next()) {
+						model.getSpouseNames().add(rs4.getString("STDNAVN").trim());
+					}
+				}
+
+			}
+		}
+
+		statement2.close();
+		statement3.close();
+		statement4.close();
+		return model;
+	}
+
+	/**
+	 * Get array of models
+	 *
 	 * @return
 	 * @throws SQLException
 	 */
@@ -27,73 +102,14 @@ public class IndividModel {
 		final List<IndividModel> liste = new ArrayList<>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
-		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
-		PreparedStatement statement3 = null;
 		final ResultSet rs1 = statement1.executeQuery();
-		ResultSet rs2, rs3;
-		int id = 0;
-		int husfader = 0;
-		int husmoder = 0;
-		String koen = "";
 
 		while (rs1.next()) {
-			id = rs1.getInt("ID");
-			statement2.setInt(1, id);
-			rs2 = statement2.executeQuery();
-
-			while (rs2.next()) {
-				if ("TRUE".equals(rs2.getString("PRIMAERNAVN").trim())) {
-					husfader = 0;
-					husmoder = 0;
-
-					model = new IndividModel();
-					model.setId(id);
-					koen = rs1.getString("KOEN").trim();
-					model.setKoen(koen);
-					model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
-					model.setFamc(rs1.getInt("FAMC"));
-					model.setStdNavn(rs2.getString("STDNAVN").trim());
-					model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());
-
-					statement3 = conn.prepareStatement(SELECT3);
-					statement3.setInt(1, id);
-					statement3.setInt(2, id);
-					rs3 = statement3.executeQuery();
-
-					if (rs3.next()) {
-						model.getFams().add(rs3.getInt("ID"));
-						husfader = rs3.getInt("HUSFADER");
-						husmoder = rs3.getInt("HUSMODER");
-					}
-
-					if ("k".equals(koen) && husfader > 0) {
-						statement3 = conn.prepareStatement(SELECT2);
-						statement3.setInt(1, husfader);
-						rs3 = statement3.executeQuery();
-
-						if (rs3.next()) {
-							model.getSpouseNames().add(rs3.getString("STDNAVN").trim());
-						}
-					}
-
-					if ("m".equals(koen) && husmoder > 0) {
-						statement3 = conn.prepareStatement(SELECT2);
-						statement3.setInt(1, husmoder);
-						rs3 = statement3.executeQuery();
-
-						if (rs3.next()) {
-							model.getSpouseNames().add(rs3.getString("STDNAVN").trim());
-						}
-					}
-
-					liste.add(model);
-				}
-			}
+			model = getData(conn, rs1);
+			liste.add(model);
 		}
 
 		statement1.close();
-		statement2.close();
-		statement3.close();
 
 		final IndividModel[] array = new IndividModel[liste.size()];
 
@@ -115,10 +131,10 @@ public class IndividModel {
 	private List<String> spouseNames = new ArrayList<>();
 	private List<IndividBegivenhedModel> begivenheder = new ArrayList<>();
 	private String noter = "";
-	private Date foedt;
-	private Date doebt;
-	private Date doed;
-	private Date begravet;
+	private String foedt;
+	private String doebt;
+	private String doed;
+	private String begravet;
 	private String fam = "";
 	private String slgt = "";
 
@@ -132,7 +148,7 @@ public class IndividModel {
 	/**
 	 * @return the begravet
 	 */
-	public Date getBegravet() {
+	public String getBegravet() {
 		return begravet;
 	}
 
@@ -146,14 +162,14 @@ public class IndividModel {
 	/**
 	 * @return the doebt
 	 */
-	public Date getDoebt() {
+	public String getDoebt() {
 		return doebt;
 	}
 
 	/**
 	 * @return the doed
 	 */
-	public Date getDoed() {
+	public String getDoed() {
 		return doed;
 	}
 
@@ -181,7 +197,7 @@ public class IndividModel {
 	/**
 	 * @return the foedt
 	 */
-	public Date getFoedt() {
+	public String getFoedt() {
 		return foedt;
 	}
 
@@ -251,7 +267,7 @@ public class IndividModel {
 	/**
 	 * @param begravet the begravet to set
 	 */
-	public void setBegravet(Date begravet) {
+	public void setBegravet(String begravet) {
 		this.begravet = begravet;
 	}
 
@@ -265,14 +281,14 @@ public class IndividModel {
 	/**
 	 * @param doebt the doebt to set
 	 */
-	public void setDoebt(Date doebt) {
+	public void setDoebt(String doebt) {
 		this.doebt = doebt;
 	}
 
 	/**
 	 * @param doed the doed to set
 	 */
-	public void setDoed(Date doed) {
+	public void setDoed(String doed) {
 		this.doed = doed;
 	}
 
@@ -300,7 +316,7 @@ public class IndividModel {
 	/**
 	 * @param foedt the foedt to set
 	 */
-	public void setFoedt(Date foedt) {
+	public void setFoedt(String foedt) {
 		this.foedt = foedt;
 	}
 

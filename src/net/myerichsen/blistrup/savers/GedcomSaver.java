@@ -3,60 +3,75 @@ package net.myerichsen.blistrup.savers;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 
 import net.myerichsen.blistrup.models.FamilieModel;
-import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 22. aug. 2023
  *
  */
 public class GedcomSaver {
-	final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
-	final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
+	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
+	private static final String SELECTF2 = "SELECT DATO FROM BLISTRUP.FAMILIEBEGIVENHED WHERE BEGTYPE = 'Vielse' AND ID = ?";
+
+	private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
+	private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+	private static OutputStreamWriter fw;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final GedcomSaver gs = new GedcomSaver();
+		args = new String[] { "C:\\Users\\michael\\BlistrupDB",
+				"C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Test.ged", "Alex Hvidberg" };
 
-		gs.save();
+		try {
+			new GedcomSaver().save(args);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 
 	}
-
-	private OutputStreamWriter fw;
 
 	/**
 	 * Worker method
 	 *
 	 * @param args
+	 * @throws Exception
 	 */
-	public void save() {
-		final String filename = "C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Test.ged";
-		final String submitterName = "Michael Erichsen";
-		final String dbPath = "C:\\Users\\michael\\BlistrupDB";
+	public void save(String[] args) throws Exception {
+		fw = new OutputStreamWriter(new FileOutputStream(args[1]));
+		Connection conn = connect(args[0]);
+		writeHeader(args[1], args[2]);
+		writeIndividuals(conn);
+		writeFamilies(conn);
+		writeSources(conn);
+		writeTrailer();
+		fw.flush();
+		fw.close();
+		System.out.println("Færdig!");
+	}
 
-		try {
-			fw = new OutputStreamWriter(new FileOutputStream(filename));
-			writeHeader(filename, submitterName);
-			writeIndividuals(dbPath);
-			writeFamilies(dbPath);
-			writeSources(dbPath);
-			writeTrailer();
-			fw.flush();
-			fw.close();
-			System.out.println("Færdig!");
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+	/**
+	 * @param dbPath
+	 * @return
+	 * @throws SQLException
+	 */
+	private Connection connect(String dbPath) throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		return conn;
+
 	}
 
 	/**
@@ -73,14 +88,19 @@ public class GedcomSaver {
 	/**
 	 * Write all families
 	 *
-	 * @param dbPath
+	 * @param conn
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	private void writeFamilies(String dbPath) throws SQLException, IOException {
-		FamilieModel[] array = FamilieModel.getData(dbPath);
+	private void writeFamilies(Connection conn) throws SQLException, IOException {
+		FamilieModel model;
+		PreparedStatement statement1 = conn.prepareStatement(SELECTF1);
+		PreparedStatement statement2 = conn.prepareStatement(SELECTF2);
+		ResultSet rs1 = statement1.executeQuery();
+		ResultSet rs2;
 
-		for (FamilieModel model : array) {
+		while (rs1.next()) {
+			model = FamilieModel.getData(conn, rs1);
 			writeLine("0 @F" + model.getId() + "@ FAM");
 			if (model.getFader() > 0) {
 				writeLine("1 HUSB @I" + model.getFader() + "@");
@@ -90,14 +110,21 @@ public class GedcomSaver {
 				writeLine("1 WIFE @I" + model.getModer() + "@");
 			}
 
-			for (IndividModel barn : model.getBoern()) {
+			for (final IndividModel barn : model.getBoern()) {
 				writeLine("1 CHIL @I" + barn.getId() + "@");
 			}
 
-//			writeLine("1 MARR");
-//			writeLine("2 DATE 01 MAY 1921");
-//			writeLine("2 PLAC Olsker, Bornholm");
+			statement2.setInt(1, model.getId());
+			rs2 = statement2.executeQuery();
+
+			if (rs2.next()) {
+				writeLine("1 MARR");
+				writeLine("2 DATE " + rs2.getString("DATO"));
+				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg");
+			}
 		}
+		statement1.close();
+		statement2.close();
 	}
 
 	/**
@@ -108,8 +135,6 @@ public class GedcomSaver {
 	 * @throws IOException
 	 */
 	private void writeHeader(String filename, String submitterName) throws IOException {
-		final LocalDateTime now = LocalDateTime.now();
-
 		writeLine("0 HEAD");
 		writeLine("1 SOUR BlistrupLokalhistorie");
 		writeLine("2 VERS 1.0.0");
@@ -118,6 +143,9 @@ public class GedcomSaver {
 		writeLine("2 VERS 5.5");
 		writeLine("2 FORM LINEAGE-LINKED");
 		writeLine("1 DEST GED55");
+
+		final LocalDateTime now = LocalDateTime.now();
+
 		writeLine("1 DATE " + dateFormat.format(now).toUpperCase());
 		writeLine("2 TIME " + timeFormat.format(now));
 		writeLine("1 CHAR ANSEL");
@@ -128,37 +156,44 @@ public class GedcomSaver {
 
 	/**
 	 * Write all individuals
-	 *
-	 * @param dbPath
+	 * 
+	 * @param conn
+	 * 
 	 * @throws SQLException
 	 * @throws IOException
+	 *
 	 */
-	private void writeIndividuals(String dbPath) throws SQLException, IOException {
+	private void writeIndividuals(Connection conn) throws SQLException, IOException {
+		IndividModel model;
 		String sex = "";
-		final IndividModel[] array = IndividModel.getData(dbPath);
+		PreparedStatement statement1 = conn.prepareStatement(SELECTI1);
+		ResultSet rs1 = statement1.executeQuery();
 
-		// For each individual
-		for (final IndividModel model : array) {
+		// TODO Handle name ", /<landsby>/"
+
+		while (rs1.next()) {
+			model = IndividModel.getData(conn, rs1);
 			writeLine("0 @I" + model.getId() + "@ INDI");
 			writeLine("1 NAME " + slashName(model.getStdNavn()));
-			sex = model.getKoen().toUpperCase().equals("M") ? "M" : "F";
+			sex = "M".equals(model.getKoen().toUpperCase()) ? "M" : "F";
 			writeLine("1 SEX " + sex);
 
 			if (model.getFamc() > 0) {
 				writeLine("1 FAMC @F" + model.getFamc() + "@");
 			}
 
-			for (Integer aFams : model.getFams()) {
+			for (final Integer aFams : model.getFams()) {
 				writeLine("1 FAMS @F" + aFams + "@");
 			}
 
-			List<IndividBegivenhedModel> begivenheder = model.getBegivenheder();
-
-			for (IndividBegivenhedModel begivenhed : begivenheder) {
-				writeLine("Begivenhed: " + begivenhed.getId() + ", " + begivenhed.getBegType() + ", "
-						+ begivenhed.getRolle() + ", " + begivenhed.getDato() + ", " + begivenhed.getDetaljer());
+			if (model.getFoedt() != null && !model.getFoedt().isBlank()) {
+				writeLine("1 BIRT");
+				writeLine("2 DATE " + model.getFoedt().trim());
 			}
+
 		}
+
+		statement1.close();
 	}
 
 	/**
@@ -173,9 +208,9 @@ public class GedcomSaver {
 	/**
 	 * Write all sources
 	 *
-	 * @param dbPath
+	 * @param conn
 	 */
-	private void writeSources(String dbPath) {
+	private void writeSources(Connection conn) {
 //		For each source
 //
 //		Get ID and strings for a title and abbreviation

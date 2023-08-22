@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 22. aug. 2023
  *
  */
 public class FamilieModel {
@@ -19,111 +19,131 @@ public class FamilieModel {
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
 
+	/**
+	 * @param statement2
+	 * @param statement3
+	 * @param statement4
+	 * @param rs1
+	 * @return
+	 * @throws SQLException
+	 */
+	public static FamilieModel getData(Connection conn, final ResultSet rs1) throws SQLException {
+		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
+		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
+		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
+
+		FamilieModel model;
+		ResultSet rs2;
+		ResultSet rs3;
+		ResultSet rs4;
+		int familieId;
+		int husFaderId;
+		int husModerId;
+		int barnId;
+		IndividModel individModel;
+		List<IndividModel> boern;
+		model = new FamilieModel();
+		familieId = rs1.getInt("ID");
+		model.setId(familieId);
+		husFaderId = rs1.getInt("HUSFADER");
+		model.setFader(husFaderId);
+		husModerId = rs1.getInt("HUSMODER");
+		model.setModer(husModerId);
+
+		// Husfaders navn
+		// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
+		statement2.setInt(1, husFaderId);
+		rs2 = statement2.executeQuery();
+
+		if (rs2.next()) {
+			model.setFaderNavn(rs2.getString("STDNAVN").trim());
+		}
+
+		// Husfaders fødsel
+		// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
+
+		statement4.setInt(1, husFaderId);
+		rs4 = statement4.executeQuery();
+
+		if (rs4.next()) {
+			model.setFaderFoedt(rs4.getString("FOEDT").trim());
+		}
+
+		// Husmoders navn
+		// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
+		statement2.setInt(1, husModerId);
+		rs2 = statement2.executeQuery();
+
+		if (rs2.next()) {
+			model.setModerNavn(rs2.getString("STDNAVN").trim());
+		}
+
+		// Husmoders fødsel
+		// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
+
+		statement4.setInt(1, husModerId);
+		rs4 = statement4.executeQuery();
+
+		if (rs4.next()) {
+			model.setModerFoedt(rs4.getString("FOEDT").trim());
+		}
+
+		// Børn
+		boern = new ArrayList<>();
+
+		// SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
+
+		statement3.setInt(1, familieId);
+		rs3 = statement3.executeQuery();
+
+		while (rs3.next()) {
+			individModel = new IndividModel();
+			barnId = rs3.getInt("ID");
+			individModel.setId(barnId);
+
+			// Barns navn
+			// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
+			statement2.setInt(1, barnId);
+			rs2 = statement2.executeQuery();
+
+			if (rs2.next()) {
+				individModel.setStdNavn(rs2.getString("STDNAVN").trim());
+			}
+
+			boern.add(individModel);
+		}
+
+		model.setBoern(boern);
+		return model;
+	}
+
 	public static FamilieModel[] getData(String dbPath) throws SQLException {
 		FamilieModel model;
 		final List<FamilieModel> liste = new ArrayList<>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
-		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
-		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
-		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
+//		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
+//		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
+//		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
 
-		ResultSet rs2, rs3, rs4;
-		int familieId = 0;
-		int husFaderId = 0;
-		int husModerId = 0;
-		int barnId = 0;
-		IndividModel individModel;
-		List<IndividModel> boern = new ArrayList<>();
+//		new ArrayList<>();
 
 		// SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE";
 
 		final ResultSet rs1 = statement1.executeQuery();
 
 		while (rs1.next()) {
-			model = new FamilieModel();
-			familieId = rs1.getInt("ID");
-			model.setId(familieId);
-			husFaderId = rs1.getInt("HUSFADER");
-			model.setFader(husFaderId);
-			husModerId = rs1.getInt("HUSMODER");
-			model.setModer(husModerId);
-
-			// Husfaders navn
-			// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
-
-			statement2.setInt(1, husFaderId);
-			rs2 = statement2.executeQuery();
-
-			if (rs2.next()) {
-				model.setFaderNavn(rs2.getString("STDNAVN").trim());
-			}
-
-			// Husfaders fødsel
-			// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
-
-			statement4.setInt(1, husFaderId);
-			rs4 = statement4.executeQuery();
-
-			if (rs4.next()) {
-				model.setFaderFoedt(rs4.getString("FOEDT").trim());
-			}
-
-			// Husmoders navn
-			// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
-
-			statement2.setInt(1, husModerId);
-			rs2 = statement2.executeQuery();
-
-			if (rs2.next()) {
-				model.setModerNavn(rs2.getString("STDNAVN").trim());
-			}
-
-			// Husmoders fødsel
-			// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
-
-			statement4.setInt(1, husModerId);
-			rs4 = statement4.executeQuery();
-
-			if (rs4.next()) {
-				model.setModerFoedt(rs4.getString("FOEDT").trim());
-			}
-
-			// Børn
-			boern = new ArrayList<IndividModel>();
-
-			// SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
-
-			statement3.setInt(1, familieId);
-			rs3 = statement3.executeQuery();
-
-			while (rs3.next()) {
-				individModel = new IndividModel();
-				barnId = rs3.getInt("ID");
-				individModel.setId(barnId);
-
-				// Barns navn
-				// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
-
-				statement2.setInt(1, barnId);
-				rs2 = statement2.executeQuery();
-
-				if (rs2.next()) {
-					individModel.setStdNavn(rs2.getString("STDNAVN").trim());
-				}
-
-				boern.add(individModel);
-			}
-
-			model.setBoern(boern);
-
+			model = getData(conn, rs1);
 			liste.add(model);
 		}
 
 		statement1.close();
-		statement2.close();
-		statement3.close();
-		statement4.close();
+//		statement2.close();
+//		statement3.close();
+//		statement4.close();
 
 		final FamilieModel[] array = new FamilieModel[liste.size()];
 
