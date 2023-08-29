@@ -5,12 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 22. aug. 2023
+ * @version 28. aug. 2023
  *
  */
 public class FamilieModel {
@@ -18,6 +19,7 @@ public class FamilieModel {
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
+	private static final String INSERT1 = "INSERT INTO BLISTRUP.FAMILIE (HUSFADER, HUSMODER) VALUES(?, ?)";
 
 	/**
 	 * @param statement2
@@ -42,6 +44,8 @@ public class FamilieModel {
 		int barnId;
 		IndividModel individModel;
 		List<IndividModel> boern;
+		String foedt = "";
+
 		model = new FamilieModel();
 		familieId = rs1.getInt("ID");
 		model.setId(familieId);
@@ -67,7 +71,11 @@ public class FamilieModel {
 		rs4 = statement4.executeQuery();
 
 		if (rs4.next()) {
-			model.setFaderFoedt(rs4.getString("FOEDT").trim());
+			foedt = rs4.getString("FOEDT");
+
+			if (foedt != null) {
+			}
+
 		}
 
 		// Husmoders navn
@@ -87,7 +95,10 @@ public class FamilieModel {
 		rs4 = statement4.executeQuery();
 
 		if (rs4.next()) {
-			model.setModerFoedt(rs4.getString("FOEDT").trim());
+			foedt = rs4.getString("FOEDT");
+			if (foedt != null) {
+				model.setModerFoedt(foedt.trim());
+			}
 		}
 
 		// Børn
@@ -250,6 +261,32 @@ public class FamilieModel {
 	 */
 	public String getNoter() {
 		return noter;
+	}
+
+	/**
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public int insert(Connection conn) throws SQLException {
+		int familieId = 0;
+
+		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		statement.setInt(1, fader);
+		statement.setInt(2, moder);
+		statement.executeUpdate();
+
+		final ResultSet generatedKeys = statement.getGeneratedKeys();
+
+		if (generatedKeys.next()) {
+			familieId = generatedKeys.getInt(1);
+		} else {
+			familieId = 0;
+		}
+		generatedKeys.close();
+
+		return familieId;
+
 	}
 
 	/**

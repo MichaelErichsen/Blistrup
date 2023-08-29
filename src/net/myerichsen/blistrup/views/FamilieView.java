@@ -199,17 +199,17 @@ public class FamilieView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnBrn = tableViewerColumn_7.getColumn();
+		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnBrn = tableViewerColumn_7.getColumn();
 		tblclmnBrn.setWidth(300);
 		tblclmnBrn.setText("B\u00F8rn");
 		tableViewerColumn_7.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				FamilieModel model = (FamilieModel) element;
-				StringBuffer sb = new StringBuffer();
+				final FamilieModel model = (FamilieModel) element;
+				final StringBuilder sb = new StringBuilder();
 
-				for (IndividModel iModel : model.getBoern()) {
+				for (final IndividModel iModel : model.getBoern()) {
 					sb.append(iModel.getStdNavn() + ", ");
 				}
 				return sb.toString();

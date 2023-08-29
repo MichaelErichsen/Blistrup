@@ -25,7 +25,6 @@ import net.myerichsen.blistrup.actions.DaabAction;
 import net.myerichsen.blistrup.actions.FolketaellingAction;
 import net.myerichsen.blistrup.actions.GedcomSaveAction;
 import net.myerichsen.blistrup.actions.KonfirmationAction;
-import net.myerichsen.blistrup.actions.OederAction;
 import net.myerichsen.blistrup.actions.TabelRydningAction;
 import net.myerichsen.blistrup.actions.VielseAction;
 
@@ -33,9 +32,10 @@ import net.myerichsen.blistrup.actions.VielseAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 29. aug. 2023
  *
  */
+// TODO Add load buttons to each view and remove initial load
 public class BlistrupLokalhistorie extends ApplicationWindow {
 	private static final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 
@@ -150,7 +150,6 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		loadMenu.add(new KonfirmationAction(this));
 		loadMenu.add(new VielseAction(this));
 		loadMenu.add(new BegravelseAction(this));
-		loadMenu.add(new OederAction(this));
 		loadMenu.add(new FolketaellingAction(this));
 		loadMenu.add(new Separator());
 		loadMenu.add(new TabelRydningAction(this));

@@ -1,12 +1,7 @@
 ----------------------------------------------------------------
-<<<<<<< HEAD
-Tue Aug 22 17:39:44 CEST 2023:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-018a-1de6-de96-00000f8882b0 
-=======
-Tue Aug 22 12:22:39 CEST 2023:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-018a-1cc4-93bf-00000f000000 
->>>>>>> branch 'master' of git@github.com:MichaelErichsen/Blistrup.git
-on database directory C:\Users\michael\BlistrupDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@73d16e93 
+Tue Aug 29 21:17:51 CEST 2023:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-018a-42bb-11b5-00000f0310e0 
+on database directory C:\Users\michael\BlistrupDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5e2de80c 
 Loaded from file:/C:/Users/michael/.m2/repository/org/apache/derby/derby/10.14.1.0/derby-10.14.1.0.jar
 java.vendor=Oracle Corporation
 java.runtime.version=17.0.6+9-LTS-190

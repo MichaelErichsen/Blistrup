@@ -2,7 +2,6 @@ package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,12 +16,10 @@ import net.myerichsen.blistrup.util.Fonkod;
  * familieforhold så vidt muligt
  *
  * @author Michael Erichsen
- * @version 22.aug. 2023
+ * @version 25. aug. 2023
  *
  */
-public class FolketaellingLoader {
-	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
-
+public class FolketaellingLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'F'";
 //			+ " FETCH FIRST 500 ROWS ONLY";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'F' AND BEGIV = ? ORDER BY PID";
@@ -50,27 +47,6 @@ public class FolketaellingLoader {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * @param input
-	 * @return
-	 */
-	private String afQ(String input) {
-		return input.replace("Qo", "ø").replace("Qe", "æ").replace("Qa", "a").trim();
-	}
-
-	/**
-	 * Forbind til databasen
-	 *
-	 * @return conn forbindelse
-	 * @throws SQLException
-	 */
-	private Connection connect() throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
-		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.execute();
-		return conn;
 	}
 
 	/**
@@ -178,7 +154,7 @@ public class FolketaellingLoader {
 		statement.setDate(6, ftAarToDate(iAar));
 		statement.setString(7, ""); // Note
 		statement.setString(8, afQ(rs.getString("BEGIV")));
-		statement.setString(9, afQ(rs.getString("STEDNAVN")));
+		statement.setString(9, formatPlaceName(afQ(rs.getString("STEDNAVN"))));
 
 		if (rs.getString("BEM") != null) {
 			statement.setString(10, afQ(rs.getString("BEM")));
@@ -407,7 +383,7 @@ public class FolketaellingLoader {
 				rolle = afQ(rs1.getString("ROLLE"));
 				navn = afQ(rs1.getString("NAVN"));
 				koen = rs1.getString("SEX").trim();
-				sb.append(rolle + ": " + navn + ", \r\n");
+				sb.append(rolle + ": " + navn + ", \r\n4 CONC ");
 
 				individId = insertIndivid(statementi1, rs1, koen, 0);
 
@@ -432,7 +408,8 @@ public class FolketaellingLoader {
 					/**
 					 * Ignorer plejebørn
 					 */
-				} else if ((rolle.toLowerCase().contains("pleye") || rolle.toLowerCase().contains("leye")) || rolle.contains("Konens ")) {
+				} else if (rolle.toLowerCase().contains("pleye") || rolle.toLowerCase().contains("leye")
+						|| rolle.contains("Konens ")) {
 					// Ignore
 
 				} else if (rolle.contains("Hustru") || rolle.contains("Kone") || rolle.contains("Husmoder")
@@ -487,21 +464,14 @@ public class FolketaellingLoader {
 					updateIndivid(statementu1, familieId2, individId);
 					insertVidne(statementi6, individId, rolle, familieId2);
 
-				} else if (rolle.contains("Svigersøn") || rolle.contains("Svigerdatter")
-						|| rolle.contains("Sviger-Søn")) {
+				} else if (rolle.contains("Svigersøn") || rolle.contains("Svigerdatter") || rolle.contains("Sviger-Søn")
+						|| rolle.contains("Stifdatter")) {
 
-				} else if (rolle.contains("Stifdatter")) {
-
-				} else if (rolle.contains("Svigerfader")) {
+				} else if (rolle.contains("Svigerfader") || rolle.contains("En Broder til Husfaderen")) {
 					// Husmoderens Fader
 					// Husmoders Fader
 					// Huusmoders Fader
 
-				} else if (rolle.contains("En Broder til Husfaderen")) {
-
-					/**
-					 * Søn
-					 */
 				} else if (rolle.contains("Søn") || rolle.contains("Datter") || rolle.contains("Døttre")
 						|| rolle.contains("Barn") || rolle.contains("Børn") || rolle.contains("Forsørges af sin Moder")
 						|| rolle.contains("Midlertidigt hos Moderen")) {

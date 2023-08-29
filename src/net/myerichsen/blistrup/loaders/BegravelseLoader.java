@@ -1,7 +1,6 @@
 package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,12 +14,10 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Indlæs begravelser
  *
  * @author Michael Erichsen
- * @version 22. aug. 2023
+ * @version 25. aug. 2023
  *
  */
-public class BegravelseLoader {
-	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
-
+public class BegravelseLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'D'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' AND BEGIV = ? ORDER BY PID";
 
@@ -50,27 +47,6 @@ public class BegravelseLoader {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * @param input
-	 * @return
-	 */
-	private String afQ(String input) {
-		return input.replace("Qo", "ø").replace("Qe", "æ").replace("Qa", "a").trim();
-	}
-
-	/**
-	 * Forbind til databasen
-	 *
-	 * @return conn forbindelse
-	 * @throws SQLException
-	 */
-	private Connection connect() throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
-		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.execute();
-		return conn;
 	}
 
 	/**
@@ -124,7 +100,7 @@ public class BegravelseLoader {
 				moder = "";
 				rolle = afQ(rs1.getString("ROLLE"));
 				navn = afQ(rs1.getString("NAVN"));
-				sb.append(rolle + ": " + navn + ", \r\n");
+				sb.append(rolle + ": " + navn + ", \r\n4 CONC ");
 				koen = rs1.getString("SEX").trim();
 
 				// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";
@@ -151,7 +127,7 @@ public class BegravelseLoader {
 				statement2.setInt(1, individId);
 
 				stdnavn = afQ(rs1.getString("STD_NAVN"));
-				statement2.setString(2, stdnavn);
+				statement2.setString(2, cleanName(stdnavn));
 				try {
 					statement2.setString(3, fonkod.generateKey(stdnavn).trim());
 				} catch (final Exception e) {
@@ -209,7 +185,7 @@ public class BegravelseLoader {
 					statement2.setString(6, rolle);
 					statement2.setString(7, afQ(rs1.getString("BEGIV")));
 					statement2.setInt(8, kildeId);
-					statement2.setString(9, afQ(rs1.getString("STEDNAVN")));
+					statement2.setString(9, formatPlaceName(afQ(rs1.getString("STEDNAVN"))));
 					statement2.setString(10, afQ(rs1.getString("BEM")));
 					statement2.setString(11, rs1.getString("FQODT").trim());
 					statement2.executeUpdate();

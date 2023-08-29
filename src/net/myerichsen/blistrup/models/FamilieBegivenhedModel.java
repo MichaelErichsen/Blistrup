@@ -6,12 +6,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 20.aug. 2023
+ * @version 29. aug. 2023
  */
 public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED";
@@ -81,11 +82,11 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 		return SELECT1;
 	}
 
-	private int familieBegivenhedId;
-	private int familieId;
-	private int husfaderAlder;
-	private int husmoderAlder;
-	private int kildeId;
+	private int familieBegivenhedId = 0;
+	private int familieId = 0;
+	private int husfaderAlder = 0;
+	private int husmoderAlder = 0;
+	private int kildeId = 0;
 	private String begType = "";
 	private String underType = "";
 	private Date dato;
@@ -94,10 +95,10 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	private String blistrupId = "";
 	private String stedNavn = "";
 	private String bem = "";
-	private int aar;
+	private int aar = 0;
 	private String rolle = "";
-	private int gom;
-	private int brud;
+	private int gom = 0;
+	private int brud = 0;
 	private String gaard = "";
 
 	/**
@@ -231,6 +232,49 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	@Override
 	public String getUnderType() {
 		return underType;
+	}
+
+	/**
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public int insert(Connection conn) throws SQLException {
+		final String INSERT1 = "INSERT INTO BLISTRUP.FAMILIEBEGIVENHED "
+				+ "(FAMILIEID, HUSFADERALDER, HUSMODERALDER, KILDEID, BEGTYPE, "
+				+ "UNDERTYPE, DATO, NOTE, DETALJER, BLISTRUPID, STEDNAVN, BEM) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		int familieBegivenhedId = 0;
+
+		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		statement.setInt(1, familieId);
+		statement.setInt(2, husfaderAlder);
+		statement.setInt(3, husmoderAlder);
+		statement.setInt(4, kildeId);
+		statement.setString(5, begType);
+		statement.setString(6, underType);
+		if (dato != null) {
+			statement.setDate(7, dato);
+		} else {
+			statement.setDate(7, new Date(1));
+		}
+		statement.setString(8, note);
+		statement.setString(9, detaljer);
+		statement.setString(10, blistrupId);
+		statement.setString(11, stedNavn);
+		statement.setString(12, bem);
+		statement.executeUpdate();
+
+		final ResultSet generatedKeys = statement.getGeneratedKeys();
+
+		if (generatedKeys.next()) {
+			familieBegivenhedId = generatedKeys.getInt(1);
+		} else {
+			familieBegivenhedId = 0;
+		}
+		generatedKeys.close();
+
+		return familieBegivenhedId;
 	}
 
 	/**
@@ -368,12 +412,62 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 
 	@Override
 	public String toString() {
-		return familieBegivenhedId + ", " + familieId + ", " + husfaderAlder + ", " + husmoderAlder + ", " + aar + ", "
-				+ (rolle != null ? rolle + ", " : "") + gom + ", " + brud + ", " + (gaard != null ? gaard + ", " : "")
-				+ kildeId + ", " + (note != null ? note + ", " : "") + (detaljer != null ? detaljer + ", " : "")
-				+ (blistrupId != null ? blistrupId + ", " : "") + (stedNavn != null ? stedNavn + ", " : "")
-				+ (bem != null ? bem + ", " : "") + id + ", " + (begType != null ? begType + ", " : "")
-				+ (underType != null ? underType + ", " : "") + (dato != null ? dato : "");
+		StringBuilder builder = new StringBuilder();
+		builder.append(familieBegivenhedId);
+		builder.append(", ");
+		builder.append(familieId);
+		builder.append(", ");
+		builder.append(husfaderAlder);
+		builder.append(", ");
+		builder.append(husmoderAlder);
+		builder.append(", ");
+		builder.append(kildeId);
+		builder.append(", ");
+		if (begType != null) {
+			builder.append(begType);
+			builder.append(", ");
+		}
+		if (underType != null) {
+			builder.append(underType);
+			builder.append(", ");
+		}
+		if (dato != null) {
+			builder.append(dato);
+			builder.append(", ");
+		}
+		if (note != null) {
+			builder.append(note);
+			builder.append(", ");
+		}
+		if (detaljer != null) {
+			builder.append(detaljer);
+			builder.append(", ");
+		}
+		if (blistrupId != null) {
+			builder.append(blistrupId);
+			builder.append(", ");
+		}
+		if (stedNavn != null) {
+			builder.append(stedNavn);
+			builder.append(", ");
+		}
+		if (bem != null) {
+			builder.append(bem);
+			builder.append(", ");
+		}
+		builder.append(aar);
+		builder.append(", ");
+		if (rolle != null) {
+			builder.append(rolle);
+			builder.append(", ");
+		}
+		builder.append(gom);
+		builder.append(", ");
+		builder.append(brud);
+		builder.append(", ");
+		if (gaard != null)
+			builder.append(gaard);
+		return builder.toString();
 	}
 
 }

@@ -9,7 +9,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
  * Filter for navnekolonnen i individbegivenhed view
  *
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 28. aug. 2023
  *
  */
 public class IndividBegivenhedNavneFilter extends ViewerFilter {
@@ -44,7 +44,7 @@ public class IndividBegivenhedNavneFilter extends ViewerFilter {
 
 		final IndividBegivenhedModel model = (IndividBegivenhedModel) element;
 
-		if (model.getStdNavn().toLowerCase().matches(searchString)) {
+		if (model.getStedNavn().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

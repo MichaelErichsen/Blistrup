@@ -28,14 +28,14 @@ public class GedcomSaveAction extends Action {
 
 	@Override
 	public void run() {
-		String[] args = new String[] { "C:\\Users\\michael\\BlistrupDB",
+		final String[] args = new String[] { "C:\\Users\\michael\\BlistrupDB",
 				"C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Test.ged", "Alex Hvidberg" };
 
 		try {
 			new GedcomSaver().save(args);
 			blh.refresh();
 			blh.getStatusLineManager().setMessage("GEDCOM er gemt");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			blh.getStatusLineManager().setErrorMessage(e.getMessage());
 		}
 

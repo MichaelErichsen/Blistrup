@@ -30,7 +30,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 27. jul. 2023
+ * @version 28. aug. 2023
  *
  */
 public class IndividBegivenhedView extends Composite {
@@ -121,11 +121,11 @@ public class IndividBegivenhedView extends Composite {
 		final TableViewerColumn tableViewerColumn_1a = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnIndividNavn = tableViewerColumn_1a.getColumn();
 		tblclmnIndividNavn.setWidth(200);
-		tblclmnIndividNavn.setText("Navn");
+		tblclmnIndividNavn.setText("Stednavn");
 		tableViewerColumn_1a.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((IndividBegivenhedModel) element).getStdNavn();
+				return ((IndividBegivenhedModel) element).getStedNavn();
 			}
 		});
 

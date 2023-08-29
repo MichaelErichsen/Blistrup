@@ -199,15 +199,16 @@ public class IndividView extends Composite {
 		tableViewerColumn6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				IndividModel model = ((IndividModel) element);
-				int famc = model.getFamc();
+				final IndividModel model = (IndividModel) element;
+				final int famc = model.getFamc();
 
 				if (famc > 0) {
 					return Integer.toString(model.getFamc());
-				} else if (model.getFams().size() > 0) {
+				}
+				if (model.getFams().size() > 0) {
 					return Integer.toString(model.getFams().get(0));
-				} else
-					return "0";
+				}
+				return "0";
 			}
 		});
 

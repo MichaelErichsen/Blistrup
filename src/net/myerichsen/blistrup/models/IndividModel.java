@@ -5,18 +5,20 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 22. aug. 2023
+ * @version 27. aug. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.FAMILIE WHERE HUSFADER = ? OR HUSMODER = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVID (KOEN, FOEDT) VALUES (?, ?)";
 
 	/**
 	 * Get a model from an SQL result set
@@ -47,9 +49,15 @@ public class IndividModel {
 				model.setId(id);
 				koen = rs1.getString("KOEN").trim();
 				model.setKoen(koen);
-				model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
+				try {
+					model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
+				} catch (Exception e) {
+				}
 				model.setFamc(rs1.getInt("FAMC"));
-				model.setFoedt(rs1.getString("FOEDT").trim());
+				try {
+					model.setFoedt(rs1.getString("FOEDT").trim());
+				} catch (Exception e) {
+				}
 
 				model.setStdNavn(rs2.getString("STDNAVN").trim());
 				model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());
@@ -255,6 +263,32 @@ public class IndividModel {
 	 */
 	public String getStdNavn() {
 		return stdNavn;
+	}
+
+	/**
+	 * Indsæt et individ
+	 *
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public int insert(Connection conn) throws SQLException {
+		int individId = 0;
+
+		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		statement.setString(1, koen);
+		statement.setString(2, foedt);
+		statement.executeUpdate();
+
+		final ResultSet generatedKeys = statement.getGeneratedKeys();
+
+		if (generatedKeys.next()) {
+			individId = generatedKeys.getInt(1);
+		} else {
+			individId = 0;
+		}
+		generatedKeys.close();
+
+		return individId;
 	}
 
 	/**

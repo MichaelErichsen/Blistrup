@@ -1,22 +1,24 @@
 package net.myerichsen.blistrup.models;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 20. aug. 2023
+ * @version 28. aug. 2023
  *
  */
 public class IndividBegivenhedModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED";
 	private static final String SELECT2 = "SELECT STDNAVN FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVIDBEGIVENHED "
+			+ " (INDIVIDID, ALDER, KILDEID, BEGTYPE, DATO, NOTE, FOEDT, STEDNAVN) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	/**
 	 * @param dbPath
@@ -30,7 +32,6 @@ public class IndividBegivenhedModel {
 		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
 		final ResultSet rs1 = statement1.executeQuery();
-		ResultSet rs2;
 		int individId;
 
 		while (rs1.next()) {
@@ -46,7 +47,7 @@ public class IndividBegivenhedModel {
 			} else {
 				model.setUnderType("");
 			}
-			model.setDato(rs1.getDate("DATO"));
+			model.setDato(rs1.getString("DATO"));
 			if (rs1.getString("NOTE") != null) {
 				model.setNote(rs1.getString("NOTE"));
 			} else {
@@ -71,12 +72,8 @@ public class IndividBegivenhedModel {
 			model.setStedNavn(rs1.getString("STEDNAVN").trim());
 			model.setBem(rs1.getString("BEM").trim());
 
-			statement2.setInt(1, individId);
-			rs2 = statement2.executeQuery();
-
-			if (rs2.next()) {
-				model.setStdNavn(rs2.getString("STDNAVN").trim());
-			}
+//			statement2.setInt(1, individId);
+//			rs2 = statement2.executeQuery();
 
 			liste.add(model);
 		}
@@ -95,12 +92,11 @@ public class IndividBegivenhedModel {
 
 	private int id;
 	private int individId;
-	private String stdNavn;
 	private int alder;
 	private int kildeId;
 	private String begType;
 	private String underType;
-	private Date dato;
+	private String dato;
 	private String note;
 	private String detaljer;
 	private String blistrupId;
@@ -140,7 +136,7 @@ public class IndividBegivenhedModel {
 	/**
 	 * @return the dato
 	 */
-	public Date getDato() {
+	public String getDato() {
 		return dato;
 	}
 
@@ -196,9 +192,9 @@ public class IndividBegivenhedModel {
 	/**
 	 * @return the stdNavn
 	 */
-	public String getStdNavn() {
-		return stdNavn;
-	}
+//	public String getStdNavn() {
+//		return stdNavn;
+//	}
 
 	/**
 	 * @return the stedNavn
@@ -212,6 +208,38 @@ public class IndividBegivenhedModel {
 	 */
 	public String getUnderType() {
 		return underType;
+	}
+
+	/**
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public int insert(Connection conn) throws SQLException {
+
+		int individBegivenhedId = 0;
+
+		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		statement.setInt(1, individId);
+		statement.setInt(2, alder);
+		statement.setInt(3, kildeId);
+		statement.setString(4, begType);
+		statement.setString(5, dato);
+		statement.setString(6, note);
+		statement.setString(7, foedt);
+		statement.setString(8, stedNavn);
+
+		statement.executeUpdate();
+
+		final ResultSet generatedKeys = statement.getGeneratedKeys();
+
+		if (generatedKeys.next()) {
+			individBegivenhedId = generatedKeys.getInt(1);
+		} else {
+			individBegivenhedId = 0;
+		}
+		generatedKeys.close();
+
+		return individBegivenhedId;
 	}
 
 	/**
@@ -243,10 +271,10 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
-	 * @param dato the dato to set
+	 * @param string the dato to set
 	 */
-	public void setDato(Date dato) {
-		this.dato = dato;
+	public void setDato(String string) {
+		this.dato = string;
 	}
 
 	/**
@@ -299,13 +327,6 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
-	 * @param stdNavn the stdNavn to set
-	 */
-	public void setStdNavn(String stdNavn) {
-		this.stdNavn = stdNavn;
-	}
-
-	/**
 	 * @param stedNavn the stedNavn to set
 	 */
 	public void setStedNavn(String stedNavn) {
@@ -321,12 +342,12 @@ public class IndividBegivenhedModel {
 
 	@Override
 	public String toString() {
-		return id + ", " + individId + ", " + (stdNavn != null ? stdNavn + ", " : "") + alder + ", " + kildeId + ", "
-				+ (begType != null ? begType + ", " : "") + (underType != null ? underType + ", " : "")
-				+ (dato != null ? dato + ", " : "") + (note != null ? note + ", " : "")
-				+ (detaljer != null ? detaljer + ", " : "") + (blistrupId != null ? blistrupId + ", " : "")
-				+ (rolle != null ? rolle + ", " : "") + (foedt != null ? foedt + ", " : "")
-				+ (stedNavn != null ? stedNavn + ", " : "") + (bem != null ? bem : "");
+		return id + ", " + individId + ", " + alder + ", " + kildeId + ", " + (begType != null ? begType + ", " : "")
+				+ (underType != null ? underType + ", " : "") + (dato != null ? dato + ", " : "")
+				+ (note != null ? note + ", " : "") + (detaljer != null ? detaljer + ", " : "")
+				+ (blistrupId != null ? blistrupId + ", " : "") + (rolle != null ? rolle + ", " : "")
+				+ (foedt != null ? foedt + ", " : "") + (stedNavn != null ? stedNavn + ", " : "")
+				+ (bem != null ? bem : "");
 	}
 
 }

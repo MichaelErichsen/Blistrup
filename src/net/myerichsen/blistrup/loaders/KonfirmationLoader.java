@@ -1,7 +1,6 @@
 package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,12 +14,10 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 25. jul. 2023
+ * @version 25. aug. 2023
  *
  */
-public class KonfirmationLoader {
-	private static final String SET_SCHEMA = "SET SCHEMA = 'BLISTRUP'";
-
+public class KonfirmationLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'B'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' AND BEGIV = ? ORDER BY PID";
 
@@ -47,27 +44,6 @@ public class KonfirmationLoader {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * @param input
-	 * @return
-	 */
-	private String afQ(String input) {
-		return input.replace("Qo", "ø").replace("Qe", "æ").replace("Qa", "a").trim();
-	}
-
-	/**
-	 * Forbind til databasen
-	 *
-	 * @return conn forbindelse
-	 * @throws SQLException
-	 */
-	private Connection connect() throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
-		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.execute();
-		return conn;
 	}
 
 	/**
@@ -113,7 +89,7 @@ public class KonfirmationLoader {
 			while (rs1.next()) {
 				rolle = rs1.getString("ROLLE").trim();
 				navn = rs1.getString("NAVN").trim();
-				sb.append(rolle + ": " + navn + "\r\n");
+				sb.append(rolle + ": " + navn + "\r\n4 CONC ");
 
 				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 				statement2.setString(1, rs1.getString("SEX").trim());
@@ -142,7 +118,7 @@ public class KonfirmationLoader {
 					statement2.setString(5, "");
 				}
 
-				statement2.setString(6, stdnavn);
+				statement2.setString(6, cleanName(stdnavn));
 				statement2.executeUpdate();
 
 				taeller++;
@@ -190,7 +166,7 @@ public class KonfirmationLoader {
 					statement2.setString(6, rolle);
 					statement2.setString(7, afQ(rs1.getString("BEGIV")));
 					statement2.setInt(8, kildeId);
-					statement2.setString(9, afQ(rs1.getString("STEDNAVN")));
+					statement2.setString(9, formatPlaceName(afQ(rs1.getString("STEDNAVN"))));
 					statement2.setString(10, afQ(rs1.getString("BEM")));
 					statement2.executeUpdate();
 					generatedKeys = statement2.getGeneratedKeys();
