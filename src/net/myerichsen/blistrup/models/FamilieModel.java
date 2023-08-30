@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 28. aug. 2023
+ * @version 30. aug. 2023
  *
  */
 public class FamilieModel {
@@ -20,6 +20,18 @@ public class FamilieModel {
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.FAMILIE (HUSFADER, HUSMODER) VALUES(?, ?)";
+	private static final String UPDATE1 = "UPDATE BLISTRUP.FAMILIE SET HUSFADER = ? WHERE ID = ?";
+	private static final String UPDATE2 = "UPDATE BLISTRUP.FAMILIE SET HUSMODER = ? WHERE ID = ?";
+
+	private static PreparedStatement statements2;
+
+	private static PreparedStatement statements3;
+
+	private static PreparedStatement statements4;
+
+	private static PreparedStatement statementi1;
+	private static PreparedStatement statementu1;
+	private static PreparedStatement statementu2;
 
 	/**
 	 * @param statement2
@@ -30,10 +42,6 @@ public class FamilieModel {
 	 * @throws SQLException
 	 */
 	public static FamilieModel getData(Connection conn, final ResultSet rs1) throws SQLException {
-		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
-		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
-		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
-
 		FamilieModel model;
 		ResultSet rs2;
 		ResultSet rs3;
@@ -46,7 +54,7 @@ public class FamilieModel {
 		List<IndividModel> boern;
 		String foedt = "";
 
-		model = new FamilieModel();
+		model = new FamilieModel(conn);
 		familieId = rs1.getInt("ID");
 		model.setId(familieId);
 		husFaderId = rs1.getInt("HUSFADER");
@@ -57,8 +65,8 @@ public class FamilieModel {
 		// Husfaders navn
 		// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 
-		statement2.setInt(1, husFaderId);
-		rs2 = statement2.executeQuery();
+		statements2.setInt(1, husFaderId);
+		rs2 = statements2.executeQuery();
 
 		if (rs2.next()) {
 			model.setFaderNavn(rs2.getString("STDNAVN").trim());
@@ -67,8 +75,8 @@ public class FamilieModel {
 		// Husfaders fødsel
 		// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
 
-		statement4.setInt(1, husFaderId);
-		rs4 = statement4.executeQuery();
+		statements4.setInt(1, husFaderId);
+		rs4 = statements4.executeQuery();
 
 		if (rs4.next()) {
 			foedt = rs4.getString("FOEDT");
@@ -81,8 +89,8 @@ public class FamilieModel {
 		// Husmoders navn
 		// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 
-		statement2.setInt(1, husModerId);
-		rs2 = statement2.executeQuery();
+		statements2.setInt(1, husModerId);
+		rs2 = statements2.executeQuery();
 
 		if (rs2.next()) {
 			model.setModerNavn(rs2.getString("STDNAVN").trim());
@@ -91,8 +99,8 @@ public class FamilieModel {
 		// Husmoders fødsel
 		// SELECT4 = "SELECT * FROM BLISTRUP.INDIVID WHERE ID = ?";
 
-		statement4.setInt(1, husModerId);
-		rs4 = statement4.executeQuery();
+		statements4.setInt(1, husModerId);
+		rs4 = statements4.executeQuery();
 
 		if (rs4.next()) {
 			foedt = rs4.getString("FOEDT");
@@ -106,8 +114,8 @@ public class FamilieModel {
 
 		// SELECT3 = "SELECT * FROM BLISTRUP.INDIVID WHERE FAMC = ?";
 
-		statement3.setInt(1, familieId);
-		rs3 = statement3.executeQuery();
+		statements3.setInt(1, familieId);
+		rs3 = statements3.executeQuery();
 
 		while (rs3.next()) {
 			individModel = new IndividModel();
@@ -117,8 +125,8 @@ public class FamilieModel {
 			// Barns navn
 			// SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 
-			statement2.setInt(1, barnId);
-			rs2 = statement2.executeQuery();
+			statements2.setInt(1, barnId);
+			rs2 = statements2.executeQuery();
 
 			if (rs2.next()) {
 				individModel.setStdNavn(rs2.getString("STDNAVN").trim());
@@ -135,26 +143,18 @@ public class FamilieModel {
 		FamilieModel model;
 		final List<FamilieModel> liste = new ArrayList<>();
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		final PreparedStatement statement1 = conn.prepareStatement(SELECT1);
-//		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
-//		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
-//		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
-
-//		new ArrayList<>();
+		final PreparedStatement statement = conn.prepareStatement(SELECT1);
 
 		// SELECT1 = "SELECT * FROM BLISTRUP.FAMILIE";
 
-		final ResultSet rs1 = statement1.executeQuery();
+		final ResultSet rs1 = statement.executeQuery();
 
 		while (rs1.next()) {
 			model = getData(conn, rs1);
 			liste.add(model);
 		}
 
-		statement1.close();
-//		statement2.close();
-//		statement3.close();
-//		statement4.close();
+		statement.close();
 
 		final FamilieModel[] array = new FamilieModel[liste.size()];
 
@@ -164,22 +164,6 @@ public class FamilieModel {
 
 		return array;
 
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			final FamilieModel[] data = FamilieModel.getData("C:\\Users\\michael\\BlistrupDB");
-
-			for (final FamilieModel familieModel : data) {
-				System.out.println(familieModel);
-			}
-			System.out.println("Færdig!");
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private int id = 0;
@@ -192,6 +176,21 @@ public class FamilieModel {
 	private String noter = "";
 	private String faderFoedt = "";
 	private String moderFoedt = "";
+
+	/**
+	 * Constructor
+	 *
+	 * @throws SQLException
+	 *
+	 */
+	public FamilieModel(Connection conn) throws SQLException {
+		statements2 = conn.prepareStatement(SELECT2);
+		statements3 = conn.prepareStatement(SELECT3);
+		statements4 = conn.prepareStatement(SELECT4);
+		statementi1 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		statementu1 = conn.prepareStatement(UPDATE1);
+		statementu2 = conn.prepareStatement(UPDATE2);
+	}
 
 	/**
 	 * @return the begivenheder
@@ -268,15 +267,14 @@ public class FamilieModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public int insert(Connection conn) throws SQLException {
+	public int insert() throws SQLException {
 		int familieId = 0;
 
-		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
-		statement.setInt(1, fader);
-		statement.setInt(2, moder);
-		statement.executeUpdate();
+		statementi1.setInt(1, fader);
+		statementi1.setInt(2, moder);
+		statementi1.executeUpdate();
 
-		final ResultSet generatedKeys = statement.getGeneratedKeys();
+		final ResultSet generatedKeys = statementi1.getGeneratedKeys();
 
 		if (generatedKeys.next()) {
 			familieId = generatedKeys.getInt(1);
@@ -406,6 +404,26 @@ public class FamilieModel {
 			builder.append(noter);
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	public void updateFather() throws SQLException {
+		statementu1.setInt(1, fader);
+		statementu1.setInt(2, id);
+		statementu1.executeUpdate();
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	public void updateMother() throws SQLException {
+		statementu2.setInt(1, moder);
+		statementu2.setInt(2, id);
+		statementu2.executeUpdate();
 	}
 
 }

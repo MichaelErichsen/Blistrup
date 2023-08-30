@@ -2,79 +2,38 @@ package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 import net.myerichsen.blistrup.models.FamilieModel;
 import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 import net.myerichsen.blistrup.models.IndividModel;
-import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
-import net.myerichsen.blistrup.util.Fonkod;
 
 /**
  * Load en FT 1771 tabel
  *
  * @author Michael Erichsen
- * @version 29. aug. 2023
+ * @version 30. aug. 2023
  *
  */
 public class FT1771Loader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM APP.FT1771";
+	private static final long FIRST_DATE = -62135773200000L;
+	private static final String SELECT1 = "SELECT * FROM FT1771";
 	private static PreparedStatement statements1;
-	private static final Fonkod fonkod = new Fonkod();
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		args = new String[] { "C:\\Users\\michael\\BlistrupDB" };
-
 		try {
-			final int taeller = new FT1771Loader().load(args);
+			final int taeller = new FT1771Loader().load();
 			System.out.println("Har indlæst " + taeller + " folketællingslinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Forbind til databasen
-	 *
-	 * @param dbPath
-	 * @return
-	 * @throws SQLException
-	 */
-	private Connection connect(String dbPath) throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		statements1 = conn.prepareStatement(SELECT1);
-		return conn;
-
-	}
-
-	/**
-	 * Formatter en tabelrække som tekst
-	 *
-	 * @param rs
-	 * @return
-	 * @throws SQLException
-	 */
-	private String getTableRow(ResultSet rs) throws SQLException {
-		final ResultSetMetaData rsmd = rs.getMetaData();
-		final StringBuilder sb = new StringBuilder();
-		final int columnCount = rsmd.getColumnCount();
-
-		for (int i = 1; i < columnCount + 1; i++) {
-			if (rs.getString(i) != null) {
-				sb.append("4 CONC " + rsmd.getColumnName(i).trim() + ": ");
-				sb.append(rs.getString(i).trim() + "\r\n");
-			}
-		}
-		return sb.toString();
 	}
 
 	/**
@@ -84,7 +43,7 @@ public class FT1771Loader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException
 	 */
-	private int load(String[] args) throws SQLException {
+	private int load() throws SQLException {
 		int count = 0;
 		String stdnavn = "";
 		IndividModel iModel;
@@ -96,14 +55,15 @@ public class FT1771Loader extends AbstractLoader {
 		int faderId;
 		String[] parts;
 		String efternavn;
-		int kildeId = 0;
 		int moderId = 0;
 		String streng = "";
 		FamilieModel fModel;
 		int familieId = 0;
 		FamilieBegivenhedModel fbModel;
 
-		final Connection conn = connect(args[0]);
+		final Connection conn = connect("APP");
+		final int kildeId = insertSource(conn, "1771");
+		statements1 = conn.prepareStatement(SELECT1);
 		final ResultSet rs = statements1.executeQuery();
 
 		while (rs.next()) {
@@ -143,14 +103,6 @@ public class FT1771Loader extends AbstractLoader {
 			stdnavn = stdnavn.replace(efternavn, "/" + efternavn + "/");
 			pModel.setStdnavn(stdnavn);
 			pModel.insert(conn);
-
-			/**
-			 * Kilde: Folketælling 1771
-			 */
-			final KildeModel kModel = new KildeModel();
-			kModel.setKbNr("Folketælling");
-			kModel.setAarInterval("1771");
-			kildeId = kModel.insert(conn);
 
 			/**
 			 * Erhverv
@@ -203,10 +155,10 @@ public class FT1771Loader extends AbstractLoader {
 			/**
 			 * Familie
 			 */
-			fModel = new FamilieModel();
+			fModel = new FamilieModel(conn);
 			fModel.setFader(faderId);
 			fModel.setModer(moderId);
-			familieId = fModel.insert(conn);
+			familieId = fModel.insert();
 
 			/**
 			 * Vielse (Familiebegivenhed)
@@ -214,6 +166,7 @@ public class FT1771Loader extends AbstractLoader {
 			fbModel = new FamilieBegivenhedModel();
 			fbModel.setFamilieId(familieId);
 			fbModel.setBegType("Vielse");
+			fbModel.setDato(new Date(FIRST_DATE));
 			fbModel.setKildeId(kildeId);
 			fbModel.insert(conn);
 
@@ -226,7 +179,7 @@ public class FT1771Loader extends AbstractLoader {
 			fbModel.setKildeId(kildeId);
 			fbModel.setDato(Date.valueOf("1771-02-01"));
 			fbModel.setStedNavn("Blistrup,,,");
-			fbModel.setDetaljer(getTableRow(rs));
+			fbModel.setDetaljer(get1771TableRow(rs));
 			fbModel.insert(conn);
 
 			count++;

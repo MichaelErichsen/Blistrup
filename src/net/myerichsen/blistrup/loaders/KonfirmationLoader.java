@@ -8,13 +8,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.myerichsen.blistrup.util.Fonkod;
-
 /**
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 25. aug. 2023
+ * @version 30. aug. 2023
  *
  */
 public class KonfirmationLoader extends AbstractLoader {
@@ -31,8 +29,6 @@ public class KonfirmationLoader extends AbstractLoader {
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 	private static final String UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
-
-	private static final Fonkod fonkod = new Fonkod();
 
 	/**
 	 * @param args
@@ -51,7 +47,7 @@ public class KonfirmationLoader extends AbstractLoader {
 	 * @throws SQLException
 	 */
 	public int load() throws SQLException {
-		final Connection conn = connect();
+		final Connection conn = connect("BLISTRUP");
 		final List<String> blistrupIdListe = new ArrayList<>();
 		String rolle = "";
 		PreparedStatement statement2;

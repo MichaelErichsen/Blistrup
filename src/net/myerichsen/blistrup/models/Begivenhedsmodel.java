@@ -4,17 +4,18 @@ import java.sql.Date;
 
 /**
  * @author Michael Erichsen
- * @version 21. jul. 2023
+ * @version 30. aug. 2023
  */
 public abstract class Begivenhedsmodel {
-	protected int id;
-	protected String begType;
-	protected String underType;
+	protected int id = 0;
+	protected String begType = "";
+	protected String underType = "";
 	protected Date dato;
-	protected int kildeId;
-	protected String note;
-	protected String detaljer;
-	protected String blistrupId;
+	protected int kildeId = 0;
+	protected String note = "";
+	protected String detaljer = "";
+	protected String blistrupId = "";
+	protected String stedNavn = "";
 
 	/**
 	 * @return the begType
@@ -63,6 +64,13 @@ public abstract class Begivenhedsmodel {
 	 */
 	public String getNote() {
 		return note;
+	}
+
+	/**
+	 * @return the stedNavn
+	 */
+	public String getStedNavn() {
+		return stedNavn;
 	}
 
 	/**
@@ -122,6 +130,13 @@ public abstract class Begivenhedsmodel {
 	}
 
 	/**
+	 * @param stedNavn the stedNavn to set
+	 */
+	public void setStedNavn(String stedNavn) {
+		this.stedNavn = stedNavn;
+	}
+
+	/**
 	 * @param underType the underType to set
 	 */
 	public void setUnderType(String underType) {
@@ -129,6 +144,40 @@ public abstract class Begivenhedsmodel {
 	}
 
 	@Override
-	public abstract String toString();
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append(id);
+		builder.append(", ");
+		if (begType != null) {
+			builder.append(begType);
+			builder.append(", ");
+		}
+		if (underType != null) {
+			builder.append(underType);
+			builder.append(", ");
+		}
+		if (dato != null) {
+			builder.append(dato);
+			builder.append(", ");
+		}
+		builder.append(kildeId);
+		builder.append(", ");
+		if (note != null) {
+			builder.append(note);
+			builder.append(", ");
+		}
+		if (detaljer != null) {
+			builder.append(detaljer);
+			builder.append(", ");
+		}
+		if (blistrupId != null) {
+			builder.append(blistrupId);
+			builder.append(", ");
+		}
+		if (stedNavn != null) {
+			builder.append(stedNavn);
+		}
+		return builder.toString();
+	}
 
 }

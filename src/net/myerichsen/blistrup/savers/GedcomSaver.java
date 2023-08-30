@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 29. aug. 2023
+ * @version 30. aug. 2023
  *
  */
 public class GedcomSaver {
@@ -83,7 +83,6 @@ public class GedcomSaver {
 	private static final String SELECTV1 = "SELECT * FROM BLISTRUP.VIDNE WHERE INDIVIDID = ?";
 	private static final String SELECTV2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE ID = ?";
 	private static final String SELECTV3 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE ID = ?";
-	private static final String FOUR_DIGITS = "[0-9]{4}";
 	private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
 	private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -209,7 +208,7 @@ public class GedcomSaver {
 	public void writeDate(ResultSet rs) throws IOException, SQLException {
 		final LocalDate localDate = LocalDate.parse(rs.getString("DATO"));
 		final String date = dateFormat.format(localDate).toUpperCase();
-		if (!"01 JAN 1970".equals(date)) {
+		if (!"01 JAN 0001".equals(date)) {
 			writeLine("2 DATE " + date);
 		}
 	}
@@ -259,7 +258,6 @@ public class GedcomSaver {
 	public void writeFamilyEvent(int id, boolean primary) throws SQLException, IOException {
 		ResultSet rs2;
 		String type;
-		String kildeId;
 		statementf2.setInt(1, id);
 		rs2 = statementf2.executeQuery();
 
@@ -278,8 +276,7 @@ public class GedcomSaver {
 
 			writeDate(rs2);
 			writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
-			kildeId = rs2.getString("KILDEID");
-			writeSourceReference(kildeId, rs2.getString("DETALJER"));
+			writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
 		}
 
 	}
@@ -443,7 +440,12 @@ public class GedcomSaver {
 		}
 
 		writeLine("2 SOUR @S" + kildeId + "@");
-		writeLine("3 PAGE " + text + "\r\n4 CONC " + detaljer);
+
+		if (detaljer.isBlank()) {
+			writeLine("3 PAGE " + text);
+		} else {
+			writeLine("3 PAGE " + text + "\r\n" + detaljer);
+		}
 	}
 
 	/**
@@ -454,46 +456,44 @@ public class GedcomSaver {
 	 * @throws IOException
 	 */
 	private void writeSources() throws SQLException, IOException {
-		int kbnr = 0;
 		String aarinterval = "";
 		int id = 0;
-		boolean found = false;
+//		String ids = "";
+//		boolean found = false;
 
 		final ResultSet rs1 = statementk1.executeQuery();
-		foreachsource: while (rs1.next()) {
+//		foreachsource: while (rs1.next()) {
+		while (rs1.next()) {
 			id = rs1.getInt("ID");
-			found = false;
+//			ids = Integer.toString(id);
+//			found = false;
 
-			for (final SourceReference sourceReference : referenceList) {
-				if ((id + "").equals(sourceReference.getId())) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found) {
-				continue foreachsource;
-			}
+//			for (final SourceReference sourceReference : referenceList) {
+//				if (ids.equals(sourceReference.getId())) {
+//					found = true;
+//					break;
+//				}
+//			}
+//
+//			if (!found) {
+//				continue foreachsource;
+//			}
 
 			writeLine("0 @S" + id + "@ SOUR");
 
-			try {
-				kbnr = Integer.parseInt(rs1.getString("KBNR").trim());
-			} catch (final Exception e) {
-				kbnr = 17;
-			}
-
 			aarinterval = rs1.getString("AARINTERVAL").trim();
 
-			if (kbnr < 10 || aarinterval.substring(0, 4).matches(FOUR_DIGITS)) {
-				writeLine("1 TITL Kirkebog Blistrup " + aarinterval);
-				writeLine("1 ABBR Kirkebog Blistrup " + aarinterval);
-			} else {
+			if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)
+					|| "1834".equals(aarinterval) || "1840".equals(aarinterval) || "1845".equals(aarinterval)
+					|| "1850".equals(aarinterval) || "1860".equals(aarinterval) || "1870".equals(aarinterval)
+					|| "1880".equals(aarinterval) || "1890".equals(aarinterval) || "1901".equals(aarinterval)) {
 				writeLine("1 TITL Folketælling Blistrup " + aarinterval);
 				writeLine("1 ABBR Folketælling Blistrup " + aarinterval);
+			} else {
+				writeLine("1 TITL Kirkebog Blistrup " + aarinterval);
+				writeLine("1 ABBR Kirkebog Blistrup " + aarinterval);
 			}
 		}
-
 	}
 
 	/**
@@ -534,12 +534,13 @@ public class GedcomSaver {
 
 			} else {
 				begId = rs1.getInt("FAMILIEBEGIVENHEDID");
+
 				if (begId > 0) {
 					statementv3.setInt(1, begId);
 					rs3 = statementv3.executeQuery();
 
 					if (rs3.next()) {
-						writeFamilyEvent(rs3.getInt("INDIVIDID"), false);
+						writeFamilyEvent(rs3.getInt("FAMILIEID"), false);
 					}
 
 				}

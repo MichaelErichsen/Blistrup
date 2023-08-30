@@ -93,10 +93,10 @@ public class KildeModel {
 		PreparedStatement statement = conn.prepareStatement(SELECT1);
 		statement.setString(1, kbNr);
 		statement.setString(2, aarInterval);
-		ResultSet rs = statement.executeQuery();
+		final ResultSet rs = statement.executeQuery();
 
 		if (rs.next()) {
-			return (rs.getInt("ID"));
+			return rs.getInt("ID");
 		}
 
 		statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);

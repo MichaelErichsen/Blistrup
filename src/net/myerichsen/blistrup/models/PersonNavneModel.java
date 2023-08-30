@@ -28,20 +28,6 @@ public class PersonNavneModel {
 	private String stdnavn = "";
 
 	/**
-	 * @return the stdnavn
-	 */
-	public String getStdnavn() {
-		return stdnavn;
-	}
-
-	/**
-	 * @param stdnavn the stdnavn to set
-	 */
-	public void setStdnavn(String stdnavn) {
-		this.stdnavn = stdnavn;
-	}
-
-	/**
 	 * @return the efternavn
 	 */
 	public String getEfternavn() {
@@ -96,8 +82,46 @@ public class PersonNavneModel {
 		return prefix;
 	}
 
+	/**
+	 * @return the stdnavn
+	 */
+	public String getStdnavn() {
+		return stdnavn;
+	}
+
 	public String getSuffix() {
 		return suffix;
+	}
+
+	/**
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public int insert(Connection conn) throws SQLException {
+		final String INSERT1 = "INSERT INTO BLISTRUP.PERSONNAVN "
+				+ "(INDIVIDID, STDNAVN, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) " + "VALUES(?, ?, ?, ?, ?, ?)";
+
+		int nameId = 0;
+
+		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		statement.setInt(1, individId);
+		statement.setString(2, stdnavn);
+		statement.setString(3, fornavn);
+		statement.setString(4, efternavn);
+		statement.setString(5, "TRUE");
+		statement.setString(6, fonetiskNavn);
+		statement.executeUpdate();
+
+		final ResultSet generatedKeys = statement.getGeneratedKeys();
+
+		if (generatedKeys.next()) {
+			nameId = generatedKeys.getInt(1);
+		} else {
+			nameId = 0;
+		}
+		generatedKeys.close();
+
+		return nameId;
 	}
 
 	public boolean isPrimaerNavn() {
@@ -157,6 +181,13 @@ public class PersonNavneModel {
 		this.primaerNavn = primaerNavn;
 	}
 
+	/**
+	 * @param stdnavn the stdnavn to set
+	 */
+	public void setStdnavn(String stdnavn) {
+		this.stdnavn = stdnavn;
+	}
+
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
 	}
@@ -168,36 +199,5 @@ public class PersonNavneModel {
 				+ (efternavnePrefix != null ? efternavnePrefix + ", " : "")
 				+ (efternavn != null ? efternavn + ", " : "") + (suffix != null ? suffix + ", " : "") + primaerNavn
 				+ ", " + (fonetiskNavn != null ? fonetiskNavn + ", " : "") + (noter != null ? noter : "");
-	}
-
-	/**
-	 * @param conn
-	 * @throws SQLException
-	 */
-	public int insert(Connection conn) throws SQLException {
-		String INSERT1 = "INSERT INTO BLISTRUP.PERSONNAVN "
-				+ "(INDIVIDID, STDNAVN, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) " + "VALUES(?, ?, ?, ?, ?, ?)";
-
-		int nameId = 0;
-
-		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
-		statement.setInt(1, individId);
-		statement.setString(2, stdnavn);
-		statement.setString(3, fornavn);
-		statement.setString(4, efternavn);
-		statement.setString(5, "TRUE");
-		statement.setString(6, fonetiskNavn);
-		statement.executeUpdate();
-
-		final ResultSet generatedKeys = statement.getGeneratedKeys();
-
-		if (generatedKeys.next()) {
-			nameId = generatedKeys.getInt(1);
-		} else {
-			nameId = 0;
-		}
-		generatedKeys.close();
-
-		return nameId;
 	}
 }

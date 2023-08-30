@@ -11,10 +11,10 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 28. aug. 2023
+ * @version 30. aug. 2023
  *
  */
-public class IndividBegivenhedModel {
+public class IndividBegivenhedModel extends Begivenhedsmodel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED";
 	private static final String SELECT2 = "SELECT STDNAVN FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVIDBEGIVENHED "
@@ -47,7 +47,7 @@ public class IndividBegivenhedModel {
 			} else {
 				model.setUnderType("");
 			}
-			model.setDato(rs1.getString("DATO"));
+			model.setDato(rs1.getDate("DATO"));
 			if (rs1.getString("NOTE") != null) {
 				model.setNote(rs1.getString("NOTE"));
 			} else {
@@ -90,19 +90,10 @@ public class IndividBegivenhedModel {
 		return array;
 	}
 
-	private int id;
 	private int individId;
 	private int alder;
-	private int kildeId;
-	private String begType;
-	private String underType;
-	private String dato;
-	private String note;
-	private String detaljer;
-	private String blistrupId;
 	private String rolle;
 	private String foedt;
-	private String stedNavn;
 	private String bem;
 
 	/**
@@ -113,38 +104,10 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
-	 * @return the begType
-	 */
-	public String getBegType() {
-		return begType;
-	}
-
-	/**
 	 * @return the bem
 	 */
 	public String getBem() {
 		return bem;
-	}
-
-	/**
-	 * @return the blistrupId
-	 */
-	public String getBlistrupId() {
-		return blistrupId;
-	}
-
-	/**
-	 * @return the dato
-	 */
-	public String getDato() {
-		return dato;
-	}
-
-	/**
-	 * @return the detaljer
-	 */
-	public String getDetaljer() {
-		return detaljer;
 	}
 
 	/**
@@ -155,31 +118,10 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-
-	/**
 	 * @return the individId
 	 */
 	public int getIndividId() {
 		return individId;
-	}
-
-	/**
-	 * @return the kildeId
-	 */
-	public int getKildeId() {
-		return kildeId;
-	}
-
-	/**
-	 * @return the note
-	 */
-	public String getNote() {
-		return note;
 	}
 
 	/**
@@ -197,20 +139,6 @@ public class IndividBegivenhedModel {
 //	}
 
 	/**
-	 * @return the stedNavn
-	 */
-	public String getStedNavn() {
-		return stedNavn;
-	}
-
-	/**
-	 * @return the underType
-	 */
-	public String getUnderType() {
-		return underType;
-	}
-
-	/**
 	 * @param conn
 	 * @throws SQLException
 	 */
@@ -223,7 +151,7 @@ public class IndividBegivenhedModel {
 		statement.setInt(2, alder);
 		statement.setInt(3, kildeId);
 		statement.setString(4, begType);
-		statement.setString(5, dato);
+		statement.setDate(5, dato);
 		statement.setString(6, note);
 		statement.setString(7, foedt);
 		statement.setString(8, stedNavn);
@@ -250,38 +178,10 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
-	 * @param begType the begType to set
-	 */
-	public void setBegType(String begType) {
-		this.begType = begType;
-	}
-
-	/**
 	 * @param bem the bem to set
 	 */
 	public void setBem(String bem) {
 		this.bem = bem;
-	}
-
-	/**
-	 * @param blistrupId the blistrupId to set
-	 */
-	public void setBlistrupId(String blistrupId) {
-		this.blistrupId = blistrupId;
-	}
-
-	/**
-	 * @param string the dato to set
-	 */
-	public void setDato(String string) {
-		this.dato = string;
-	}
-
-	/**
-	 * @param detaljer the detaljer to set
-	 */
-	public void setDetaljer(String detaljer) {
-		this.detaljer = detaljer;
 	}
 
 	/**
@@ -292,31 +192,10 @@ public class IndividBegivenhedModel {
 	}
 
 	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	/**
 	 * @param individId the individId to set
 	 */
 	public void setIndividId(int individId) {
 		this.individId = individId;
-	}
-
-	/**
-	 * @param kildeId the kildeId to set
-	 */
-	public void setKildeId(int kildeId) {
-		this.kildeId = kildeId;
-	}
-
-	/**
-	 * @param note the note to set
-	 */
-	public void setNote(String note) {
-		this.note = note;
 	}
 
 	/**
@@ -326,28 +205,35 @@ public class IndividBegivenhedModel {
 		this.rolle = rolle;
 	}
 
-	/**
-	 * @param stedNavn the stedNavn to set
-	 */
-	public void setStedNavn(String stedNavn) {
-		this.stedNavn = stedNavn;
-	}
-
-	/**
-	 * @param underType the underType to set
-	 */
-	public void setUnderType(String underType) {
-		this.underType = underType;
-	}
-
 	@Override
 	public String toString() {
-		return id + ", " + individId + ", " + alder + ", " + kildeId + ", " + (begType != null ? begType + ", " : "")
-				+ (underType != null ? underType + ", " : "") + (dato != null ? dato + ", " : "")
-				+ (note != null ? note + ", " : "") + (detaljer != null ? detaljer + ", " : "")
-				+ (blistrupId != null ? blistrupId + ", " : "") + (rolle != null ? rolle + ", " : "")
-				+ (foedt != null ? foedt + ", " : "") + (stedNavn != null ? stedNavn + ", " : "")
-				+ (bem != null ? bem : "");
+		final StringBuilder builder = new StringBuilder();
+		builder.append(individId);
+		builder.append(", ");
+		builder.append(alder);
+		builder.append(", ");
+		if (rolle != null) {
+			builder.append(rolle);
+			builder.append(", ");
+		}
+		if (foedt != null) {
+			builder.append(foedt);
+			builder.append(", ");
+		}
+		if (bem != null) {
+			builder.append(bem);
+			builder.append(", ");
+		}
+		if (getClass() != null) {
+			builder.append(getClass());
+			builder.append(", ");
+		}
+		builder.append(hashCode());
+		builder.append(", ");
+		if (super.toString() != null) {
+			builder.append(super.toString());
+		}
+		return builder.toString();
 	}
 
 }

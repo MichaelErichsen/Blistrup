@@ -12,9 +12,10 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 29. aug. 2023
+ * @version 30. aug. 2023
  */
 public class FamilieBegivenhedModel extends Begivenhedsmodel {
+	private static final long FIRST_DATE = -62135773200000L;
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED";
 
 	/**
@@ -75,25 +76,9 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 		return array;
 	}
 
-	/**
-	 * @return the select1
-	 */
-	public static String getSelect1() {
-		return SELECT1;
-	}
-
-	private int familieBegivenhedId = 0;
 	private int familieId = 0;
 	private int husfaderAlder = 0;
 	private int husmoderAlder = 0;
-	private int kildeId = 0;
-	private String begType = "";
-	private String underType = "";
-	private Date dato;
-	private String note = "";
-	private String detaljer = "";
-	private String blistrupId = "";
-	private String stedNavn = "";
 	private String bem = "";
 	private int aar = 0;
 	private String rolle = "";
@@ -109,14 +94,6 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @return the begType
-	 */
-	@Override
-	public String getBegType() {
-		return begType;
-	}
-
-	/**
 	 * @return the bem
 	 */
 	public String getBem() {
@@ -124,41 +101,10 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @return the blistrupId
-	 */
-	@Override
-	public String getBlistrupId() {
-		return blistrupId;
-	}
-
-	/**
 	 * @return the brud
 	 */
 	public int getBrud() {
 		return brud;
-	}
-
-	/**
-	 * @return the dato
-	 */
-	@Override
-	public Date getDato() {
-		return dato;
-	}
-
-	/**
-	 * @return the detaljer
-	 */
-	@Override
-	public String getDetaljer() {
-		return detaljer;
-	}
-
-	/**
-	 * @return the familieBegivenhedId
-	 */
-	public int getFamilieBegivenhedId() {
-		return familieBegivenhedId;
 	}
 
 	/**
@@ -197,22 +143,6 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @return the kildeId
-	 */
-	@Override
-	public int getKildeId() {
-		return kildeId;
-	}
-
-	/**
-	 * @return the note
-	 */
-	@Override
-	public String getNote() {
-		return note;
-	}
-
-	/**
 	 * @return the rolle
 	 */
 	public String getRolle() {
@@ -222,16 +152,9 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	/**
 	 * @return the stedNavn
 	 */
+	@Override
 	public String getStedNavn() {
 		return stedNavn;
-	}
-
-	/**
-	 * @return the underType
-	 */
-	@Override
-	public String getUnderType() {
-		return underType;
 	}
 
 	/**
@@ -256,7 +179,7 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 		if (dato != null) {
 			statement.setDate(7, dato);
 		} else {
-			statement.setDate(7, new Date(1));
+			statement.setDate(7, new Date(FIRST_DATE));
 		}
 		statement.setString(8, note);
 		statement.setString(9, detaljer);
@@ -285,14 +208,6 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @param begType the begType to set
-	 */
-	@Override
-	public void setBegType(String begType) {
-		this.begType = begType;
-	}
-
-	/**
 	 * @param bem the bem to set
 	 */
 	public void setBem(String bem) {
@@ -300,41 +215,10 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @param blistrupId the blistrupId to set
-	 */
-	@Override
-	public void setBlistrupId(String blistrupId) {
-		this.blistrupId = blistrupId;
-	}
-
-	/**
 	 * @param brud the brud to set
 	 */
 	public void setBrud(int brud) {
 		this.brud = brud;
-	}
-
-	/**
-	 * @param dato the dato to set
-	 */
-	@Override
-	public void setDato(Date dato) {
-		this.dato = dato;
-	}
-
-	/**
-	 * @param detaljer the detaljer to set
-	 */
-	@Override
-	public void setDetaljer(String detaljer) {
-		this.detaljer = detaljer;
-	}
-
-	/**
-	 * @param familieBegivenhedId the familieBegivenhedId to set
-	 */
-	public void setFamilieBegivenhedId(int familieBegivenhedId) {
-		this.familieBegivenhedId = familieBegivenhedId;
 	}
 
 	/**
@@ -373,22 +257,6 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @param kildeId the kildeId to set
-	 */
-	@Override
-	public void setKildeId(int kildeId) {
-		this.kildeId = kildeId;
-	}
-
-	/**
-	 * @param note the note to set
-	 */
-	@Override
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	/**
 	 * @param rolle the rolle to set
 	 */
 	public void setRolle(String rolle) {
@@ -398,22 +266,15 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	/**
 	 * @param stedNavn the stedNavn to set
 	 */
+	@Override
 	public void setStedNavn(String stedNavn) {
 		this.stedNavn = stedNavn;
 	}
 
-	/**
-	 * @param underType the underType to set
-	 */
-	@Override
-	public void setUnderType(String underType) {
-		this.underType = underType;
-	}
-
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(familieBegivenhedId);
+		final StringBuilder builder = new StringBuilder();
+		builder.append(id);
 		builder.append(", ");
 		builder.append(familieId);
 		builder.append(", ");
@@ -465,8 +326,9 @@ public class FamilieBegivenhedModel extends Begivenhedsmodel {
 		builder.append(", ");
 		builder.append(brud);
 		builder.append(", ");
-		if (gaard != null)
+		if (gaard != null) {
 			builder.append(gaard);
+		}
 		return builder.toString();
 	}
 

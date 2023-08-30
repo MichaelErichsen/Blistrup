@@ -11,14 +11,14 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 27. aug. 2023
+ * @version 30. aug. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.FAMILIE WHERE HUSFADER = ? OR HUSMODER = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
-	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVID (KOEN, FOEDT) VALUES (?, ?)";
+	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVID (KOEN, FOEDT, FAMC) VALUES (?, ?, ?)";
 
 	/**
 	 * Get a model from an SQL result set
@@ -51,12 +51,12 @@ public class IndividModel {
 				model.setKoen(koen);
 				try {
 					model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
-				} catch (Exception e) {
+				} catch (final Exception e) {
 				}
 				model.setFamc(rs1.getInt("FAMC"));
 				try {
 					model.setFoedt(rs1.getString("FOEDT").trim());
-				} catch (Exception e) {
+				} catch (final Exception e) {
 				}
 
 				model.setStdNavn(rs2.getString("STDNAVN").trim());
@@ -277,6 +277,7 @@ public class IndividModel {
 		final PreparedStatement statement = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 		statement.setString(1, koen);
 		statement.setString(2, foedt);
+		statement.setInt(3, famc);
 		statement.executeUpdate();
 
 		final ResultSet generatedKeys = statement.getGeneratedKeys();

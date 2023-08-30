@@ -7,13 +7,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.myerichsen.blistrup.util.Fonkod;
-
 /**
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 25. aug. 2023
+ * @version 30. aug. 2023
  *
  */
 public class VielseLoader extends AbstractLoader {
@@ -30,8 +28,6 @@ public class VielseLoader extends AbstractLoader {
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 	private static final String UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
-
-	private static final Fonkod fonkod = new Fonkod();
 
 	/**
 	 * @param args
@@ -69,7 +65,7 @@ public class VielseLoader extends AbstractLoader {
 		int faderFamilieId = 0;
 		String stdnavn = "";
 
-		final Connection conn = connect();
+		final Connection conn = connect("BLISTRUP");
 
 // SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' FETCH FIRST 50 ROWS ONLY";
 

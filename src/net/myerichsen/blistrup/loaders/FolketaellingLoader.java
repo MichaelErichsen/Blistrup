@@ -9,14 +9,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.myerichsen.blistrup.util.Fonkod;
-
 /**
  * Læs folketællingsdata fra grundtabellen ind i GEDCOM tabeller. Analyser
  * familieforhold så vidt muligt
  *
  * @author Michael Erichsen
- * @version 25. aug. 2023
+ * @version 30. aug. 2023
  *
  */
 public class FolketaellingLoader extends AbstractLoader {
@@ -34,8 +32,6 @@ public class FolketaellingLoader extends AbstractLoader {
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 	private static final String UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
-
-	private static final Fonkod fonkod = new Fonkod();
 
 	/**
 	 * @param args
@@ -187,8 +183,8 @@ public class FolketaellingLoader extends AbstractLoader {
 			throws SQLException {
 		int individId = 0;
 
-		// FIXME Sammenblandede parametre rs1 og familieid
-		// FIXME Caused by: ERROR 22018: Invalid character string format for type
+		// Sammenblandede parametre rs1 og familieid
+		// Caused by: ERROR 22018: Invalid character string format for type
 		// INTEGER: PID
 		//
 		// Fra sønnesøn
@@ -344,7 +340,7 @@ public class FolketaellingLoader extends AbstractLoader {
 		int faderfamilie = 0;
 		int moderfamilie = 0;
 
-		final Connection conn = connect();
+		final Connection conn = connect("BLISTRUP");
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statements2 = conn.prepareStatement(SELECT2);
 		final PreparedStatement statementi1 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
@@ -488,15 +484,8 @@ public class FolketaellingLoader extends AbstractLoader {
 					updateFamilie(statementu2, headId, faderfamilie);
 					insertVidne(statementi6, individId, rolle, familieId);
 
-				} else if (rolle.contains("Svigermoder") || rolle.contains("svigermor")) {
+				} else if ((rolle.contains("Svigermoder") || rolle.contains("svigermor")) || rolle.contains("Bedstemoder") || rolle.contains("stifmoder")) {
 
-				} else if (rolle.contains("Bedstemoder")) {
-
-				} else if (rolle.contains("stifmoder")) {
-
-					/**
-					 * Moder
-					 */
 				} else if (rolle.contains("Moder") || rolle.contains("mor") || rolle.contains("moder")) {
 					// Indsæt ny familie med ind. som husmoder on head som barn
 					moderfamilie = insertFamilie(statementi4, rs1, "k", individId);
