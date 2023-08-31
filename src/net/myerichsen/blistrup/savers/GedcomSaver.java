@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 31. aug. 2023
  *
  */
 public class GedcomSaver {
@@ -318,7 +318,7 @@ public class GedcomSaver {
 	 */
 	public void writeIndividualEvent(int id, boolean primary) throws SQLException, IOException {
 		String type;
-		String kildeId;
+		String note;
 
 		statementi2.setInt(1, id);
 		final ResultSet rs2 = statementi2.executeQuery();
@@ -332,8 +332,15 @@ public class GedcomSaver {
 				writeLine("1 CONF");
 			} else if ("Begravelse".equals(type)) {
 				writeLine("1 BURI");
+			} else if ("Folketælling".equals(type)) {
+				writeLine("1 CENS");
 			} else if ("Erhverv".equals(type)) {
-				writeLine("1 OCCU " + rs2.getString("NOTE"));
+				note = rs2.getString("NOTE");
+
+				if (!note.isBlank()) {
+					writeLine("1 OCCU " + note);
+				}
+
 				return;
 			}
 
@@ -344,9 +351,7 @@ public class GedcomSaver {
 			} else {
 				writeLine("2 NOTE Vidne");
 			}
-			kildeId = rs2.getString("KILDEID");
-			writeSourceReference(kildeId, rs2.getString("DETALJER"));
-
+			writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
 		}
 	}
 

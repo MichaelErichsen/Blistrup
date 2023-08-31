@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 31. aug. 2023
  */
 public class FamilieBegivenhedModel extends Begivenhedsmodel {
 	private static final long FIRST_DATE = -62135773200000L;

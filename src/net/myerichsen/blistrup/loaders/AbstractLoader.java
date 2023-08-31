@@ -14,11 +14,52 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 31. aug. 2023
  *
  */
 
 public abstract class AbstractLoader {
+	protected static class IndividData {
+		int id = 0;
+		String stillingIHusstanden = "";
+		String detaljer;
+
+		/**
+		 * Constructor
+		 *
+		 * @param id
+		 * @param stillingIHusstanden
+		 * @param detaljer
+		 */
+		public IndividData(int id, String stillingIHusstanden, String detaljer) {
+			this.id = id;
+			this.stillingIHusstanden = stillingIHusstanden;
+			this.detaljer = detaljer;
+		}
+
+		/**
+		 * @return the detaljer
+		 */
+		public String getDetaljer() {
+			return detaljer;
+		}
+
+		/**
+		 * @return the id
+		 */
+		public int getId() {
+			return id;
+		}
+
+		/**
+		 * @return the stillingIHusstanden
+		 */
+		public String getStillingIHusstanden() {
+			return stillingIHusstanden;
+		}
+
+	}
+
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String[] steder = new String[] { "Aggebo", "Alme", "Alume", "Ammendrup", "Annisse",
 			"Bakkebjerg", "Bannebjerg", "Blidstrup", "Blistrup", "Esbønderup", "Esrum", "Fjellenstrup", "Frederiksborg",
