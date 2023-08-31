@@ -105,7 +105,7 @@ public class GedcomSaver {
 	 */
 	public static void main(String[] args) {
 		args = new String[] { "C:\\Users\\michael\\BlistrupDB",
-				"C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Blistrup.ged", "Alex Hvidberg" };
+				"C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Blistrup.ged", "Alex /Hvidberg/" };
 
 		try {
 			new GedcomSaver().save(args);
@@ -257,7 +257,7 @@ public class GedcomSaver {
 	 */
 	public void writeFamilyEvent(int id, boolean primary) throws SQLException, IOException {
 		ResultSet rs2;
-		String type;
+		String type = "";
 		statementf2.setInt(1, id);
 		rs2 = statementf2.executeQuery();
 
@@ -268,10 +268,10 @@ public class GedcomSaver {
 				writeLine("1 MARR");
 			} else if ("Folketælling".equals(type)) {
 				writeLine("1 CENS");
-			}
 
-			if (!primary) {
-				writeLine("2 NOTE Vidne");
+				if (!primary) {
+					writeLine("2 NOTE Vidne");
+				}
 			}
 
 			writeDate(rs2);

@@ -15,23 +15,21 @@ import net.myerichsen.blistrup.models.IndividModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
- * Load en FT 1801 tabel
+ * Load en FT 1834 tabel
  *
  * @author Michael Erichsen
  * @version 31. aug. 2023
  *
  */
-
-public class FT1801Loader extends AbstractLoader {
-	private static final String[] famsArrayM = new String[] { "Hosbonde", "Huusbonde og National Soldat", "Huusbonde" };
-	private static final String[] famsArrayF = new String[] { "hans Kone", "Hosbondinde", "Huusbondinde", "Konen",
-			"Sammes Kone" };
-	private static final String[] famcArray = new String[] { "2den Søn", "3die Søn", "Datter", "Deres Søn",
-			"Hendes Børn", "Huusbondens Datter", "deres Børn", "deres Datter", "deres Døttre", "deres Sønner",
-			"hans Datter", "hans Døttre", "hans Søn", "hans egne Døttre", "hans yngste Søn", "hendes Datter",
-			"hendes Søn", "yngste Søn", "ældste Søn" };
+public class FT1834Loader extends AbstractLoader {
+	private static final String[] famcArray = { "Avlsbestyrer, deres Børn", "Børn", "deres Barn", "Deres Børn",
+			"deres Børn Dagleier", "deres Børn Skomager", "deres Børn Skomager, Militair", "deres Børn Skræder",
+			"deres Børn Skræderpige", "deres Børn Snedker", "Deres Børn, Hugger", "deres Børn, Skræder", "Deres Datter",
+			"deres Søn", "deres Søn og Avlskarl", "hans Børn", "hans Datter", "hans Søn", "hendes Børn",
+			"hendes Børn Snedker", "hendes Datter", "hendes Døttre", "hendes Søn", "hendes Søn, Millitair",
+			"Inderste, Datter af Huusfader", "uægte Børn" };
 	private static final long FIRST_DATE = -62135773200000L;
-	private static final String SELECT1 = "SELECT * FROM FT1801";
+	private static final String SELECT1 = "SELECT * FROM FT1834";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
 	private static PreparedStatement statementi1;
@@ -41,7 +39,7 @@ public class FT1801Loader extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			final int taeller = new FT1801Loader().load();
+			final int taeller = new FT1834Loader().load();
 			System.out.println("Har indlæst " + taeller + " folketællingslinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -55,45 +53,40 @@ public class FT1801Loader extends AbstractLoader {
 	 * @param rs
 	 * @param kildeId
 	 * @param familieId
+	 * @param nrIHusstand
 	 * @return
 	 * @throws SQLException
 	 */
-	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
+	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId, int nrIHusstand)
 			throws SQLException {
-		boolean found = false;
 
 		/**
 		 * Individ
 		 */
 		final IndividModel iModel = new IndividModel();
 		iModel.setKoen(rs.getString("KØN").startsWith("M") ? "M" : "F");
-		final String stillingIHusstanden = rs.getString("STILLING_I_HUSSTANDEN");
-		for (final String string : famsArrayM) {
-			if (string.equals(stillingIHusstanden) || stillingIHusstanden.startsWith(string + " ")) {
-				iModel.getFams().add(familieId);
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			for (final String string : famsArrayF) {
-				if (string.equals(stillingIHusstanden) || stillingIHusstanden.startsWith(string + " ")) {
-					iModel.getFams().add(familieId);
-					found = true;
-					break;
-				}
-			}
-		}
-		if (!found) {
+		iModel.setNrIHusstanden(nrIHusstand);
+		final String kildeErhverv = rs.getString("KILDEERHVERV");
+		if (nrIHusstand == 0 && "Gift".equals(rs.getString("CIVILSTAND"))) {
+			iModel.getFams().add(familieId);
+			iModel.setPrimary(true);
+		} else if (nrIHusstand == 0
+				&& ("Enkemand".equals(rs.getString("CIVILSTAND")) || "Enke".equals(rs.getString("CIVILSTAND")))) {
+			iModel.getFams().add(familieId);
+			iModel.setPrimary(false);
+		} else if (nrIHusstand == 1 && iModel.isPrimary()) {
+			iModel.getFams().add(familieId);
+			iModel.setPrimary(false);
+		} else {
 			for (final String string : famcArray) {
-				if (string.equals(stillingIHusstanden) || stillingIHusstanden.startsWith(string + " ")) {
+				if (string.equals(kildeErhverv) || kildeErhverv.startsWith(string + " ")) {
 					iModel.setFamc(familieId);
 					break;
 				}
 			}
 		}
 		try {
-			iModel.setFoedt(Integer.toString(1801 - Integer.parseInt(rs.getString("ALDER"))));
+			iModel.setFoedt(Integer.toString(1834 - Integer.parseInt(rs.getString("ALDER"))));
 		} catch (final Exception e1) {
 		}
 		final int individId = iModel.insert(conn);
@@ -124,10 +117,10 @@ public class FT1801Loader extends AbstractLoader {
 		ibModel.setIndividId(individId);
 		ibModel.setKildeId(kildeId);
 		ibModel.setBegType("Erhverv");
-		ibModel.setNote(rs.getString("KILDEERHVERV"));
+		ibModel.setNote(kildeErhverv);
 		ibModel.insert(conn);
 
-		final IndividData id = new IndividData(individId, stillingIHusstanden, getTableRow(rs), iModel);
+		final IndividData id = new IndividData(individId, kildeErhverv, getTableRow(rs), iModel);
 		return id;
 	}
 
@@ -139,34 +132,30 @@ public class FT1801Loader extends AbstractLoader {
 	 */
 	private int load() throws SQLException {
 		int count = 0;
-		String kildeStedNavn = "";
+		String matrNrAdresse = "";
 		String hfNr = "";
 		FamilieModel fModel = null;
 		int familieId = 0;
 		FamilieBegivenhedModel fbModel;
 		IndividData id;
 		StringBuilder sb;
-		String stillingIHusstanden = "";
 		List<IndividData> list = new ArrayList<>();
 		int ftId = 0;
-		boolean found = false;
 		int individId = 0;
-
+		int nrIHusstand = 0;
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1801");
+		final int kildeId = insertSource(conn, "1834");
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
 
 		while (rs.next()) {
-			found = false;
-
 			/**
 			 * Næste husstand
 			 */
-			if (!kildeStedNavn.equals(rs.getString("KILDESTEDNAVN"))
+			if (!matrNrAdresse.equals(rs.getString("MATR_NR__ADRESSE"))
 					|| !hfNr.equals(rs.getString("HUSSTANDS_FAMILIENR_"))) {
-				if (!kildeStedNavn.isBlank()) {
+				if (!matrNrAdresse.isBlank()) {
 					/**
 					 * Folketælling (Familiebegivenhed)
 					 */
@@ -174,8 +163,8 @@ public class FT1801Loader extends AbstractLoader {
 					fbModel.setFamilieId(familieId);
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
-					fbModel.setDato(Date.valueOf("1801-02-01"));
-					fbModel.setStedNavn(rs.getString("KILDESTEDNAVN") + ",,,");
+					fbModel.setDato(Date.valueOf("1834-02-18"));
+					fbModel.setStedNavn(matrNrAdresse + ",,,");
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");
@@ -183,13 +172,14 @@ public class FT1801Loader extends AbstractLoader {
 					sb.append(list.get(list.size() - 1).getDetaljer());
 					fbModel.setDetaljer(sb.toString());
 					ftId = fbModel.insert(conn);
+
 					/**
 					 * Vidner til folketælling
 					 */
 					for (final IndividData individData : list) {
 						individId = individData.getId();
 
-						if (individId == fModel.getFader() || individId == fModel.getModer()) {
+						if (individData.getiModel().isPrimary()) {
 							continue;
 						}
 
@@ -217,29 +207,22 @@ public class FT1801Loader extends AbstractLoader {
 				fbModel.setKildeId(kildeId);
 				fbModel.insert(conn);
 
-				kildeStedNavn = rs.getString("KILDESTEDNAVN");
+				nrIHusstand = 0;
+				matrNrAdresse = rs.getString("MATR_NR__ADRESSE");
 				hfNr = rs.getString("HUSSTANDS_FAMILIENR_");
 				list = new ArrayList<>();
 			}
 
-			id = insertIndividual(conn, rs, kildeId, familieId);
-			stillingIHusstanden = id.getStillingIHusstanden();
+			id = insertIndividual(conn, rs, kildeId, familieId, nrIHusstand);
+			id.getStillingIHusstanden();
 
-			for (final String string : famsArrayM) {
-				if (string.equals(stillingIHusstanden) || stillingIHusstanden.startsWith(string + " ")) {
+			if (id.getiModel().isPrimary()) {
+				if ("M".equals(id.getiModel().getKoen())) {
 					fModel.setFader(id.getId());
 					fModel.updateFather();
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				for (final String string : famsArrayF) {
-					if (string.equals(stillingIHusstanden) || stillingIHusstanden.startsWith(string + " ")) {
-						fModel.setModer(id.getId());
-						fModel.updateMother();
-						break;
-					}
+				} else if ("F".equals(id.getiModel().getKoen())) {
+					fModel.setModer(id.getId());
+					fModel.updateMother();
 				}
 			}
 

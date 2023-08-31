@@ -11,13 +11,17 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 31. aug. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
+
 	private static final String SELECT2 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.FAMILIE WHERE HUSFADER = ? OR HUSMODER = ?";
+
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVID (KOEN, FOEDT, FAMC) VALUES (?, ?, ?)";
 
 	/**
@@ -130,8 +134,11 @@ public class IndividModel {
 
 	private int id = 0;
 	private int famc = 0;
+
 	private String koen = "";
+
 	private String BlistrupId = "";
+
 	private List<PersonNavneModel> personNavneListe = new ArrayList<>();
 	private String fonetiskNavn = "";
 	private String stdNavn = "";
@@ -145,6 +152,8 @@ public class IndividModel {
 	private String begravet;
 	private String fam = "";
 	private String slgt = "";
+	private int nrIHusstanden = 0;
+	private boolean primary = false;
 
 	/**
 	 * @return the begivenheder
@@ -238,6 +247,13 @@ public class IndividModel {
 	}
 
 	/**
+	 * @return the nrIHusstanden
+	 */
+	public int getNrIHusstanden() {
+		return nrIHusstanden;
+	}
+
+	/**
 	 * @return the personNavneListe
 	 */
 	public List<PersonNavneModel> getPersonNavneListe() {
@@ -290,6 +306,13 @@ public class IndividModel {
 		generatedKeys.close();
 
 		return individId;
+	}
+
+	/**
+	 * @return the primary
+	 */
+	public boolean isPrimary() {
+		return primary;
 	}
 
 	/**
@@ -384,10 +407,24 @@ public class IndividModel {
 	}
 
 	/**
+	 * @param nrIHusstanden the nrIHusstanden to set
+	 */
+	public void setNrIHusstanden(int nrIHusstanden) {
+		this.nrIHusstanden = nrIHusstanden;
+	}
+
+	/**
 	 * @param personNavneListe the personNavneListe to set
 	 */
 	public void setPersonNavneListe(List<PersonNavneModel> personNavneListe) {
 		this.personNavneListe = personNavneListe;
+	}
+
+	/**
+	 * @param primary the primary to set
+	 */
+	public void setPrimary(boolean primary) {
+		this.primary = primary;
 	}
 
 	/**

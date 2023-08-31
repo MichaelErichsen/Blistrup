@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import net.myerichsen.blistrup.models.IndividModel;
 import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.util.Fonkod;
 
@@ -18,11 +19,17 @@ import net.myerichsen.blistrup.util.Fonkod;
  *
  */
 
+/**
+ * @author Michael Erichsen
+ * @version 31. aug. 2023
+ *
+ */
 public abstract class AbstractLoader {
 	protected static class IndividData {
-		int id = 0;
-		String stillingIHusstanden = "";
-		String detaljer;
+		protected int id = 0;
+		protected String stillingIHusstanden = "";
+		protected String detaljer;
+		protected IndividModel iModel;
 
 		/**
 		 * Constructor
@@ -30,11 +37,13 @@ public abstract class AbstractLoader {
 		 * @param id
 		 * @param stillingIHusstanden
 		 * @param detaljer
+		 * @param iModel
 		 */
-		public IndividData(int id, String stillingIHusstanden, String detaljer) {
+		public IndividData(int id, String stillingIHusstanden, String detaljer, IndividModel iModel) {
 			this.id = id;
 			this.stillingIHusstanden = stillingIHusstanden;
 			this.detaljer = detaljer;
+			this.iModel = iModel;
 		}
 
 		/**
@@ -52,10 +61,31 @@ public abstract class AbstractLoader {
 		}
 
 		/**
+		 * @return the iModel
+		 */
+		public IndividModel getiModel() {
+			return iModel;
+		}
+
+		/**
 		 * @return the stillingIHusstanden
 		 */
 		public String getStillingIHusstanden() {
 			return stillingIHusstanden;
+		}
+
+		/**
+		 * @param iModel the iModel to set
+		 */
+		public void setiModel(IndividModel iModel) {
+			this.iModel = iModel;
+		}
+
+		/**
+		 * @param stillingIHusstanden the stillingIHusstanden to set
+		 */
+		public void setStillingIHusstanden(String stillingIHusstanden) {
+			this.stillingIHusstanden = stillingIHusstanden;
 		}
 
 	}

@@ -111,7 +111,7 @@ public class FT1787Loader extends AbstractLoader {
 		ibModel.setNote(rs.getString("KILDEERHVERV"));
 		ibModel.insert(conn);
 
-		final IndividData id = new IndividData(individId, stillingIHusstanden, getTableRow(rs));
+		final IndividData id = new IndividData(individId, stillingIHusstanden, getTableRow(rs), iModel);
 		return id;
 	}
 
