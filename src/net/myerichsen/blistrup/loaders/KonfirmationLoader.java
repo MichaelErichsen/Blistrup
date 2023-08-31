@@ -85,7 +85,7 @@ public class KonfirmationLoader extends AbstractLoader {
 			while (rs1.next()) {
 				rolle = rs1.getString("ROLLE").trim();
 				navn = rs1.getString("NAVN").trim();
-				sb.append(rolle + ": " + navn + "\r\n4 CONC ");
+				sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
 				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 				statement2.setString(1, rs1.getString("SEX").trim());

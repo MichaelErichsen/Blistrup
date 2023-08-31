@@ -124,7 +124,7 @@ public abstract class AbstractLoader {
 
 		for (int i = 1; i < columnCount + 1; i++) {
 			if (rs.getString(i) != null) {
-				sb.append("4 CONC " + rsmd.getColumnName(i).toLowerCase().trim() + ": ");
+				sb.append("4 CONT " + rsmd.getColumnName(i).toLowerCase().trim() + ": ");
 				sb.append(rs.getString(i).trim() + "\r\n");
 			}
 		}
@@ -148,7 +148,7 @@ public abstract class AbstractLoader {
 				sb.append(rs.getString(i).trim() + ", ");
 			}
 		}
-		return "4 CONC " + sb.toString();
+		return "4 CONT " + sb.toString();
 	}
 
 	/**

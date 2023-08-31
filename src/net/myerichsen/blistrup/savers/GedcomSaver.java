@@ -441,7 +441,7 @@ public class GedcomSaver {
 
 		writeLine("2 SOUR @S" + kildeId + "@");
 
-		if (detaljer.isBlank()) {
+		if (detaljer == null || detaljer.isBlank()) {
 			writeLine("3 PAGE " + text);
 		} else {
 			writeLine("3 PAGE " + text + "\r\n" + detaljer);

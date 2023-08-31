@@ -379,7 +379,7 @@ public class FolketaellingLoader extends AbstractLoader {
 				rolle = afQ(rs1.getString("ROLLE"));
 				navn = afQ(rs1.getString("NAVN"));
 				koen = rs1.getString("SEX").trim();
-				sb.append(rolle + ": " + navn + ", \r\n4 CONC ");
+				sb.append(rolle + ": " + navn + ", \r\n4 CONT ");
 
 				individId = insertIndivid(statementi1, rs1, koen, 0);
 

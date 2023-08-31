@@ -91,7 +91,7 @@ public class VielseLoader extends AbstractLoader {
 				rolle = rs1.getString("ROLLE").trim();
 				navn = rs1.getString("NAVN").trim();
 				fader = rs1.getString("FADER");
-				sb.append(rolle + ": " + navn + "\r\n4 CONC ");
+				sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
 				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 				statement2.setString(1, rs1.getString("SEX").trim());

@@ -96,7 +96,7 @@ public class BegravelseLoader extends AbstractLoader {
 				moder = "";
 				rolle = afQ(rs1.getString("ROLLE"));
 				navn = afQ(rs1.getString("NAVN"));
-				sb.append(rolle + ": " + navn + ", \r\n4 CONC ");
+				sb.append(rolle + ": " + navn + ", \r\n4 CONT ");
 				koen = rs1.getString("SEX").trim();
 
 				// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";

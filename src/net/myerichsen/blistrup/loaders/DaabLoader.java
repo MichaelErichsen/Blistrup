@@ -91,7 +91,7 @@ public class DaabLoader extends AbstractLoader {
 			while (rs1.next()) {
 				rolle = rs1.getString("ROLLE").trim();
 				navn = rs1.getString("NAVN").trim();
-				sb.append(rolle + ": " + navn + ", \r\n4 CONC ");
+				sb.append(rolle + ": " + navn + ", \r\n4 CONT ");
 
 				// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
