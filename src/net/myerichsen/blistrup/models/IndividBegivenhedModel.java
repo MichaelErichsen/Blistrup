@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 31. aug. 2023
  *
  */
 public class IndividBegivenhedModel extends Begivenhedsmodel {
@@ -58,7 +58,10 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 			} else {
 				model.setDetaljer("");
 			}
-			model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
+			try {
+				model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
+			} catch (Exception e) {
+			}
 			if (rs1.getString("ROLLE") != null) {
 				model.setRolle(rs1.getString("ROLLE").trim());
 			} else {
@@ -70,10 +73,10 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 				model.setFoedt("");
 			}
 			model.setStedNavn(rs1.getString("STEDNAVN").trim());
-			model.setBem(rs1.getString("BEM").trim());
-
-//			statement2.setInt(1, individId);
-//			rs2 = statement2.executeQuery();
+			try {
+				model.setBem(rs1.getString("BEM").trim());
+			} catch (Exception e) {
+			}
 
 			liste.add(model);
 		}

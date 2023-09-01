@@ -30,7 +30,7 @@ import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 28. aug. 2023
+ * @version 31. aug. 2023
  *
  */
 public class IndividBegivenhedView extends Composite {
@@ -170,7 +170,11 @@ public class IndividBegivenhedView extends Composite {
 			@Override
 			public String getText(Object element) {
 				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-				return formatter.format(((IndividBegivenhedModel) element).getDato());
+				try {
+					return formatter.format(((IndividBegivenhedModel) element).getDato());
+				} catch (Exception e) {
+					return "";
+				}
 			}
 		});
 

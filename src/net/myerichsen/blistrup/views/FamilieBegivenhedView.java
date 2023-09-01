@@ -21,7 +21,7 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 
 /**
  * @author Michael Erichsen
- * @version 27. jul. 2023
+ * @version 31. aug. 2023
  *
  */
 public class FamilieBegivenhedView extends Composite {
@@ -100,7 +100,8 @@ public class FamilieBegivenhedView extends Composite {
 			@Override
 			public String getText(Object element) {
 				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-				return formatter.format(((FamilieBegivenhedModel) element).getDato());
+				String date = formatter.format(((FamilieBegivenhedModel) element).getDato());
+				return date.equals("0001-01-01") ? "" : date;
 			}
 		});
 
@@ -109,6 +110,7 @@ public class FamilieBegivenhedView extends Composite {
 		tblclmnRolle.setWidth(100);
 		tblclmnRolle.setText("Rolle");
 		tableViewerColumn_3a.setLabelProvider(new ColumnLabelProvider() {
+
 			@Override
 			public String getText(Object element) {
 				return ((FamilieBegivenhedModel) element).getRolle();

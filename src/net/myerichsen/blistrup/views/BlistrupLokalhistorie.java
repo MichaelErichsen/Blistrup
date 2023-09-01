@@ -22,7 +22,11 @@ import org.eclipse.swt.widgets.TabItem;
 import net.myerichsen.blistrup.actions.AfslutAction;
 import net.myerichsen.blistrup.actions.BegravelseAction;
 import net.myerichsen.blistrup.actions.DaabAction;
-import net.myerichsen.blistrup.actions.FolketaellingAction;
+import net.myerichsen.blistrup.actions.FT1771Action;
+import net.myerichsen.blistrup.actions.FT1787Action;
+import net.myerichsen.blistrup.actions.FT1801Action;
+import net.myerichsen.blistrup.actions.FT1834Action;
+import net.myerichsen.blistrup.actions.FT1840Action;
 import net.myerichsen.blistrup.actions.GedcomSaveAction;
 import net.myerichsen.blistrup.actions.KonfirmationAction;
 import net.myerichsen.blistrup.actions.TabelRydningAction;
@@ -32,7 +36,7 @@ import net.myerichsen.blistrup.actions.VielseAction;
  * Hovedvindue for Blistrup Lokalhistorie programmet
  *
  * @author Michael Erichsen
- * @version 29. aug. 2023
+ * @version 01. sep. 2023
  *
  */
 // TODO Add load buttons to each view and remove initial load
@@ -143,6 +147,7 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		final MenuManager fileMenu = new MenuManager("&Filer");
 		final MenuManager loadMenu = new MenuManager("&Indl\u00E6s");
 		final MenuManager saveMenu = new MenuManager("&Gem");
+		final MenuManager ftMenu = new MenuManager("Folke&t\u00E6llinger");
 
 		fileMenu.add(afslut);
 
@@ -150,9 +155,22 @@ public class BlistrupLokalhistorie extends ApplicationWindow {
 		loadMenu.add(new KonfirmationAction(this));
 		loadMenu.add(new VielseAction(this));
 		loadMenu.add(new BegravelseAction(this));
-		loadMenu.add(new FolketaellingAction(this));
+		loadMenu.add(ftMenu);
 		loadMenu.add(new Separator());
 		loadMenu.add(new TabelRydningAction(this));
+
+		ftMenu.add(new FT1771Action(this));
+		ftMenu.add(new FT1787Action(this));
+		ftMenu.add(new FT1801Action(this));
+		ftMenu.add(new FT1834Action(this));
+		ftMenu.add(new FT1840Action(this));
+//		ftMenu.add(new FT1845Action(this));
+//		ftMenu.add(new FT1850Action(this));
+//		ftMenu.add(new FT1860Action(this));
+//		ftMenu.add(new FT1870Action(this));
+//		ftMenu.add(new FT1880Action(this));
+//		ftMenu.add(new FT1890Action(this));
+//		ftMenu.add(new FT1901Action(this));
 
 		saveMenu.add(new GedcomSaveAction(this));
 
