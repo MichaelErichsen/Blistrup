@@ -18,7 +18,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1840 tabel
  *
  * @author Michael Erichsen
- * @version 31. aug. 2023
+ * @version 1. sep. 2023
  *
  */
 public class FT1840Loader extends AbstractLoader {
@@ -38,6 +38,15 @@ public class FT1840Loader extends AbstractLoader {
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
 	private static PreparedStatement statementi1;
+	private static boolean primary = true;
+	private static int nrIHusstand = 0;
+
+	/**
+	 * @return the primary
+	 */
+	public static boolean isPrimary() {
+		return primary;
+	}
 
 	/**
 	 * @param args
@@ -52,17 +61,23 @@ public class FT1840Loader extends AbstractLoader {
 	}
 
 	/**
+	 * @param primary the primary to set
+	 */
+	public static void setPrimary(boolean primary) {
+		FT1840Loader.primary = primary;
+	}
+
+	/**
 	 * Indsæt et individ og returner de nødvendige data
 	 *
 	 * @param conn
 	 * @param rs
 	 * @param kildeId
 	 * @param familieId
-	 * @param nrIHusstand
 	 * @return
 	 * @throws SQLException
 	 */
-	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId, int nrIHusstand)
+	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
 			throws SQLException {
 		String koen = "M";
 		boolean found = false;
@@ -72,7 +87,6 @@ public class FT1840Loader extends AbstractLoader {
 		 */
 		final IndividModel iModel = new IndividModel();
 
-		iModel.setNrIHusstanden(nrIHusstand);
 		final String kildeErhverv = rs.getString("KILDEERHVERV");
 
 		if (nrIHusstand == 0 || nrIHusstand == 1) {
@@ -115,18 +129,19 @@ public class FT1840Loader extends AbstractLoader {
 			}
 		}
 
-		if (nrIHusstand == 0 && "Gift".equals(rs.getString("CIVILSTAND"))) {
-			iModel.getFams().add(familieId);
-			iModel.setPrimary(true);
-		} else if ((nrIHusstand == 0) || (nrIHusstand == 1 && iModel.isPrimary())) {
-			iModel.getFams().add(familieId);
-			iModel.setPrimary(false);
-		}
-
 		try {
 			iModel.setFoedt(Integer.toString(1840 - Integer.parseInt(rs.getString("ALDER"))));
 		} catch (final Exception e1) {
 		}
+
+		if (nrIHusstand == 0 && "Gift".equals(rs.getString("CIVILSTAND"))) {
+			iModel.getFams().add(familieId);
+
+		} else if (nrIHusstand == 0 || nrIHusstand == 1 && isPrimary()) {
+			iModel.getFams().add(familieId);
+
+		}
+
 		final int individId = iModel.insert(conn);
 		iModel.setId(individId);
 
@@ -181,7 +196,6 @@ public class FT1840Loader extends AbstractLoader {
 		List<IndividData> list = new ArrayList<>();
 		int ftId = 0;
 		int individId = 0;
-		int nrIHusstand = 0;
 		final Connection conn = connect("APP");
 		final int kildeId = insertSource(conn, "1840");
 		statements1 = conn.prepareStatement(SELECT1);
@@ -219,7 +233,7 @@ public class FT1840Loader extends AbstractLoader {
 					for (final IndividData individData : list) {
 						individId = individData.getId();
 
-						if (individData.getiModel().isPrimary()) {
+						if (isPrimary()) {
 							continue;
 						}
 
@@ -247,6 +261,10 @@ public class FT1840Loader extends AbstractLoader {
 				fbModel.setKildeId(kildeId);
 				fbModel.insert(conn);
 
+				/**
+				 * Reset for next family
+				 */
+				setPrimary(true);
 				nrIHusstand = 0;
 				kildeStedNavn = rs.getString("KILDESTEDNAVN");
 				matrNrAdresse = rs.getString("MATR_NR__ADRESSE");
@@ -254,24 +272,25 @@ public class FT1840Loader extends AbstractLoader {
 				list = new ArrayList<>();
 			}
 
-			id = insertIndividual(conn, rs, kildeId, familieId, nrIHusstand);
-			nrIHusstand++;
-//			id.getStillingIHusstanden();
+			id = insertIndividual(conn, rs, kildeId, familieId);
 
-			if (id.getiModel().isPrimary()) {
+			if (isPrimary()) {
 				if ("M".equals(id.getiModel().getKoen())) {
 					fModel.setFader(id.getId());
 					fModel.updateFather();
 				} else if ("F".equals(id.getiModel().getKoen())) {
 					fModel.setModer(id.getId());
 					fModel.updateMother();
+					setPrimary(false);
 				}
 			}
 
 			list.add(id);
+			nrIHusstand++;
 			count++;
 		}
 
+		conn.commit();
 		conn.close();
 		return count;
 	}

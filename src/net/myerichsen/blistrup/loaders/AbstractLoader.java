@@ -13,15 +13,9 @@ import net.myerichsen.blistrup.util.Fonkod;
 
 /**
  * Abstrakt overklasse for Blistrup loader programmer
- *
+ * 
  * @author Michael Erichsen
- * @version 31. aug. 2023
- *
- */
-
-/**
- * @author Michael Erichsen
- * @version 31. aug. 2023
+ * @version 1. sep. 2023
  *
  */
 public abstract class AbstractLoader {
@@ -148,6 +142,7 @@ public abstract class AbstractLoader {
 	 */
 	protected Connection connect(String schema) throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
+		conn.setAutoCommit(false);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();

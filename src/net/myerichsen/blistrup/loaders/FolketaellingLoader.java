@@ -484,7 +484,8 @@ public class FolketaellingLoader extends AbstractLoader {
 					updateFamilie(statementu2, headId, faderfamilie);
 					insertVidne(statementi6, individId, rolle, familieId);
 
-				} else if ((rolle.contains("Svigermoder") || rolle.contains("svigermor")) || rolle.contains("Bedstemoder") || rolle.contains("stifmoder")) {
+				} else if ((rolle.contains("Svigermoder") || rolle.contains("svigermor"))
+						|| rolle.contains("Bedstemoder") || rolle.contains("stifmoder")) {
 
 				} else if (rolle.contains("Moder") || rolle.contains("mor") || rolle.contains("moder")) {
 					// Indsæt ny familie med ind. som husmoder on head som barn
@@ -498,8 +499,11 @@ public class FolketaellingLoader extends AbstractLoader {
 
 			}
 		}
-		return taeller;
 
+		conn.commit();
+		conn.close();
+
+		return taeller;
 	}
 
 	/**

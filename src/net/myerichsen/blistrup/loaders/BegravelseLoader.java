@@ -310,6 +310,7 @@ public class BegravelseLoader extends AbstractLoader {
 			statement2.close();
 		}
 
+		conn.commit();
 		conn.close();
 		return taeller;
 	}

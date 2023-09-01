@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * Ryd alle tabeller
  *
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 1. sep. 2023
  *
  */
 public class ClearTables {
@@ -40,6 +40,7 @@ public class ClearTables {
 	 */
 	public void clear() throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:C:\\Users\\michael\\BlistrupDB");
+		conn.setAutoCommit(false);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.execute();
 		conn.prepareStatement(DELETE1).executeUpdate();
@@ -50,6 +51,7 @@ public class ClearTables {
 		conn.prepareStatement(DELETE6).executeUpdate();
 		conn.prepareStatement(DELETE7).executeUpdate();
 
+		conn.commit();
 		conn.close();
 	}
 }

@@ -33,6 +33,22 @@ public class FT1834Loader extends AbstractLoader {
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
 	private static PreparedStatement statementi1;
+	private static boolean primary = true;
+	private static int nrIHusstand = 0;
+
+	/**
+	 * @return the nrIHusstand
+	 */
+	public static int getNrIHusstand() {
+		return nrIHusstand;
+	}
+
+	/**
+	 * @return the primary
+	 */
+	public static boolean isPrimary() {
+		return primary;
+	}
 
 	/**
 	 * @param args
@@ -44,6 +60,20 @@ public class FT1834Loader extends AbstractLoader {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @param nrIHusstand the nrIHusstand to set
+	 */
+	public static void setNrIHusstand(int nrIHusstand) {
+		FT1834Loader.nrIHusstand = nrIHusstand;
+	}
+
+	/**
+	 * @param primary the primary to set
+	 */
+	public static void setPrimary(boolean primary) {
+		FT1834Loader.primary = primary;
 	}
 
 	/**
@@ -65,18 +95,17 @@ public class FT1834Loader extends AbstractLoader {
 		 */
 		final IndividModel iModel = new IndividModel();
 		iModel.setKoen(rs.getString("KØN").startsWith("M") ? "M" : "F");
-		iModel.setNrIHusstanden(nrIHusstand);
 		final String kildeErhverv = rs.getString("KILDEERHVERV");
 		if (nrIHusstand == 0 && "Gift".equals(rs.getString("CIVILSTAND"))) {
 			iModel.getFams().add(familieId);
-			iModel.setPrimary(true);
+			setPrimary(true);
 		} else if (nrIHusstand == 0
 				&& ("Enkemand".equals(rs.getString("CIVILSTAND")) || "Enke".equals(rs.getString("CIVILSTAND")))) {
 			iModel.getFams().add(familieId);
-			iModel.setPrimary(false);
-		} else if (nrIHusstand == 1 && iModel.isPrimary()) {
+			setPrimary(false);
+		} else if (nrIHusstand == 1 && isPrimary()) {
 			iModel.getFams().add(familieId);
-			iModel.setPrimary(false);
+			setPrimary(false);
 		} else {
 			for (final String string : famcArray) {
 				if (string.equals(kildeErhverv) || kildeErhverv.startsWith(string + " ")) {
@@ -179,7 +208,7 @@ public class FT1834Loader extends AbstractLoader {
 					for (final IndividData individData : list) {
 						individId = individData.getId();
 
-						if (individData.getiModel().isPrimary()) {
+						if (isPrimary()) {
 							continue;
 						}
 
@@ -216,7 +245,7 @@ public class FT1834Loader extends AbstractLoader {
 			id = insertIndividual(conn, rs, kildeId, familieId, nrIHusstand);
 			id.getStillingIHusstanden();
 
-			if (id.getiModel().isPrimary()) {
+			if (isPrimary()) {
 				if ("M".equals(id.getiModel().getKoen())) {
 					fModel.setFader(id.getId());
 					fModel.updateFather();
@@ -230,6 +259,7 @@ public class FT1834Loader extends AbstractLoader {
 			count++;
 		}
 
+		conn.commit();
 		conn.close();
 		return count;
 	}

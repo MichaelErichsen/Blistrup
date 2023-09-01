@@ -293,6 +293,7 @@ public class VielseLoader extends AbstractLoader {
 
 		}
 
+		conn.commit();
 		conn.close();
 		return taeller;
 	}

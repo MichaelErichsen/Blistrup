@@ -185,6 +185,7 @@ public class FT1771Loader extends AbstractLoader {
 			count++;
 		}
 
+		conn.commit();
 		conn.close();
 		return count;
 	}
