@@ -21,6 +21,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * @version 1. sep. 2023
  *
  */
+// FIXME Indsætter primære som individbegivenheder
 public class FT1840Loader extends AbstractLoader {
 	private static final String[] famsArrayF = { "hans Kone", "Huuskone,	lever af sin Jordlod",
 			"Huuskone, lever af Spind", "Huusmands Enke", "Huusmands Enke, lever	af sin Jordlod",
@@ -136,10 +137,11 @@ public class FT1840Loader extends AbstractLoader {
 
 		if (nrIHusstand == 0 && "Gift".equals(rs.getString("CIVILSTAND"))) {
 			iModel.getFams().add(familieId);
+			iModel.setPrimary(true);
 
 		} else if (nrIHusstand == 0 || nrIHusstand == 1 && isPrimary()) {
 			iModel.getFams().add(familieId);
-
+			iModel.setPrimary(true);
 		}
 
 		final int individId = iModel.insert(conn);
@@ -233,7 +235,7 @@ public class FT1840Loader extends AbstractLoader {
 					for (final IndividData individData : list) {
 						individId = individData.getId();
 
-						if (isPrimary()) {
+						if (individData.getiModel().isPrimary()) {
 							continue;
 						}
 

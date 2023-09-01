@@ -145,6 +145,7 @@ public class IndividModel {
 	private String begravet;
 	private String fam = "";
 	private String slgt = "";
+	private boolean primary = false;
 
 	/**
 	 * @return the begivenheder
@@ -293,6 +294,13 @@ public class IndividModel {
 	}
 
 	/**
+	 * @return the primary
+	 */
+	public boolean isPrimary() {
+		return primary;
+	}
+
+	/**
 	 * @param begivenheder the begivenheder to set
 	 */
 	public void setBegivenheder(List<IndividBegivenhedModel> begivenheder) {
@@ -388,6 +396,13 @@ public class IndividModel {
 	 */
 	public void setPersonNavneListe(List<PersonNavneModel> personNavneListe) {
 		this.personNavneListe = personNavneListe;
+	}
+
+	/**
+	 * @param primary the primary to set
+	 */
+	public void setPrimary(boolean primary) {
+		this.primary = primary;
 	}
 
 	/**
@@ -491,7 +506,9 @@ public class IndividModel {
 		}
 		if (slgt != null) {
 			builder.append(slgt);
+			builder.append(", ");
 		}
+		builder.append("Primary: " + isPrimary());
 		return builder.toString();
 	}
 

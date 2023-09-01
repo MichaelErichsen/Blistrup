@@ -18,7 +18,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1834 tabel
  *
  * @author Michael Erichsen
- * @version 31. aug. 2023
+ * @version 1. sep. 2023
  *
  */
 public class FT1834Loader extends AbstractLoader {
@@ -98,13 +98,15 @@ public class FT1834Loader extends AbstractLoader {
 		final String kildeErhverv = rs.getString("KILDEERHVERV");
 		if (nrIHusstand == 0 && "Gift".equals(rs.getString("CIVILSTAND"))) {
 			iModel.getFams().add(familieId);
-			setPrimary(true);
+			iModel.setPrimary(true);
 		} else if (nrIHusstand == 0
 				&& ("Enkemand".equals(rs.getString("CIVILSTAND")) || "Enke".equals(rs.getString("CIVILSTAND")))) {
 			iModel.getFams().add(familieId);
+			iModel.setPrimary(true);
 			setPrimary(false);
 		} else if (nrIHusstand == 1 && isPrimary()) {
 			iModel.getFams().add(familieId);
+			iModel.setPrimary(true);
 			setPrimary(false);
 		} else {
 			for (final String string : famcArray) {
@@ -208,7 +210,7 @@ public class FT1834Loader extends AbstractLoader {
 					for (final IndividData individData : list) {
 						individId = individData.getId();
 
-						if (isPrimary()) {
+						if (individData.getiModel().isPrimary()) {
 							continue;
 						}
 
@@ -245,7 +247,7 @@ public class FT1834Loader extends AbstractLoader {
 			id = insertIndividual(conn, rs, kildeId, familieId, nrIHusstand);
 			id.getStillingIHusstanden();
 
-			if (isPrimary()) {
+			if (id.getiModel().isPrimary()) {
 				if ("M".equals(id.getiModel().getKoen())) {
 					fModel.setFader(id.getId());
 					fModel.updateFather();
