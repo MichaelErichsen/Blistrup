@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 31. aug. 2023
+ * @version 2. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -105,7 +105,7 @@ public class GedcomSaver {
 	 */
 	public static void main(String[] args) {
 		args = new String[] { "C:\\Users\\michael\\BlistrupDB",
-				"C:\\Users\\michael\\Documents\\The Master Genealogist v9\\Export\\Blistrup.ged", "Alex /Hvidberg/" };
+				"C:\\Users\\michael\\Documents\\Vejby\\VejbyGedcom\\1845.ged", "Alex /Hvidberg/" };
 
 		try {
 			new GedcomSaver().save(args);

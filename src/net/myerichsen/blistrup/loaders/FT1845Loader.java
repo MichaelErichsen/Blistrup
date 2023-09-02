@@ -15,26 +15,26 @@ import net.myerichsen.blistrup.models.IndividModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
- * Load en FT 1840 tabel
+ * Load en FT 1845 tabel
  *
  * @author Michael Erichsen
- * @version 1. sep. 2023
+ * @version 2. sep. 2023
  *
  */
-public class FT1840Loader extends AbstractLoader {
-	private static final String[] famsArrayF = { "hans Kone", "Huuskone,	lever af sin Jordlod",
-			"Huuskone, lever af Spind", "Huusmands Enke", "Huusmands Enke, lever	af sin Jordlod",
-			"Huusmands-Enke, lever af sin Jordlod" };
-	private static final String[] famcArrayM = { "deres Søn", "deres Søn, Skræder", "deres Sønner",
-			"Enkens Søn, Arbeidsmand", "Enkens Sønner", "hans Søn", "hans Sønner", "hendes Søn", "Konens Søn",
-			"Mandens Sønner" };
-	private static final String[] famcArrayF = { "deres Datter", "Deres Døttre", "Enkens Døttre" };
-	private static final String[] famcArray = { "Børn", "Børn der forsørges af Gaarden",
-			"Børn der forsørges af Gaarden, Hjulmand", "deres Barn", "Deres Børn", "Deres Børnparcellist",
-			"Dyrker Jorden hos Forældrene, deres Barn", "hendes Barn", "hendes Børn", "Skræder, deres Barn",
-			"Snedker, hendes Barn", "Væverske, deres Barn" };
+public class FT1845Loader extends AbstractLoader {
+	private static final String[] famsArrayF = { "Gaardmands Enke", "Gaardeierske", "hans Kone",
+			"Huusmands Enke og Arbeidskone", "Huusmands Enke og Dagleierske", "Huusmands Enke, lever af sin Jordlod" };
+	private static final String[] famcArrayM = { "deres Søn", "deres Søn, som driver Skomager Profession",
+			"deres Sønner", "hans Søn", "hans Søn, Arbeidsmand", "hans Søn, Avlsbestyrer", "hans Søn, Skræder",
+			"driver Hjulmand-Profession, deres Børn", "ernærer sig som Skræder, deres Børn", "hans Sønner",
+			"hendes Søn", "hendes Søn, Arbeidsmand", "hendes Sønner", "bestyrer Parcellen, deres Børn",
+			"hendes Børn, ernærer sig som Snedker" };
+	private static final String[] famcArrayF = { "Datter og Huusholderske", "deres Datter", "deres Døttre",
+			"hans Datter", "hendes Datter" };
+	private static final String[] famcArray = { "deres Barn", "deres Børn", "disse ovennævnte ere hendes Børn",
+			"hans Børn", "hendes Børn" };
 	private static final long FIRST_DATE = -62135773200000L;
-	private static final String SELECT1 = "SELECT * FROM FT1840";
+	private static final String SELECT1 = "SELECT * FROM FT1845";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
 	private static PreparedStatement statementi1;
@@ -53,7 +53,7 @@ public class FT1840Loader extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			final int taeller = new FT1840Loader().load();
+			final int taeller = new FT1845Loader().load();
 			System.out.println("Har indlæst " + taeller + " folketællingslinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -64,7 +64,7 @@ public class FT1840Loader extends AbstractLoader {
 	 * @param primary the primary to set
 	 */
 	public static void setPrimary(boolean primary) {
-		FT1840Loader.primary = primary;
+		FT1845Loader.primary = primary;
 	}
 
 	/**
@@ -77,9 +77,20 @@ public class FT1840Loader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException
 	 */
+
+//	Kildestednavn
+//	Husstands/familienr.
+//	Matr.nr./Adresse
+//	Kildenavn
+//	Køn
+//	Alder
+//	Civilstand
+//	Kildeerhverv
+//	Kildefødested
+//	Kildehenvisning
+
 	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
 			throws SQLException {
-		String koen = "M";
 		boolean found = false;
 
 		/**
@@ -88,19 +99,18 @@ public class FT1840Loader extends AbstractLoader {
 		final IndividModel iModel = new IndividModel();
 
 		final String kildeErhverv = rs.getString("KILDEERHVERV");
+		String koen = rs.getString("KØN");
+		iModel.setKoen("M".equals(koen) ? "M" : "F");
 
 		if (nrIHusstand == 0 || nrIHusstand == 1) {
 			for (final String string : famsArrayF) {
 				if (string.equals(kildeErhverv) || kildeErhverv.startsWith(string + " ")) {
-					koen = "F";
 					break;
 				}
 			}
-			iModel.setKoen(koen);
 		} else {
 			for (final String string : famcArrayM) {
 				if (string.equals(kildeErhverv) || kildeErhverv.startsWith(string + " ")) {
-					iModel.setKoen("M");
 					iModel.setFamc(familieId);
 					found = true;
 					break;
@@ -109,7 +119,6 @@ public class FT1840Loader extends AbstractLoader {
 			if (!found) {
 				for (final String string : famcArrayF) {
 					if (string.equals(kildeErhverv) || kildeErhverv.startsWith(string + " ")) {
-						iModel.setKoen("F");
 						iModel.setFamc(familieId);
 						break;
 					}
@@ -118,19 +127,15 @@ public class FT1840Loader extends AbstractLoader {
 			if (!found) {
 				for (final String string : famcArray) {
 					if (string.equals(kildeErhverv) || kildeErhverv.startsWith(string + " ")) {
-						iModel.setKoen("?");
 						iModel.setFamc(familieId);
 						break;
 					}
 				}
 			}
-			if (!found) {
-				iModel.setKoen("?");
-			}
 		}
 
 		try {
-			iModel.setFoedt(Integer.toString(1840 - Integer.parseInt(rs.getString("ALDER"))));
+			iModel.setFoedt(Integer.toString(1845 - Integer.parseInt(rs.getString("ALDER"))));
 		} catch (final Exception e1) {
 		}
 
@@ -198,7 +203,7 @@ public class FT1840Loader extends AbstractLoader {
 		int ftId = 0;
 		int individId = 0;
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1840");
+		final int kildeId = insertSource(conn, "1845");
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
@@ -218,7 +223,7 @@ public class FT1840Loader extends AbstractLoader {
 					fbModel.setFamilieId(familieId);
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
-					fbModel.setDato(Date.valueOf("1840-02-01"));
+					fbModel.setDato(Date.valueOf("1845-02-01"));
 					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
