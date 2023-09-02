@@ -105,7 +105,7 @@ public class GedcomSaver {
 	 */
 	public static void main(String[] args) {
 		args = new String[] { "C:\\Users\\michael\\BlistrupDB",
-				"C:\\Users\\michael\\Documents\\Vejby\\VejbyGedcom\\1850.ged", "Alex /Hvidberg/" };
+				"C:\\Users\\michael\\Documents\\Vejby\\VejbyGedcom\\1860.ged", "Alex /Hvidberg/" };
 
 		try {
 			new GedcomSaver().save(args);
