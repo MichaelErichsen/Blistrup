@@ -76,28 +76,6 @@ public class FT1860Loader extends AbstractLoader {
 	 * @throws SQLException
 	 */
 
-//	Kildestednavn
-//	Husstands/familienr.
-//	Matr.nr./Adresse
-//	Kildenavn
-//	Køn
-//	Alder
-//	Civilstand
-//	Kildeerhverv (2) (Hvis (1) blank
-//	NB Stilling_i_husstanden (1)
-//	Kildefødested
-//	Kildekommentar
-
-//	Kildestednavn
-//	Husstands/familienr.
-//	Matr.nr./Adresse
-//	Kildenavn
-//	Køn
-//	Alder
-//	Civilstand
-//	Stilling_i_husstanden
-//	Kildefødested
-
 	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
 			throws SQLException {
 		boolean found = false;

@@ -15,20 +15,22 @@ import net.myerichsen.blistrup.models.IndividModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
- * Load en FT 1850 tabel
+ * Load en FT 1870 tabel
  *
  * @author Michael Erichsen
  * @version 2. sep. 2023
  *
  */
 public class FT1870Loader extends AbstractLoader {
-	private static final String[] famsArrayF = { "Hans hustru", "Hans kone", "Husmoder", "Husmoder, hans hustru",
-			"Kone" };
-	private static final String[] famcArrayM = { "Deres Søn", "Hans Søn", "Søn" };
-	private static final String[] famcArrayF = { "Datter", "Deres datter", "Hendes datter" };
-	private static final String[] famcArray = { "Barn" };
+	private static final String[] famsArrayF = { "Hans kone", "Husmoder" };
+	private static final String[] famcArrayM = { "Deres søn", "Hendes søn", "Husfaders stedsøn", "Husfaders søn",
+			"Stedsøn", "Søn" };
+	private static final String[] famcArrayF = { "Datter", "Deres datter", "Hans datter", "Hendes datter",
+			"Husfaders steddatter", "Steddatter" };
+	private static final String[] famcArray = { "Barn", "Deres barn", "Hans barn", "Hans stedbarn", "Hendes barn",
+			"Hends barn", "Husfaders barn", "Husfaders stedbarn", "Husmoders barn", "Stedbarn" };
 	private static final long FIRST_DATE = -62135773200000L;
-	private static final String SELECT1 = "SELECT * FROM FT1850";
+	private static final String SELECT1 = "SELECT * FROM FT1870";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
 	private static PreparedStatement statementi1;
@@ -48,7 +50,7 @@ public class FT1870Loader extends AbstractLoader {
 	public static void main(String[] args) {
 		try {
 			final int taeller = new FT1870Loader().load();
-			System.out.println("Har indlæst " + taeller + " linier fra 1850 folketællingen");
+			System.out.println("Har indlæst " + taeller + " linier fra 1870 folketællingen");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -71,18 +73,6 @@ public class FT1870Loader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException
 	 */
-
-//	Kildestednavn
-//	Husstands/familienr.
-//	Matr.nr./Adresse
-//	Kildenavn
-//	Køn
-//	Alder
-//	Civilstand
-//	Kildeerhverv
-//	Stilling_i_husstanden
-//	Kildefødested
-//	Kildehenvisning
 
 	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
 			throws SQLException {
@@ -130,7 +120,7 @@ public class FT1870Loader extends AbstractLoader {
 		}
 
 		try {
-			iModel.setFoedt(Integer.toString(1850 - Integer.parseInt(rs.getString("ALDER"))));
+			iModel.setFoedt(Integer.toString(1870 - Integer.parseInt(rs.getString("ALDER"))));
 		} catch (final Exception e1) {
 		}
 
@@ -199,7 +189,7 @@ public class FT1870Loader extends AbstractLoader {
 		int ftId = 0;
 		int individId = 0;
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1850");
+		final int kildeId = insertSource(conn, "1870");
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
@@ -219,7 +209,7 @@ public class FT1870Loader extends AbstractLoader {
 					fbModel.setFamilieId(familieId);
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
-					fbModel.setDato(Date.valueOf("1850-02-01"));
+					fbModel.setDato(Date.valueOf("1870-02-01"));
 					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
