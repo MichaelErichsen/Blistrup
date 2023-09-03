@@ -67,7 +67,7 @@ public class VielseLoader extends AbstractLoader {
 
 		final Connection conn = connect("BLISTRUP");
 
-// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' FETCH FIRST 50 ROWS ONLY";
+// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C'";
 
 		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		ResultSet rs1 = statement1.executeQuery();
@@ -194,13 +194,14 @@ public class VielseLoader extends AbstractLoader {
 							faderFamilieId = 0;
 						}
 						generatedKeys.close();
-					}
 
 // UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
-					statement2 = conn.prepareStatement(UPDATE1);
-					statement2.setInt(1, faderFamilieId);
-					statement2.setInt(2, faderId);
+						statement2 = conn.prepareStatement(UPDATE1);
+						statement2.setInt(1, faderFamilieId);
+						statement2.setInt(2, faderId);
+						statement2.executeUpdate();
+					}
 
 // INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
 
@@ -270,14 +271,14 @@ public class VielseLoader extends AbstractLoader {
 							faderFamilieId = 0;
 						}
 						generatedKeys.close();
-					}
 
 // UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
-					statement2 = conn.prepareStatement(UPDATE1);
-					statement2.setInt(1, faderFamilieId);
-					statement2.setInt(2, faderId);
-
+						statement2 = conn.prepareStatement(UPDATE1);
+						statement2.setInt(1, faderFamilieId);
+						statement2.setInt(2, faderId);
+						statement2.executeUpdate();
+					}
 				} else {
 					// Forlover
 // INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
@@ -287,7 +288,7 @@ public class VielseLoader extends AbstractLoader {
 					statement2.setString(2, rs1.getString("ROLLE").trim());
 					statement2.setInt(3, familieBegivenhedsId);
 				}
-				statement2.executeUpdate();
+//				statement2.executeUpdate();
 
 			}
 
