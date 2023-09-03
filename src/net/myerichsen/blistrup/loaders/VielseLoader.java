@@ -11,7 +11,7 @@ import java.util.List;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 3. sep. 2023
  *
  */
 public class VielseLoader extends AbstractLoader {
@@ -217,7 +217,7 @@ public class VielseLoader extends AbstractLoader {
 
 					statement2.setString(4, afQ(rs1.getString("BEGIV")));
 					statement2.setInt(5, kildeId);
-					statement2.setString(6, formatPlaceName(afQ(rs1.getString("STEDNAVN"))));
+					statement2.setString(6, "Blistrup,,,");
 					statement2.setString(7, afQ(rs1.getString("BEM")));
 					statement2.executeUpdate();
 					generatedKeys = statement2.getGeneratedKeys();

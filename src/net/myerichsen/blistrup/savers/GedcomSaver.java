@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 2. sep. 2023
+ * @version 3. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,6 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
+	private static String titel = "Daab";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -105,7 +106,7 @@ public class GedcomSaver {
 	 */
 	public static void main(String[] args) {
 		args = new String[] { "C:\\Users\\michael\\BlistrupDB",
-				"C:\\Users\\michael\\Documents\\Vejby\\VejbyGedcom\\1870.ged", "Alex /Hvidberg/" };
+				"C:\\Users\\michael\\Documents\\Vejby\\VejbyGedcom\\" + titel + ".ged", "Alex /Hvidberg/" };
 
 		try {
 			new GedcomSaver().save(args);
@@ -449,7 +450,7 @@ public class GedcomSaver {
 		if (detaljer == null || detaljer.isBlank()) {
 			writeLine("3 PAGE " + text);
 		} else {
-			writeLine("3 PAGE " + text + "\r\n" + detaljer);
+			writeLine("3 PAGE " + text + "\r\n4 CONT " + detaljer);
 		}
 	}
 
