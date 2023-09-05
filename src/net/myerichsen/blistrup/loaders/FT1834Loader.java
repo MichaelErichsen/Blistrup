@@ -162,7 +162,7 @@ public class FT1834Loader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException
 	 */
-	private int load() throws SQLException {
+	public int load() throws SQLException {
 		int count = 0;
 		String matrNrAdresse = "";
 		String hfNr = "";

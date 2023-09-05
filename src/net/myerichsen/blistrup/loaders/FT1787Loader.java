@@ -19,7 +19,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1787 tabel
  *
  * @author Michael Erichsen
- * @version 31. aug. 2023
+ * @version 5. sep. 2023
  *
  */
 public class FT1787Loader extends AbstractLoader {
@@ -122,7 +122,7 @@ public class FT1787Loader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException
 	 */
-	private int load() throws SQLException {
+	public int load() throws SQLException {
 		int count = 0;
 		String kildeStedNavn = "";
 		String hfNr = "";

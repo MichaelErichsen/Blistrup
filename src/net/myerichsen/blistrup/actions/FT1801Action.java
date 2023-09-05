@@ -4,12 +4,12 @@ import java.sql.SQLException;
 
 import org.eclipse.jface.action.Action;
 
-import net.myerichsen.blistrup.loaders.FolketaellingLoader;
+import net.myerichsen.blistrup.loaders.FT1801Loader;
 import net.myerichsen.blistrup.views.BlistrupLokalhistorie;
 
 /**
  * @author Michael Erichsen
- * @version 01. sep. 2023
+ * @version 5. sep. 2023
  *
  */
 public class FT1801Action extends Action {
@@ -31,7 +31,7 @@ public class FT1801Action extends Action {
 	@Override
 	public void run() {
 		try {
-			final int load = new FolketaellingLoader().load();
+			final int load = new FT1801Loader().load();
 			blh.refresh();
 			blh.getStatusLineManager().setMessage(load + " folketællinger for 1801 er indlæst");
 		} catch (final SQLException e) {
