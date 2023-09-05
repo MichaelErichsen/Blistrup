@@ -7,11 +7,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.myerichsen.blistrup.models.KildeModel;
+
 /**
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 3. sep. 2023
+ * @version 5. sep. 2023
  *
  */
 public class VielseLoader extends AbstractLoader {
@@ -20,7 +22,6 @@ public class VielseLoader extends AbstractLoader {
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
-	private static final String INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
 	private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
@@ -52,7 +53,6 @@ public class VielseLoader extends AbstractLoader {
 		ResultSet generatedKeys = null;
 		int individId = 0;
 		String aar = "";
-		int kildeId = 0;
 		int familieBegivenhedsId = 0;
 		int familieId = 0;
 		int taeller = 0;
@@ -131,24 +131,14 @@ public class VielseLoader extends AbstractLoader {
 				if ("gom".equals(rolle)) {
 					gom = individId;
 
-// INSERT3 = "INSERT INTO KILDE (KBNR, AARINTERVAL, KBDEL, TIFNR, OPSLAG, OPNR) VALUES(?, ?, ?, ?, ?, ?)";
-
-					statement2 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
-					statement2.setString(1, rs1.getString("KBNR").trim());
-					statement2.setString(2, rs1.getString("KILDE").trim());
-					statement2.setString(3, rs1.getString("KBDEL").trim());
-					statement2.setString(4, rs1.getString("TIFNR").trim());
-					statement2.setString(5, rs1.getString("OPSLAG").trim());
-					statement2.setString(6, rs1.getString("OPNR").trim());
-					statement2.executeUpdate();
-					generatedKeys = statement2.getGeneratedKeys();
-
-					if (generatedKeys.next()) {
-						kildeId = generatedKeys.getInt(1);
-					} else {
-						kildeId = 0;
-					}
-					generatedKeys.close();
+					final KildeModel kModel = new KildeModel();
+					kModel.setKbNr(rs1.getString("KBNR").trim());
+					kModel.setAarInterval(rs1.getString("KILDE").trim());
+					kModel.setKbDel(rs1.getString("KBDEL").trim());
+					kModel.setTifNr(rs1.getString("TIFNR").trim());
+					kModel.setOpslag(rs1.getString("OPSLAG").trim());
+					kModel.setOpNr(rs1.getString("OPNR").trim());
+					final int kildeId = kModel.insert(conn);
 
 // INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 

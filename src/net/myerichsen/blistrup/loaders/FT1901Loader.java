@@ -12,41 +12,21 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 import net.myerichsen.blistrup.models.FamilieModel;
 import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 import net.myerichsen.blistrup.models.IndividModel;
+import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
  * Load en FT 1901 tabel
  *
  * @author Michael Erichsen
- * @version 3. sep. 2023
+ * @version 5. sep. 2023
  *
  */
-
-// Kildestednavn
-// Husstands/familienr.
-// Matr.nr./Adresse
-// Kildenavn
-// Køn
-// Civilstand
-// Kildeerhverv
-// Stilling_i_husstanden
-// Kildefødested
-// Flyttet til kommunen
-// Hvornår gift
-// Født kildedato
-// Kildehenvisning
-// Kildekommentar
-
-// TODO RESI Flyttet til kommunen
-// TODO MARR Hvornår gift
-// TODO BIRT Født kildedato
-
 public class FT1901Loader extends AbstractLoader {
 	private static final String[] famsArrayF = { "Husejerske", "Husmoder" };
 	private static final String[] famcArrayM = { "Søn" };
 	private static final String[] famcArrayF = { "Datter" };
 	private static final String[] famcArray = { "Barn" };
-	private static final long FIRST_DATE = -62135773200000L;
 	private static final String SELECT1 = "SELECT * FROM FT1901";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
@@ -94,7 +74,6 @@ public class FT1901Loader extends AbstractLoader {
 	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
 			throws SQLException {
 		boolean found = false;
-
 		/**
 		 * Individ
 		 */
@@ -137,7 +116,7 @@ public class FT1901Loader extends AbstractLoader {
 		}
 
 		try {
-			iModel.setFoedt(Integer.toString(1901 - Integer.parseInt(rs.getString("ALDER"))));
+			iModel.setFoedt(rs.getString("FØDT_KILDEDATO"));
 		} catch (final Exception e1) {
 		}
 
@@ -174,13 +153,30 @@ public class FT1901Loader extends AbstractLoader {
 		/**
 		 * Erhverv
 		 */
-		final IndividBegivenhedModel ibModel = new IndividBegivenhedModel();
+		IndividBegivenhedModel ibModel = new IndividBegivenhedModel();
 		ibModel.setIndividId(individId);
 		ibModel.setKildeId(kildeId);
 		ibModel.setBegType("Erhverv");
 		final String kildeErhverv = rs.getString("KILDEERHVERV");
 		ibModel.setNote(kildeErhverv);
 		ibModel.insert(conn);
+
+		/**
+		 * Bolig
+		 */
+		String flyttetTilKommunen = rs.getString("FLYTTET_TIL_KOMMUNEN");
+
+		if (flyttetTilKommunen != null && !flyttetTilKommunen.isBlank()) {
+			ibModel = new IndividBegivenhedModel();
+			ibModel.setIndividId(individId);
+			ibModel.setKildeId(kildeId);
+			ibModel.setBegType("Bolig");
+			try {
+				ibModel.setDato(Date.valueOf(flyttetTilKommunen + "-01-01"));
+			} catch (final Exception e) {
+			}
+			ibModel.insert(conn);
+		}
 
 		final IndividData id = new IndividData(individId, kildeErhverv, getTableRow(rs), iModel);
 		return id;
@@ -206,7 +202,10 @@ public class FT1901Loader extends AbstractLoader {
 		int ftId = 0;
 		int individId = 0;
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1901");
+		final KildeModel kModel = new KildeModel();
+		kModel.setKbNr("Folketælling");
+		kModel.setAarInterval("1901");
+		final int kildeId = kModel.insert(conn);
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
@@ -266,7 +265,10 @@ public class FT1901Loader extends AbstractLoader {
 				fbModel = new FamilieBegivenhedModel();
 				fbModel.setFamilieId(familieId);
 				fbModel.setBegType("Vielse");
-				fbModel.setDato(new Date(FIRST_DATE));
+				try {
+					fbModel.setDato(Date.valueOf(rs.getString("HVORNÅR_GIFT") + "-01-01"));
+				} catch (final Exception e) {
+				}
 				fbModel.setKildeId(kildeId);
 				fbModel.insert(conn);
 

@@ -60,7 +60,7 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 			}
 			try {
 				model.setBlistrupId(rs1.getString("BLISTRUPID").trim());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 			if (rs1.getString("ROLLE") != null) {
 				model.setRolle(rs1.getString("ROLLE").trim());
@@ -75,7 +75,7 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 			model.setStedNavn(rs1.getString("STEDNAVN").trim());
 			try {
 				model.setBem(rs1.getString("BEM").trim());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 
 			liste.add(model);

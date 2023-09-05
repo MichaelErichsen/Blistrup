@@ -10,13 +10,14 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 import net.myerichsen.blistrup.models.FamilieModel;
 import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 import net.myerichsen.blistrup.models.IndividModel;
+import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
  * Load en FT 1771 tabel
  *
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 5. sep. 2023
  *
  */
 public class FT1771Loader extends AbstractLoader {
@@ -62,7 +63,12 @@ public class FT1771Loader extends AbstractLoader {
 		FamilieBegivenhedModel fbModel;
 
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1771");
+
+		final KildeModel kModel = new KildeModel();
+		kModel.setKbNr("Folketælling");
+		kModel.setAarInterval("1771");
+		final int kildeId = kModel.insert(conn);
+
 		statements1 = conn.prepareStatement(SELECT1);
 		final ResultSet rs = statements1.executeQuery();
 

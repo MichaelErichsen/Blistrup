@@ -172,7 +172,7 @@ public class IndividBegivenhedView extends Composite {
 				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				try {
 					return formatter.format(((IndividBegivenhedModel) element).getDato());
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					return "";
 				}
 			}

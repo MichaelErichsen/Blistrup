@@ -12,6 +12,7 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 import net.myerichsen.blistrup.models.FamilieModel;
 import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 import net.myerichsen.blistrup.models.IndividModel;
+import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
@@ -136,7 +137,10 @@ public class FT1787Loader extends AbstractLoader {
 		int individId = 0;
 
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1787");
+		final KildeModel kModel = new KildeModel();
+		kModel.setKbNr("Folketælling");
+		kModel.setAarInterval("1787");
+		final int kildeId = kModel.insert(conn);
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
@@ -167,7 +171,7 @@ public class FT1787Loader extends AbstractLoader {
 					/**
 					 * Vidner til folketælling
 					 */
-					for (IndividData individData : list) {
+					for (final IndividData individData : list) {
 						individId = individData.getId();
 
 						if (individId == fModel.getFader() || individId == fModel.getModer()) {

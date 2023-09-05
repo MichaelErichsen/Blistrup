@@ -100,8 +100,8 @@ public class FamilieBegivenhedView extends Composite {
 			@Override
 			public String getText(Object element) {
 				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-				String date = formatter.format(((FamilieBegivenhedModel) element).getDato());
-				return date.equals("0001-01-01") ? "" : date;
+				final String date = formatter.format(((FamilieBegivenhedModel) element).getDato());
+				return "0001-01-01".equals(date) ? "" : date;
 			}
 		});
 

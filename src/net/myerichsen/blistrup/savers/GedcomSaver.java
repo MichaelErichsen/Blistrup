@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 3. sep. 2023
+ * @version 5. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static String titel = "Vielser";
+	private static final String titel = "Vielser";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -85,6 +85,7 @@ public class GedcomSaver {
 	private static final String SELECTV2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE ID = ?";
 	private static final String SELECTV3 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE ID = ?";
 	private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
+	private static final DateTimeFormatter date8Format = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
 
 	private static OutputStreamWriter fw;
@@ -259,6 +260,8 @@ public class GedcomSaver {
 	public void writeFamilyEvent(int id, boolean primary) throws SQLException, IOException {
 		ResultSet rs2;
 		String type = "";
+		String stedNavn = "";
+
 		statementf2.setInt(1, id);
 		rs2 = statementf2.executeQuery();
 
@@ -266,6 +269,9 @@ public class GedcomSaver {
 			type = rs2.getString("BEGTYPE").trim();
 
 			if ("Vielse".equals(type)) {
+				if (!primary) {
+					continue;
+				}
 				writeLine("1 MARR");
 			} else if ("Folketælling".equals(type)) {
 				writeLine("1 CENS");
@@ -276,7 +282,12 @@ public class GedcomSaver {
 			}
 
 			writeDate(rs2);
-			writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
+
+			stedNavn = rs2.getString("STEDNAVN");
+
+			if (stedNavn != null && !stedNavn.isBlank()) {
+				writeLine("2 PLAC " + stedNavn);
+			}
 			writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
 		}
 
@@ -320,38 +331,71 @@ public class GedcomSaver {
 	public void writeIndividualEvent(int id, boolean primary) throws SQLException, IOException {
 		String type;
 		String note;
+		String stedNavn = "";
 
 		statementi2.setInt(1, id);
 		final ResultSet rs2 = statementi2.executeQuery();
 
-		if (rs2.next()) {
+		while (rs2.next()) {
 			type = rs2.getString("BEGTYPE").trim();
+			stedNavn = rs2.getString("STEDNAVN");
 
 			if ("Dåb".equals(type)) {
 				writeLine("1 CHR");
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
+				if (primary) {
+					writeLine("2 NOTE " + rs2.getString("NOTE"));
+				} else {
+					writeLine("2 NOTE Vidne");
+				}
 			} else if ("Konfirmation".equals(type)) {
 				writeLine("1 CONF");
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
+				if (primary) {
+					writeLine("2 NOTE " + rs2.getString("NOTE"));
+				} else {
+					writeLine("2 NOTE Vidne");
+				}
 			} else if ("Begravelse".equals(type)) {
 				writeLine("1 BURI");
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
+				if (primary) {
+					writeLine("2 NOTE " + rs2.getString("NOTE"));
+				} else {
+					writeLine("2 NOTE Vidne");
+				}
 			} else if ("Folketælling".equals(type)) {
 				writeLine("1 CENS");
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
+				if (primary) {
+					writeLine("2 NOTE " + rs2.getString("NOTE"));
+				} else {
+					writeLine("2 NOTE Vidne");
+				}
+			} else if ("Bolig".equals(type)) {
+				writeLine("1 RESI");
+				writeLine("2 PLAC Blistrup");
 			} else if ("Erhverv".equals(type)) {
+				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
 				note = rs2.getString("NOTE");
 
 				if (!note.isBlank()) {
 					writeLine("1 OCCU " + note);
 				}
 
-				return;
+				continue;
 			}
 
 			writeDate(rs2);
-			writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
-			if (primary) {
-				writeLine("2 NOTE " + rs2.getString("NOTE"));
-			} else {
-				writeLine("2 NOTE Vidne");
-			}
+
 			writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
 		}
 	}
@@ -367,11 +411,17 @@ public class GedcomSaver {
 	private void writeIndividuals(Connection conn) throws SQLException, IOException {
 		IndividModel model;
 		String sex = "";
+		String foedt = "";
+		LocalDate localDate;
 
 		final ResultSet rs1 = statementi1.executeQuery();
 
 		while (rs1.next()) {
 			model = IndividModel.getData(conn, rs1);
+			if (model.getStdNavn().contains("ubeboet")) {
+				continue;
+			}
+
 			writeLine("0 @I" + model.getId() + "@ INDI");
 			writeLine("1 NAME " + model.getStdNavn());
 			sex = "M".equals(model.getKoen().toUpperCase()) ? "M" : "F";
@@ -385,13 +435,26 @@ public class GedcomSaver {
 				writeLine("1 FAMS @F" + aFams + "@");
 			}
 
-			if (model.getFoedt() != null && !model.getFoedt().isBlank()) {
-				writeLine("1 BIRT");
-				if (model.getFoedt().trim().length() > 4) {
-					final LocalDate localDate = LocalDate.parse(model.getFoedt().trim());
-					writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
-				} else {
-					writeLine("2 DATE " + model.getFoedt());
+			foedt = model.getFoedt();
+
+			if (foedt != null && !foedt.isBlank()) {
+				foedt = foedt.trim();
+
+				if (!"0 0000".equals(foedt)) {
+					writeLine("1 BIRT");
+					if (foedt.length() == 8) {
+						if ("0000".equals(foedt.substring(4, 8))) {
+							foedt = foedt.replace("0000", "0101");
+						}
+
+						localDate = LocalDate.parse(foedt, date8Format);
+						writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
+					} else if (foedt.length() > 4) {
+						localDate = LocalDate.parse(foedt);
+						writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
+					} else {
+						writeLine("2 DATE " + model.getFoedt());
+					}
 				}
 			}
 
@@ -448,9 +511,11 @@ public class GedcomSaver {
 		writeLine("2 SOUR @S" + kildeId + "@");
 
 		if (detaljer == null || detaljer.isBlank()) {
-			writeLine("3 PAGE " + text);
+			if (text != null && !"".equals(text)) {
+				writeLine("3 PAGE " + text);
+			}
 		} else {
-			writeLine("3 PAGE " + text + "\r\n4 CONT " + detaljer);
+			writeLine("3 PAGE " + text + "\r\n" + detaljer);
 		}
 	}
 

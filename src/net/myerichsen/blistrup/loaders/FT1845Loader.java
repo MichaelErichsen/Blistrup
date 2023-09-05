@@ -12,6 +12,7 @@ import net.myerichsen.blistrup.models.FamilieBegivenhedModel;
 import net.myerichsen.blistrup.models.FamilieModel;
 import net.myerichsen.blistrup.models.IndividBegivenhedModel;
 import net.myerichsen.blistrup.models.IndividModel;
+import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
@@ -88,7 +89,7 @@ public class FT1845Loader extends AbstractLoader {
 		final IndividModel iModel = new IndividModel();
 
 		final String kildeErhverv = rs.getString("KILDEERHVERV");
-		String koen = rs.getString("KØN");
+		final String koen = rs.getString("KØN");
 		iModel.setKoen("M".equals(koen) ? "M" : "F");
 
 		if (nrIHusstand == 0 || nrIHusstand == 1) {
@@ -192,7 +193,10 @@ public class FT1845Loader extends AbstractLoader {
 		int ftId = 0;
 		int individId = 0;
 		final Connection conn = connect("APP");
-		final int kildeId = insertSource(conn, "1845");
+		final KildeModel kModel = new KildeModel();
+		kModel.setKbNr("Folketælling");
+		kModel.setAarInterval("1845");
+		final int kildeId = kModel.insert(conn);
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
