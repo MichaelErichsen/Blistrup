@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs dåbsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 5. sep. 2023
  *
  */
 public class DaabLoader extends AbstractLoader {
@@ -80,7 +80,7 @@ public class DaabLoader extends AbstractLoader {
 		}
 
 		for (final String blistrupId : blistrupIdListe) {
-			sb = new StringBuilder();
+			sb = new StringBuilder("4 CONT ");
 
 			// SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' AND BEGIV = ?
 			// ORDER BY PID";

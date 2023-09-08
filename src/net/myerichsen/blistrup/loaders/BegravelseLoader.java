@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs begravelser
  *
  * @author Michael Erichsen
- * @version 30. aug. 2023
+ * @version 5. sep. 2023
  *
  */
 public class BegravelseLoader extends AbstractLoader {
@@ -83,7 +83,7 @@ public class BegravelseLoader extends AbstractLoader {
 		}
 
 		for (final String blistrupId : blistrupIdListe) {
-			sb = new StringBuilder();
+			sb = new StringBuilder("4 CONT ");
 
 			// SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' AND BEGIV = ?
 			// ORDER BY PID";

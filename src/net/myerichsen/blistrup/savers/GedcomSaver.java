@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 8. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Begravelser";
+	private static final String titel = "Matrikel";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -380,15 +380,18 @@ public class GedcomSaver {
 				} else {
 					writeLine("2 NOTE Vidne");
 				}
+			} else if ("Matrikel".equals(type)) {
+				writeLine("1 RESI");
+				writeLine("2 PLAC Matr. " + rs2.getString("STEDNAVN"));
 			} else if ("Bolig".equals(type)) {
 				writeLine("1 RESI");
-				writeLine("2 PLAC Blistrup");
+				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");
 			} else if ("Erhverv".equals(type)) {
-				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
 				note = rs2.getString("NOTE");
 
 				if (!note.isBlank()) {
 					writeLine("1 OCCU " + note);
+					writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
 				}
 
 				continue;
@@ -560,6 +563,9 @@ public class GedcomSaver {
 					|| "1880".equals(aarinterval) || "1890".equals(aarinterval) || "1901".equals(aarinterval)) {
 				writeLine("1 TITL Folketælling Blistrup " + aarinterval);
 				writeLine("1 ABBR Folketælling Blistrup " + aarinterval);
+			} else if ("1844".equals(aarinterval)) {
+				writeLine("1 TITL Hartkornsmatrikel Blistrup " + aarinterval);
+				writeLine("1 ABBR Hartkornsmatrikel Blistrup " + aarinterval);
 			} else {
 				writeLine("1 TITL Kirkebog Blistrup " + aarinterval);
 				writeLine("1 ABBR Kirkebog Blistrup " + aarinterval);
