@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Matrikel";
+	private static final String titel = "Arvefæste";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -380,7 +380,7 @@ public class GedcomSaver {
 				} else {
 					writeLine("2 NOTE Vidne");
 				}
-			} else if ("Matrikel".equals(type)) {
+			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC Matr. " + rs2.getString("STEDNAVN"));
 			} else if ("Bolig".equals(type)) {
@@ -392,6 +392,7 @@ public class GedcomSaver {
 				if (!note.isBlank()) {
 					writeLine("1 OCCU " + note);
 					writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
+					writeLine("2 NOTE " + note);
 				}
 
 				continue;
@@ -557,7 +558,10 @@ public class GedcomSaver {
 
 			aarinterval = rs1.getString("AARINTERVAL").trim();
 
-			if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)
+			if ("Arvefæste".equals(rs1.getString("KBNR").trim())) {
+				writeLine("1 TITL Arvefæste Blistrup " + aarinterval);
+				writeLine("1 ABBR Arvefæste Blistrup " + aarinterval);
+			} else if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)
 					|| "1834".equals(aarinterval) || "1840".equals(aarinterval) || "1845".equals(aarinterval)
 					|| "1850".equals(aarinterval) || "1860".equals(aarinterval) || "1870".equals(aarinterval)
 					|| "1880".equals(aarinterval) || "1890".equals(aarinterval) || "1901".equals(aarinterval)) {

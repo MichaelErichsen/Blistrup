@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 9. sep. 2023
  *
  */
 public abstract class AbstractLoader {
@@ -100,7 +100,8 @@ public abstract class AbstractLoader {
 	 * @return
 	 */
 	protected String afQ(String input) {
-		return input.replace("Qo", "ø").replace("Qe", "æ").replace("Qa", "a").trim();
+		return input.replace("QO", "Ø").replace("QE", "Æ").replace("QA", "Å").replace("Qo", "ø").replace("Qe", "æ")
+				.replace("Qa", "å").trim();
 	}
 
 	/**

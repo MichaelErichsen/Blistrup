@@ -9,10 +9,10 @@ import java.sql.Statement;
 import net.myerichsen.blistrup.models.KildeModel;
 
 /**
- * Indlæs begravelser
+ * Indlæs matrikler
  *
  * @author Michael Erichsen
- * @version 8. sep. 2023
+ * @version 9. sep. 2023
  *
  */
 public class MatrikelLoader extends AbstractLoader {
