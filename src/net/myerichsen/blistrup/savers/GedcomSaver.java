@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Fæstebrevkopier";
+	private static final String titel = "Dåb";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -195,7 +195,7 @@ public class GedcomSaver {
 		conn.close();
 		writeTrailer();
 		System.out.println("Udskrevet trailer");
-		System.out.println("Færdig!");
+		System.out.println(titel + " udskrevet");
 		fw.flush();
 		fw.close();
 	}
