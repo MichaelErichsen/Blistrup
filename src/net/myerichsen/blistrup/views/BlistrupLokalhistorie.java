@@ -39,7 +39,6 @@ import net.myerichsen.blistrup.actions.VielseAction;
  * @version 01. sep. 2023
  *
  */
-// TODO Add load buttons to each view and remove initial load
 public class BlistrupLokalhistorie extends ApplicationWindow {
 	private static final String dbPath = "C:\\Users\\michael\\BlistrupDB";
 

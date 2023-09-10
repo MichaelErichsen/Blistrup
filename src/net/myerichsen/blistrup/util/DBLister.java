@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.gedcom4j.exception.GedcomParserException;
+
 /**
  * Class to list contents of a BLISTRUP Derby table.
  *

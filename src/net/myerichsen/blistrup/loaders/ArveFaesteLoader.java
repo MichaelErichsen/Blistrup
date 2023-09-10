@@ -148,9 +148,10 @@ public class ArveFaesteLoader extends AbstractLoader {
 
 				taeller++;
 
-			} else
+			} else {
 				System.err.println("Ikke fundet: SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'M' AND AAR = " + aar
 						+ " AND LBNR = " + lbNr + " AND STEDNAVN = " + stedNavn);
+			}
 		}
 
 		statement0.close();

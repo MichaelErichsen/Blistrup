@@ -164,7 +164,7 @@ public class FT1901Loader extends AbstractLoader {
 		/**
 		 * Bolig
 		 */
-		String flyttetTilKommunen = rs.getString("FLYTTET_TIL_KOMMUNEN");
+		final String flyttetTilKommunen = rs.getString("FLYTTET_TIL_KOMMUNEN");
 
 		if (flyttetTilKommunen != null && !flyttetTilKommunen.isBlank()) {
 			ibModel = new IndividBegivenhedModel();

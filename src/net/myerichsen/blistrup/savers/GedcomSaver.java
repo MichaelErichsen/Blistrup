@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Matrikel";
+	private static final String titel = "Fæstebrevkopier";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -380,9 +380,14 @@ public class GedcomSaver {
 				} else {
 					writeLine("2 NOTE Vidne");
 				}
-			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type)) {
+			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
+					|| "Fæstebrevkopier".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
+				note = rs2.getString("NOTE");
+				if (note != null && !note.isBlank()) {
+					writeLine("2 NOTE " + note);
+				}
 			} else if ("Bolig".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");
@@ -532,44 +537,26 @@ public class GedcomSaver {
 	 */
 	private void writeSources() throws SQLException, IOException {
 		String aarinterval = "";
-		int id = 0;
-//		String ids = "";
-//		boolean found = false;
+		String kbNr = "";
 
 		final ResultSet rs1 = statementk1.executeQuery();
-//		foreachsource: while (rs1.next()) {
 		while (rs1.next()) {
-			id = rs1.getInt("ID");
-//			ids = Integer.toString(id);
-//			found = false;
+			writeLine("0 @S" + rs1.getInt("ID") + "@ SOUR");
 
-//			for (final SourceReference sourceReference : referenceList) {
-//				if (ids.equals(sourceReference.getId())) {
-//					found = true;
-//					break;
-//				}
-//			}
-//
-//			if (!found) {
-//				continue foreachsource;
-//			}
-
-			writeLine("0 @S" + id + "@ SOUR");
-
+			kbNr = rs1.getString("KBNR").trim();
 			aarinterval = rs1.getString("AARINTERVAL").trim();
 
-			if ("Arvefæste".equals(rs1.getString("KBNR").trim())) {
-				writeLine("1 TITL Arvefæste Blistrup " + aarinterval);
-				writeLine("1 ABBR Arvefæste Blistrup " + aarinterval);
+			if ("Arvefæste".equals(kbNr) || "Matrikel".equals(kbNr) || "Fæstedesignation".equals(kbNr)
+					|| "Fæstebrevkopier".equals(kbNr)) {
+				writeLine("1 TITL " + kbNr + " Blistrup " + aarinterval);
+				writeLine("1 ABBR " + kbNr + " Blistrup " + aarinterval);
 			} else if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)
 					|| "1834".equals(aarinterval) || "1840".equals(aarinterval) || "1845".equals(aarinterval)
 					|| "1850".equals(aarinterval) || "1860".equals(aarinterval) || "1870".equals(aarinterval)
 					|| "1880".equals(aarinterval) || "1890".equals(aarinterval) || "1901".equals(aarinterval)) {
 				writeLine("1 TITL Folketælling Blistrup " + aarinterval);
 				writeLine("1 ABBR Folketælling Blistrup " + aarinterval);
-			} else if ("1844".equals(aarinterval)) {
-				writeLine("1 TITL Hartkornsmatrikel Blistrup " + aarinterval);
-				writeLine("1 ABBR Hartkornsmatrikel Blistrup " + aarinterval);
+
 			} else {
 				writeLine("1 TITL Kirkebog Blistrup " + aarinterval);
 				writeLine("1 ABBR Kirkebog Blistrup " + aarinterval);

@@ -50,6 +50,7 @@ public class MatrikelLoader extends AbstractLoader {
 		String jordlod = "";
 		String blistrupId = "";
 		String stedNavn = "";
+		String matr = "";
 
 		final KildeModel kModel = new KildeModel();
 		kModel.setKbNr("Matrikel");
@@ -125,15 +126,23 @@ public class MatrikelLoader extends AbstractLoader {
 				} else {
 					stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg, ";
 				}
-				jordlod = "Matr. " + afQ(rs1.getString("MATR_")) + ", " + afQ(rs1.getString("GAARD")) + ", " + stedNavn;
+
+				matr = afQ(rs1.getString("MATR_"));
+
+				if (matr.isBlank()) {
+					jordlod = afQ(rs1.getString("GAARD")) + ", " + stedNavn;
+				} else {
+					jordlod = "Matr. " + matr + ", " + afQ(rs1.getString("GAARD")) + ", " + stedNavn;
+				}
 				statement4.setString(6, jordlod);
 				statement4.executeUpdate();
 
 				taeller++;
 
-			} else
+			} else {
 				System.err.println("Ikke fundet: SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'H' AND BEGIV = "
 						+ blistrupId + " AND STEDNAVN = " + stedNavn);
+			}
 
 		}
 
