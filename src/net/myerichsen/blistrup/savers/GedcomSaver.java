@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 8. sep. 2023
+ * @version 10. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Arvefæste";
+	private static final String titel = "Matrikel";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -382,7 +382,7 @@ public class GedcomSaver {
 				}
 			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type)) {
 				writeLine("1 RESI");
-				writeLine("2 PLAC Matr. " + rs2.getString("STEDNAVN"));
+				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
 			} else if ("Bolig".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");

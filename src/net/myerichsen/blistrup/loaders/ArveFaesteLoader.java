@@ -11,10 +11,10 @@ import java.time.format.DateTimeFormatter;
 import net.myerichsen.blistrup.models.KildeModel;
 
 /**
- * Indlæs arvefæester
+ * Indlæs arvefæster
  *
  * @author Michael Erichsen
- * @version 9. sep. 2023
+ * @version 10. sep. 2023
  *
  */
 public class ArveFaesteLoader extends AbstractLoader {
@@ -25,7 +25,6 @@ public class ArveFaesteLoader extends AbstractLoader {
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER, BLISTRUPID, KILDEID, STEDNAVN, DETALJER) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-//	private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
 	private static final DateTimeFormatter date8Format = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	/**
@@ -45,7 +44,6 @@ public class ArveFaesteLoader extends AbstractLoader {
 	 * @throws SQLException
 	 */
 	public int load() throws SQLException {
-		final Connection conn = connect("BLISTRUP");
 		ResultSet rs1, generatedKeys;
 		int individId = 0;
 		int taeller = 0;
@@ -56,7 +54,10 @@ public class ArveFaesteLoader extends AbstractLoader {
 		String stedNavn = "";
 		int alder = 0;
 		LocalDate localDate;
+		String aar = "";
+		String lbNr = "";
 
+		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
 		kModel.setKbNr("Arvefæste");
 		kModel.setAarInterval("1788-1844");
@@ -77,13 +78,17 @@ public class ArveFaesteLoader extends AbstractLoader {
 			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'M' AND AAR = ? AND LBNR = ? AND
 			// STEDNAVN = ?";
 
-			statement1.setString(1, rs0.getString("AAR"));
-			statement1.setString(2, rs0.getString("LBNR"));
-			stedNavn = afQ(rs0.getString("STEDNAVN"));
+			aar = rs0.getString("AAR");
+			statement1.setString(1, aar);
+			lbNr = rs0.getString("LBNR");
+			statement1.setString(2, lbNr);
+			stedNavn = rs0.getString("STEDNAVN");
 			statement1.setString(3, stedNavn);
 			rs1 = statement1.executeQuery();
 
 			if (rs1.next()) {
+				stedNavn = afQ(stedNavn);
+
 				// "INSERT INTO INDIVID (BLISTRUPID, KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?,
 
 				blistrupId = afQ(rs1.getString("BEGIV"));
@@ -104,7 +109,7 @@ public class ArveFaesteLoader extends AbstractLoader {
 
 				generatedKeys.close();
 
-//				private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
+				// "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN)
 
 				statement3.setInt(1, individId);
 				stdnavn = afQ(rs1.getString("STD_NAVN"));
@@ -117,13 +122,13 @@ public class ArveFaesteLoader extends AbstractLoader {
 
 				statement3.executeUpdate();
 
-//				private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER, BLISTRUPID, KILDEID, STEDNAVN, DETALJER) "
+				// "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER, BLISTRUPID,
+				// KILDEID, STEDNAVN, DETALJER) "
 
 				statement4.setInt(1, individId);
 				statement4.setString(2, "Arvefæste");
 				localDate = LocalDate.parse(rs1.getString("DATO"), date8Format);
 				statement4.setString(3, localDate.toString());
-//				statement4.setString(3, dateFormat.format(localDate).toUpperCase());
 
 				try {
 					alder = Integer.parseInt(rs1.getString("AAR")) - Integer.parseInt(rs1.getString("ALDER"));
@@ -134,8 +139,7 @@ public class ArveFaesteLoader extends AbstractLoader {
 				statement4.setString(4, Integer.toString(alder));
 				statement4.setString(5, blistrupId);
 				statement4.setInt(6, kildeId);
-// FIXME QOlhøjsgaard      
-				jordlod = afQ(rs1.getString("MATR_")) + ", " + afQ(rs1.getString("GAARD")) + ", " + stedNavn
+				jordlod = "Matr. " + afQ(rs1.getString("MATR_")) + ", " + afQ(rs1.getString("GAARD")) + ", " + stedNavn
 						+ ", Blistrup, Holbo, Frederiksborg, ";
 				statement4.setString(7, jordlod);
 				statement4.setString(8, "4 CONT Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG")
@@ -144,8 +148,9 @@ public class ArveFaesteLoader extends AbstractLoader {
 
 				taeller++;
 
-			}
-
+			} else
+				System.err.println("Ikke fundet: SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'M' AND AAR = " + aar
+						+ " AND LBNR = " + lbNr + " AND STEDNAVN = " + stedNavn);
 		}
 
 		statement0.close();

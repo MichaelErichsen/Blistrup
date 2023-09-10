@@ -13,7 +13,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 10. sep. 2023
  *
  */
 public class VielseLoader extends AbstractLoader {
@@ -67,7 +67,7 @@ public class VielseLoader extends AbstractLoader {
 
 		final Connection conn = connect("BLISTRUP");
 
-// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C'";
+		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C'";
 
 		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
 		ResultSet rs1 = statement1.executeQuery();
@@ -76,7 +76,7 @@ public class VielseLoader extends AbstractLoader {
 			blistrupIdListe.add(rs1.getString("BEGIV"));
 		}
 
-// SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
+		// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
 
 		for (final String blistrupId : blistrupIdListe) {
 			sb = new StringBuilder();
@@ -85,7 +85,7 @@ public class VielseLoader extends AbstractLoader {
 			statement1.setString(1, blistrupId);
 			rs1 = statement1.executeQuery();
 
-// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+			// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 			while (rs1.next()) {
 				rolle = rs1.getString("ROLLE").trim();
@@ -107,7 +107,8 @@ public class VielseLoader extends AbstractLoader {
 				}
 				generatedKeys.close();
 
-// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
+				// "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN,
+				// FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
 
 				statement2 = conn.prepareStatement(INSERT2);
 				statement2.setInt(1, individId);
@@ -140,7 +141,7 @@ public class VielseLoader extends AbstractLoader {
 					kModel.setOpNr(rs1.getString("OPNR").trim());
 					final int kildeId = kModel.insert(conn);
 
-// INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+					// "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 					statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, gom);
@@ -155,7 +156,7 @@ public class VielseLoader extends AbstractLoader {
 					generatedKeys.close();
 
 					if (fader != null && !fader.isBlank()) {
-// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+						// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 						statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 						statement2.setString(1, rs1.getString("SEX").trim());
@@ -171,7 +172,7 @@ public class VielseLoader extends AbstractLoader {
 						}
 						generatedKeys.close();
 
-// INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+						// "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 						statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 						statement2.setInt(1, faderId);
@@ -185,7 +186,7 @@ public class VielseLoader extends AbstractLoader {
 						}
 						generatedKeys.close();
 
-// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+						// "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
 						statement2 = conn.prepareStatement(UPDATE1);
 						statement2.setInt(1, faderFamilieId);
@@ -193,7 +194,8 @@ public class VielseLoader extends AbstractLoader {
 						statement2.executeUpdate();
 					}
 
-// INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
+					// "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID,
+					// KILDEID, STEDNAVN, BEM) "
 
 					statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, familieId);
@@ -222,7 +224,7 @@ public class VielseLoader extends AbstractLoader {
 				} else if ("brud".equals(rolle)) {
 					brud = individId;
 
-// UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
+					// "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
 
 					statement2.close();
 					statement2 = conn.prepareStatement(UPDATE2);
@@ -231,7 +233,7 @@ public class VielseLoader extends AbstractLoader {
 					statement2.executeUpdate();
 
 					if (fader != null && !fader.isBlank()) {
-// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+						// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
 						statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 						statement2.setString(1, rs1.getString("SEX").trim());
@@ -248,7 +250,7 @@ public class VielseLoader extends AbstractLoader {
 						}
 						generatedKeys.close();
 
-// INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+						// "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
 						statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
 						statement2.setInt(1, faderId);
@@ -262,7 +264,7 @@ public class VielseLoader extends AbstractLoader {
 						}
 						generatedKeys.close();
 
-// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+						// "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
 						statement2 = conn.prepareStatement(UPDATE1);
 						statement2.setInt(1, faderFamilieId);
@@ -271,14 +273,13 @@ public class VielseLoader extends AbstractLoader {
 					}
 				} else {
 					// Forlover
-// INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
+					// "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 					statement2.close();
 					statement2 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
 					statement2.setInt(1, individId);
 					statement2.setString(2, rs1.getString("ROLLE").trim());
 					statement2.setInt(3, familieBegivenhedsId);
 				}
-//				statement2.executeUpdate();
 
 			}
 

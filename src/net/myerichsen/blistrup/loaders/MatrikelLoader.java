@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs matrikler
  *
  * @author Michael Erichsen
- * @version 9. sep. 2023
+ * @version 10. sep. 2023
  *
  */
 public class MatrikelLoader extends AbstractLoader {
@@ -73,11 +73,12 @@ public class MatrikelLoader extends AbstractLoader {
 
 			blistrupId = afQ(rs0.getString("BEGIV"));
 			statement1.setString(1, blistrupId);
-			stedNavn = afQ(rs0.getString("STEDNAVN"));
+			stedNavn = rs0.getString("STEDNAVN");
 			statement1.setString(2, stedNavn);
 			rs1 = statement1.executeQuery();
 
 			if (rs1.next()) {
+				stedNavn = afQ(stedNavn);
 				koen = rs1.getString("SEX");
 
 				// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
@@ -124,13 +125,15 @@ public class MatrikelLoader extends AbstractLoader {
 				} else {
 					stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg, ";
 				}
-				jordlod = afQ(rs1.getString("MATR_")) + ", " + afQ(rs1.getString("GAARD")) + ", " + stedNavn;
+				jordlod = "Matr. " + afQ(rs1.getString("MATR_")) + ", " + afQ(rs1.getString("GAARD")) + ", " + stedNavn;
 				statement4.setString(6, jordlod);
 				statement4.executeUpdate();
 
 				taeller++;
 
-			}
+			} else
+				System.err.println("Ikke fundet: SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'H' AND BEGIV = "
+						+ blistrupId + " AND STEDNAVN = " + stedNavn);
 
 		}
 
