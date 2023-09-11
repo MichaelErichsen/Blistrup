@@ -17,7 +17,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * @version 10. sep. 2023
  *
  */
-public class FaesteBrevKopier extends AbstractLoader {
+public class FaesteBrevKopiLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'L'";
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
@@ -30,7 +30,7 @@ public class FaesteBrevKopier extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			final int taeller = new FaesteBrevKopier().load();
+			final int taeller = new FaesteBrevKopiLoader().load();
 			System.out.println("Har indlæst " + taeller + " fæstebrevkopilinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();

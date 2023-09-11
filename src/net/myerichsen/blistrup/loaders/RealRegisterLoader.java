@@ -14,11 +14,12 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 10. sep. 2023
+ * @version 11. sep. 2023
  *
  */
-public class FaesteDesignation extends AbstractLoader {
-	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'";
+
+public class RealRegisterLoader extends AbstractLoader {
+	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N'";
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, NOTE, DETALJER) "
@@ -30,8 +31,8 @@ public class FaesteDesignation extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			final int taeller = new FaesteDesignation().load();
-			System.out.println("Har indlæst " + taeller + " fæstedesignationslinier");
+			final int taeller = new RealRegisterLoader().load();
+			System.out.println("Har indlæst " + taeller + " realregisterlinier");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -58,8 +59,8 @@ public class FaesteDesignation extends AbstractLoader {
 
 		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
-		kModel.setKbNr("Fæstedesignation");
-		kModel.setAarInterval("1754-1832");
+		kModel.setKbNr("Realregister");
+		kModel.setAarInterval("1795-1914");
 		final int kildeId = kModel.insert(conn);
 
 		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
@@ -72,7 +73,7 @@ public class FaesteDesignation extends AbstractLoader {
 		final ResultSet rs1 = statement0.executeQuery();
 
 		while (rs1.next()) {
-			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
+			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N'
 
 			blistrupId = afQ(rs1.getString("BEGIV"));
 			stedNavn = afQ(rs1.getString("STEDNAVN"));
@@ -100,9 +101,9 @@ public class FaesteDesignation extends AbstractLoader {
 			// PRIMAERNAVN) VALUES
 
 			statement3.setInt(1, individId);
-
-			stdnavn = afQ(rs1.getString("HP"));
+			stdnavn = afQ(rs1.getString("STD_NAVN"));
 			statement3.setString(2, cleanName(stdnavn));
+
 			try {
 				statement3.setString(3, fonkod.generateKey(stdnavn).trim());
 			} catch (final Exception e) {
@@ -115,7 +116,8 @@ public class FaesteDesignation extends AbstractLoader {
 			// BLISTRUPID, KILDEID, STEDNAVN, NOTE, DETALJER) "
 
 			statement4.setInt(1, individId);
-			statement4.setString(2, "Fæstedesignation");
+			statement4.setString(2, "Realregister");
+
 			try {
 				dato = rs1.getString("DATO").replace("0000", "0101");
 				localDate = LocalDate.parse(dato, date8Format);
@@ -123,8 +125,10 @@ public class FaesteDesignation extends AbstractLoader {
 			} catch (final Exception e) {
 				statement4.setString(3, "0001-01-01");
 			}
+
 			statement4.setString(4, blistrupId);
 			statement4.setInt(5, kildeId);
+
 			if (stedNavn.contains("Blistrup")) {
 				stedNavn = stedNavn + ", Holbo, Frederiksborg, ";
 			} else {
@@ -138,8 +142,8 @@ public class FaesteDesignation extends AbstractLoader {
 			} else {
 				jordlod = "Matr. " + matr + ", " + afQ(gaard) + ", " + stedNavn;
 			}
-			statement4.setString(6, jordlod);
 
+			statement4.setString(6, jordlod);
 			til = rs1.getString("TIL");
 			fra = rs1.getString("FRA");
 
@@ -151,8 +155,10 @@ public class FaesteDesignation extends AbstractLoader {
 				statement4.setString(7, "");
 			}
 
-			statement4.setString(8, "4 CONT Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG")
-					+ ", " + rs1.getString("STILLING"));
+			statement4.setString(8,
+					"4 CONT Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG") + ", "
+							+ afQ(rs1.getString("STILLING")) + ", " + rs1.getString("CIVILSTAND") + ", "
+							+ afQ(rs1.getString("ERHVERV")));
 			statement4.executeUpdate();
 
 			taeller++;

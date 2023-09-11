@@ -19,7 +19,7 @@ public class MatrikelLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV, STEDNAVN FROM F9PERSONFAMILIEQ WHERE TYPE = 'H'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'H' AND BEGIV = ? AND STEDNAVN = ?";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT) VALUES (?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN) "
 			+ "VALUES (?, ?, ?, ?, ?, ?)";
@@ -86,6 +86,8 @@ public class MatrikelLoader extends AbstractLoader {
 
 				statement2.setString(1, "m".equals(koen) ? "M" : "F");
 				statement2.setString(2, blistrupId);
+				statement2.setString(3, rs1.getString("FAM"));
+				statement2.setString(4, rs1.getString("SLGT"));
 				statement2.executeUpdate();
 				generatedKeys = statement2.getGeneratedKeys();
 

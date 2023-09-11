@@ -21,7 +21,7 @@ public class BegravelseLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'D'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' AND BEGIV = ? ORDER BY PID";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -106,6 +106,8 @@ public class BegravelseLoader extends AbstractLoader {
 				statement2.setString(1, koen);
 				statement2.setString(2, rs1.getString("PID").trim());
 				statement2.setString(3, rs1.getString("FQODT").trim());
+				statement2.setString(4, rs1.getString("FAM"));
+				statement2.setString(5, rs1.getString("SLGT"));
 				statement2.executeUpdate();
 				generatedKeys = statement2.getGeneratedKeys();
 

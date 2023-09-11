@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 10. sep. 2023
+ * @version 11. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Dåb";
+	private static final String titel = "Konfirmation";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
@@ -381,7 +381,7 @@ public class GedcomSaver {
 					writeLine("2 NOTE Vidne");
 				}
 			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
-					|| "Fæstebrevkopier".equals(type)) {
+					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
 				note = rs2.getString("NOTE");
@@ -547,7 +547,7 @@ public class GedcomSaver {
 			aarinterval = rs1.getString("AARINTERVAL").trim();
 
 			if ("Arvefæste".equals(kbNr) || "Matrikel".equals(kbNr) || "Fæstedesignation".equals(kbNr)
-					|| "Fæstebrevkopier".equals(kbNr)) {
+					|| "Fæstebrevkopier".equals(kbNr) || "Realregister".equals(kbNr)) {
 				writeLine("1 TITL " + kbNr + " Blistrup " + aarinterval);
 				writeLine("1 ABBR " + kbNr + " Blistrup " + aarinterval);
 			} else if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)

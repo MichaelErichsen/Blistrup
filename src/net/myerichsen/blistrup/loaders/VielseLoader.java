@@ -20,7 +20,7 @@ public class VielseLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C'";
 	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT) VALUES (?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
@@ -97,6 +97,8 @@ public class VielseLoader extends AbstractLoader {
 				statement2.setString(1, rs1.getString("SEX").trim());
 				statement2.setString(2, rs1.getString("PID").trim());
 				statement2.setString(3, rs1.getString("FQODT").trim());
+				statement2.setString(4, rs1.getString("FAM"));
+				statement2.setString(5, rs1.getString("SLGT"));
 				statement2.executeUpdate();
 				generatedKeys = statement2.getGeneratedKeys();
 
