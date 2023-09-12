@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 11. sep. 2023
+ * @version 12. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -524,7 +524,7 @@ public class GedcomSaver {
 				writeLine("3 PAGE " + text);
 			}
 		} else {
-			writeLine("3 PAGE " + text + "\r\n" + detaljer);
+			writeLine("3 PAGE " + text + "\r\n4 CONT " + detaljer);
 		}
 	}
 
