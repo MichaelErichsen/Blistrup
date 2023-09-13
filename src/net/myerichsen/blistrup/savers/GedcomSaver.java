@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 12. sep. 2023
+ * @version 13. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,16 +74,20 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Konfirmation";
+	private static final String titel = "Vielser";
+	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
+	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
+	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
+	private static final String SELECTF5 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE ID = ?";
 	private static final String SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 	private static final String SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
-	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
-	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
+	private static final String SELECTI3 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE ID = ?";
 	private static final String SELECTK1 = "SELECT * FROM BLISTRUP.KILDE";
 	private static final String SELECTK2 = "SELECT * FROM BLISTRUP.KILDE WHERE ID = ?";
 	private static final String SELECTV1 = "SELECT * FROM BLISTRUP.VIDNE WHERE INDIVIDID = ?";
-	private static final String SELECTV2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE ID = ?";
-	private static final String SELECTV3 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE ID = ?";
+	private static final String SELECTV2 = "SELECT * FROM BLISTRUP.VIDNE WHERE INDIVIDID = ? AND FAMILIEBEGIVENHEDID = ?";
+	private static final String SELECTP1 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+
 	private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
 	private static final DateTimeFormatter date8Format = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
@@ -92,13 +96,16 @@ public class GedcomSaver {
 	private static final List<SourceReference> referenceList = new ArrayList<>();
 	private static PreparedStatement statementi1;
 	private static PreparedStatement statementi2;
+	private static PreparedStatement statementi3;
 	private static PreparedStatement statementf1;
 	private static PreparedStatement statementf2;
+	private static PreparedStatement statementf4;
+	private static PreparedStatement statementf5;
 	private static PreparedStatement statementk1;
 	private static PreparedStatement statementk2;
 	private static PreparedStatement statementv1;
 	private static PreparedStatement statementv2;
-	private static PreparedStatement statementv3;
+	private static PreparedStatement statementp1;
 
 	/**
 	 * Indgangspunkt
@@ -126,15 +133,18 @@ public class GedcomSaver {
 	 */
 	private Connection connect(String dbPath) throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		statementi1 = conn.prepareStatement(SELECTI1);
-		statementi2 = conn.prepareStatement(SELECTI2);
 		statementf1 = conn.prepareStatement(SELECTF1);
 		statementf2 = conn.prepareStatement(SELECTF2);
+		statementf4 = conn.prepareStatement(SELECTF4);
+		statementf5 = conn.prepareStatement(SELECTF5);
+		statementi1 = conn.prepareStatement(SELECTI1);
+		statementi2 = conn.prepareStatement(SELECTI2);
+		statementi3 = conn.prepareStatement(SELECTI3);
 		statementk1 = conn.prepareStatement(SELECTK1);
 		statementk2 = conn.prepareStatement(SELECTK2);
+		statementp1 = conn.prepareStatement(SELECTP1);
 		statementv1 = conn.prepareStatement(SELECTV1);
 		statementv2 = conn.prepareStatement(SELECTV2);
-		statementv3 = conn.prepareStatement(SELECTV3);
 		return conn;
 
 	}
@@ -149,11 +159,11 @@ public class GedcomSaver {
 	private String findTextFromSource(String kildeId) throws SQLException {
 		final StringBuilder sb = new StringBuilder();
 
+		// SELECTK2 = "SELECT * FROM BLISTRUP.KILDE WHERE ID = ?";
 		statementk2.setInt(1, Integer.parseInt(kildeId));
 		final ResultSet rs1 = statementk2.executeQuery();
 
 		if (rs1.next()) {
-
 			if (rs1.getString("KBDEL") != null && !rs1.getString("KBDEL").isBlank()) {
 				sb.append("KBDEL " + rs1.getString("KBDEL").trim() + ", ");
 			}
@@ -224,6 +234,9 @@ public class GedcomSaver {
 	 */
 	private void writeFamilies(Connection conn) throws SQLException, IOException {
 		FamilieModel model;
+
+		// SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
+
 		final ResultSet rs1 = statementf1.executeQuery();
 		while (rs1.next()) {
 			model = FamilieModel.getData(conn, rs1);
@@ -241,54 +254,90 @@ public class GedcomSaver {
 				writeLine("1 CHIL @I" + barn.getId() + "@");
 			}
 
-			writeFamilyEvent(model.getId(), true);
+			writeFamilyEvent(model.getId(), 0, true);
 
 		}
 
-		statementf1.close();
-		statementf2.close();
 	}
 
 	/**
 	 * Udskriv alle familiebegivenheder for en familie
 	 *
-	 * @param id
+	 * @param familieId
+	 * @param individId
 	 * @param primary
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public void writeFamilyEvent(int id, boolean primary) throws SQLException, IOException {
-		ResultSet rs2;
+	public void writeFamilyEvent(int familieId, int individId, boolean primary) throws SQLException, IOException {
 		String type = "";
 		String stedNavn = "";
+		ResultSet rs2, rs3, rs4;
+		StringBuilder sb;
 
-		statementf2.setInt(1, id);
-		rs2 = statementf2.executeQuery();
+		// SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
+		statementf4.setInt(1, familieId);
+		final ResultSet rs1 = statementf4.executeQuery();
 
-		while (rs2.next()) {
-			type = rs2.getString("BEGTYPE").trim();
+		while (rs1.next()) {
+			type = rs1.getString("BEGTYPE").trim();
 
 			if ("Vielse".equals(type)) {
-				if (!primary) {
-					continue;
-				}
 				writeLine("1 MARR");
 			} else if ("Folketælling".equals(type)) {
 				writeLine("1 CENS");
 
-				if (!primary) {
-					writeLine("2 NOTE Vidne");
-				}
 			}
 
-			writeDate(rs2);
+			writeDate(rs1);
 
-			stedNavn = rs2.getString("STEDNAVN");
+			stedNavn = rs1.getString("STEDNAVN");
 
 			if (stedNavn != null && !stedNavn.isBlank()) {
 				writeLine("2 PLAC " + stedNavn);
 			}
-			writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
+
+			if (!primary) {
+				// SELECTV2 = "SELECT * FROM BLISTRUP.VIDNE WHERE INDIVIDID = ? AND
+				// FAMILIEBEGIVENHEDID = ?"
+
+				statementv2.setInt(1, individId);
+				statementv2.setInt(2, rs1.getInt("ID"));
+				rs2 = statementv2.executeQuery();
+
+				if (rs2.next()) {
+					sb = new StringBuilder(rs2.getString("ROLLE"));
+
+					// SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?"
+					statementf2.setInt(1, familieId);
+					rs3 = statementf2.executeQuery();
+
+					if (rs3.next()) {
+						sb.append(" for ");
+
+						// SELECTP1 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+						statementp1.setInt(1, rs3.getInt("HUSFADER"));
+						rs4 = statementp1.executeQuery();
+
+						if (rs4.next()) {
+							sb.append(rs4.getString("STDNAVN").replace("/", "").trim());
+							sb.append(" og ");
+						}
+
+						// SELECTP1 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+						statementp1.setInt(1, rs3.getInt("HUSMODER"));
+						rs4 = statementp1.executeQuery();
+
+						if (rs4.next()) {
+							sb.append(rs4.getString("STDNAVN").replace("/", "").trim());
+						}
+					}
+					writeLine("2 NOTE " + sb.toString());
+				}
+			}
+
+			writeSourceReference(rs1.getString("KILDEID"), rs1.getString("DETALJER"));
+
 		}
 
 	}
@@ -323,17 +372,18 @@ public class GedcomSaver {
 	/**
 	 * Udskriv alle begivenheder for et individ
 	 *
-	 * @param id
+	 * @param individId
 	 * @param primary
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public void writeIndividualEvent(int id, boolean primary) throws SQLException, IOException {
+	public void writeIndividualEvent(int individId, boolean primary) throws SQLException, IOException {
 		String type;
 		String note;
 		String stedNavn = "";
 
-		statementi2.setInt(1, id);
+		// SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
+		statementi2.setInt(1, individId);
 		final ResultSet rs2 = statementi2.executeQuery();
 
 		while (rs2.next()) {
@@ -423,6 +473,7 @@ public class GedcomSaver {
 		String foedt = "";
 		LocalDate localDate;
 
+		// SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 		final ResultSet rs1 = statementi1.executeQuery();
 
 		while (rs1.next()) {
@@ -472,7 +523,6 @@ public class GedcomSaver {
 
 		}
 
-		statementi1.close();
 	}
 
 	/**
@@ -539,6 +589,8 @@ public class GedcomSaver {
 		String aarinterval = "";
 		String kbNr = "";
 
+		// SELECTK1 = "SELECT * FROM BLISTRUP.KILDE";
+
 		final ResultSet rs1 = statementk1.executeQuery();
 		while (rs1.next()) {
 			writeLine("0 @S" + rs1.getInt("ID") + "@ SOUR");
@@ -586,6 +638,8 @@ public class GedcomSaver {
 		int begId = 0;
 		ResultSet rs2, rs3;
 
+		// SELECTV1 = "SELECT * FROM BLISTRUP.VIDNE WHERE INDIVIDID = ?";
+
 		statementv1.setInt(1, individId);
 		final ResultSet rs1 = statementv1.executeQuery();
 
@@ -593,8 +647,10 @@ public class GedcomSaver {
 			begId = rs1.getInt("INDIVIDBEGIVENHEDID");
 
 			if (begId > 0) {
-				statementv2.setInt(1, begId);
-				rs2 = statementv2.executeQuery();
+				// SELECTI3 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE ID = ?";
+
+				statementi3.setInt(1, begId);
+				rs2 = statementi3.executeQuery();
 
 				if (rs2.next()) {
 					writeIndividualEvent(rs2.getInt("INDIVIDID"), false);
@@ -604,11 +660,13 @@ public class GedcomSaver {
 				begId = rs1.getInt("FAMILIEBEGIVENHEDID");
 
 				if (begId > 0) {
-					statementv3.setInt(1, begId);
-					rs3 = statementv3.executeQuery();
+					// SELECTF5 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE ID = ?";
+
+					statementf5.setInt(1, begId);
+					rs3 = statementf5.executeQuery();
 
 					if (rs3.next()) {
-						writeFamilyEvent(rs3.getInt("FAMILIEID"), false);
+						writeFamilyEvent(rs3.getInt("FAMILIEID"), individId, false);
 					}
 
 				}

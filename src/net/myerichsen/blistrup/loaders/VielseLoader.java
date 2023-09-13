@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.myerichsen.blistrup.models.KildeModel;
 
@@ -13,18 +11,17 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 10. sep. 2023
+ * @version 13. sep. 2023
  *
  */
 public class VielseLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C'";
-	private static final String SELECT2 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = '1802C10k25' ORDER BY BEGIV, RX";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
-	private static final String INSERT4 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
-	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
-	private static final String INSERT6 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
+	private static final String INSERT3 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+	private static final String INSERT4 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
+	private static final String INSERT5 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
@@ -47,13 +44,11 @@ public class VielseLoader extends AbstractLoader {
 	 * @throws Exception
 	 */
 	public int load() throws Exception {
-		final List<String> blistrupIdListe = new ArrayList<>();
 		String rolle = "";
-		PreparedStatement statement2 = null;
 		ResultSet generatedKeys = null;
 		int individId = 0;
 		String aar = "";
-		int familieBegivenhedsId = 0;
+		int familieBegivenhedId = 0;
 		int familieId = 0;
 		int taeller = 0;
 		StringBuilder sb;
@@ -64,229 +59,230 @@ public class VielseLoader extends AbstractLoader {
 		int faderId = 0;
 		int faderFamilieId = 0;
 		String stdnavn = "";
+		String rx = "";
 
 		final Connection conn = connect("BLISTRUP");
+		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
+		final PreparedStatement statementi1 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
+		final PreparedStatement statementi2 = conn.prepareStatement(INSERT2);
+		final PreparedStatement statementi3 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
+		final PreparedStatement statementi4 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
+		final PreparedStatement statementi5 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
+		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
+		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 
-		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C'";
+		// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER
+		// BY PID";
 
-		PreparedStatement statement1 = conn.prepareStatement(SELECT1);
-		ResultSet rs1 = statement1.executeQuery();
+		final ResultSet rs1 = statements1.executeQuery();
+
+		sb = new StringBuilder();
 
 		while (rs1.next()) {
-			blistrupIdListe.add(rs1.getString("BEGIV"));
-		}
+			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
 
-		// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = ? ORDER BY PID";
+			rx = rs1.getString("RX").trim();
+			rolle = rs1.getString("ROLLE").trim();
+			navn = rs1.getString("NAVN").trim();
+			fader = rs1.getString("FADER");
+			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
-		for (final String blistrupId : blistrupIdListe) {
-			sb = new StringBuilder();
+			statementi1.setString(1, rs1.getString("SEX").trim());
+			statementi1.setString(2, rs1.getString("PID").trim());
+			statementi1.setString(3, rs1.getString("FQODT").trim());
+			statementi1.setString(4, rs1.getString("FAM"));
+			statementi1.setString(5, rs1.getString("SLGT"));
+			statementi1.executeUpdate();
+			generatedKeys = statementi1.getGeneratedKeys();
 
-			statement1 = conn.prepareStatement(SELECT2);
-			statement1.setString(1, blistrupId);
-			rs1 = statement1.executeQuery();
+			if (generatedKeys.next()) {
+				individId = generatedKeys.getInt(1);
+			} else {
+				individId = 0;
+			}
+			generatedKeys.close();
 
-			// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+			// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN,
+			// PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
 
-			while (rs1.next()) {
-				rolle = rs1.getString("ROLLE").trim();
-				navn = rs1.getString("NAVN").trim();
-				fader = rs1.getString("FADER");
-				sb.append(rolle + ": " + navn + "\r\n4 CONT ");
+			statementi2.setInt(1, individId);
+			statementi2.setString(2, afQ(rs1.getString("FORNVN")));
+			statementi2.setString(3, afQ(rs1.getString("EFTERNVN")));
+			statementi2.setString(4, "TRUE");
+			stdnavn = afQ(rs1.getString("STD_NAVN"));
 
-				statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
-				statement2.setString(1, rs1.getString("SEX").trim());
-				statement2.setString(2, rs1.getString("PID").trim());
-				statement2.setString(3, rs1.getString("FQODT").trim());
-				statement2.setString(4, rs1.getString("FAM"));
-				statement2.setString(5, rs1.getString("SLGT"));
-				statement2.executeUpdate();
-				generatedKeys = statement2.getGeneratedKeys();
+			try {
+				statementi2.setString(5, fonkod.generateKey(stdnavn).trim());
+			} catch (final Exception e) {
+				statementi2.setString(5, "");
+			}
+
+			statementi2.setString(6, cleanName(stdnavn));
+			statementi2.executeUpdate();
+
+			taeller++;
+
+			// gom
+			if ("1".equals(rx)) {
+				gom = individId;
+
+				final KildeModel kModel = new KildeModel();
+				kModel.setKbNr(rs1.getString("KBNR").trim());
+				kModel.setAarInterval(rs1.getString("KILDE").trim());
+				kModel.setKbDel(rs1.getString("KBDEL").trim());
+				kModel.setTifNr(rs1.getString("TIFNR").trim());
+				kModel.setOpslag(rs1.getString("OPSLAG").trim());
+				kModel.setOpNr(rs1.getString("OPNR").trim());
+				final int kildeId = kModel.insert(conn);
+
+				// INSERT3 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";";
+
+				statementi3.setInt(1, gom);
+				statementi3.executeUpdate();
+				generatedKeys = statementi3.getGeneratedKeys();
 
 				if (generatedKeys.next()) {
-					individId = generatedKeys.getInt(1);
+					familieId = generatedKeys.getInt(1);
 				} else {
-					individId = 0;
+					familieId = 0;
 				}
 				generatedKeys.close();
 
-				// "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN,
-				// FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
+				System.out.println("Familieid " + familieId);
 
-				statement2 = conn.prepareStatement(INSERT2);
-				statement2.setInt(1, individId);
-				statement2.setString(2, afQ(rs1.getString("FORNVN")));
-				statement2.setString(3, afQ(rs1.getString("EFTERNVN")));
-				statement2.setString(4, "TRUE");
-				stdnavn = afQ(rs1.getString("STD_NAVN"));
+				if (fader != null && !fader.isBlank()) {
+					// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
+
+					statementi1.setString(1, rs1.getString("SEX").trim());
+					statementi1.setString(2, rs1.getString("PID").trim());
+					statementi1.setString(3, rs1.getString("FQODT").trim());
+					statementi1.setString(4, rs1.getString("FAM"));
+					statementi1.setString(5, rs1.getString("SLGT"));
+					statementi1.executeUpdate();
+					generatedKeys = statementi1.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						faderId = generatedKeys.getInt(1);
+					} else {
+						faderId = 0;
+					}
+					generatedKeys.close();
+
+					// INSERT3 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+
+					statementi3.setInt(1, faderId);
+					statementi3.executeUpdate();
+					generatedKeys = statementi3.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						faderFamilieId = generatedKeys.getInt(1);
+					} else {
+						faderFamilieId = 0;
+					}
+					generatedKeys.close();
+
+					// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+
+					statementu1.setInt(1, faderFamilieId);
+					statementu1.setInt(2, faderId);
+					statementu1.executeUpdate();
+				}
+
+				// INSERT5 = "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO,
+				// BLISTRUPID, KILDEID, STEDNAVN, BEM) "
+
+				statementi5.setInt(1, familieId);
+				statementi5.setString(2, "Vielse");
 
 				try {
-					statement2.setString(5, fonkod.generateKey(stdnavn).trim());
+					aar = rs1.getString("AAR").trim();
+					statementi5.setString(3, aar + "-01-01");
 				} catch (final Exception e) {
-					statement2.setString(5, "");
+					statementi5.setString(3, "0001-01-01");
 				}
 
-				statement2.setString(6, cleanName(stdnavn));
-				statement2.executeUpdate();
-				statement2.close();
+				statementi5.setString(4, afQ(rs1.getString("BEGIV")));
+				statementi5.setInt(5, kildeId);
+				statementi5.setString(6, "Blistrup, Holbo, Frederiksborg");
+				statementi5.setString(7, afQ(rs1.getString("BEM")));
+				statementi5.executeUpdate();
+				generatedKeys = statementi5.getGeneratedKeys();
 
-				taeller++;
-
-				if ("gom".equals(rolle)) {
-					gom = individId;
-
-					final KildeModel kModel = new KildeModel();
-					kModel.setKbNr(rs1.getString("KBNR").trim());
-					kModel.setAarInterval(rs1.getString("KILDE").trim());
-					kModel.setKbDel(rs1.getString("KBDEL").trim());
-					kModel.setTifNr(rs1.getString("TIFNR").trim());
-					kModel.setOpslag(rs1.getString("OPSLAG").trim());
-					kModel.setOpNr(rs1.getString("OPNR").trim());
-					final int kildeId = kModel.insert(conn);
-
-					// "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
-
-					statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
-					statement2.setInt(1, gom);
-					statement2.executeUpdate();
-					generatedKeys = statement2.getGeneratedKeys();
-
-					if (generatedKeys.next()) {
-						familieId = generatedKeys.getInt(1);
-					} else {
-						familieId = 0;
-					}
-					generatedKeys.close();
-
-					if (fader != null && !fader.isBlank()) {
-						// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
-
-						statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
-						statement2.setString(1, rs1.getString("SEX").trim());
-						statement2.setString(2, rs1.getString("PID").trim());
-						statement2.setString(3, rs1.getString("FQODT").trim());
-						statement2.executeUpdate();
-						generatedKeys = statement2.getGeneratedKeys();
-
-						if (generatedKeys.next()) {
-							faderId = generatedKeys.getInt(1);
-						} else {
-							faderId = 0;
-						}
-						generatedKeys.close();
-
-						// "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
-
-						statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
-						statement2.setInt(1, faderId);
-						statement2.executeUpdate();
-						generatedKeys = statement2.getGeneratedKeys();
-
-						if (generatedKeys.next()) {
-							faderFamilieId = generatedKeys.getInt(1);
-						} else {
-							faderFamilieId = 0;
-						}
-						generatedKeys.close();
-
-						// "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
-
-						statement2 = conn.prepareStatement(UPDATE1);
-						statement2.setInt(1, faderFamilieId);
-						statement2.setInt(2, faderId);
-						statement2.executeUpdate();
-					}
-
-					// "INSERT INTO FAMILIEBEGIVENHED (FAMILIEID, BEGTYPE, DATO, BLISTRUPID,
-					// KILDEID, STEDNAVN, BEM) "
-
-					statement2 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
-					statement2.setInt(1, familieId);
-					statement2.setString(2, "Vielse");
-
-					try {
-						aar = rs1.getString("AAR").trim();
-						statement2.setString(3, aar + "-01-01");
-					} catch (final Exception e) {
-						statement2.setString(3, "0001-01-01");
-					}
-
-					statement2.setString(4, afQ(rs1.getString("BEGIV")));
-					statement2.setInt(5, kildeId);
-					statement2.setString(6, "Blistrup,,,");
-					statement2.setString(7, afQ(rs1.getString("BEM")));
-					statement2.executeUpdate();
-					generatedKeys = statement2.getGeneratedKeys();
-
-					if (generatedKeys.next()) {
-						familieBegivenhedsId = generatedKeys.getInt(1);
-					} else {
-						familieBegivenhedsId = 0;
-					}
-					generatedKeys.close();
-				} else if ("brud".equals(rolle)) {
-					brud = individId;
-
-					// "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
-
-					statement2.close();
-					statement2 = conn.prepareStatement(UPDATE2);
-					statement2.setInt(1, brud);
-					statement2.setInt(2, familieId);
-					statement2.executeUpdate();
-
-					if (fader != null && !fader.isBlank()) {
-						// "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
-
-						statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
-						statement2.setString(1, rs1.getString("SEX").trim());
-						statement2.setString(2, rs1.getString("PID").trim());
-						statement2.setString(3, rs1.getString("FQODT").trim());
-						statement2.executeUpdate();
-						generatedKeys.close();
-						generatedKeys = statement2.getGeneratedKeys();
-
-						if (generatedKeys.next()) {
-							faderId = generatedKeys.getInt(1);
-						} else {
-							faderId = 0;
-						}
-						generatedKeys.close();
-
-						// "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
-
-						statement2 = conn.prepareStatement(INSERT4, Statement.RETURN_GENERATED_KEYS);
-						statement2.setInt(1, faderId);
-						statement2.executeUpdate();
-						generatedKeys = statement2.getGeneratedKeys();
-
-						if (generatedKeys.next()) {
-							faderFamilieId = generatedKeys.getInt(1);
-						} else {
-							faderFamilieId = 0;
-						}
-						generatedKeys.close();
-
-						// "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
-
-						statement2 = conn.prepareStatement(UPDATE1);
-						statement2.setInt(1, faderFamilieId);
-						statement2.setInt(2, faderId);
-						statement2.executeUpdate();
-					}
+				if (generatedKeys.next()) {
+					familieBegivenhedId = generatedKeys.getInt(1);
 				} else {
-					// Forlover
-					// "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
-					statement2.close();
-					statement2 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
-					statement2.setInt(1, individId);
-					statement2.setString(2, rs1.getString("ROLLE").trim());
-					statement2.setInt(3, familieBegivenhedsId);
+					familieBegivenhedId = 0;
 				}
+				generatedKeys.close();
 
+				// brud
+			} else if ("2".equals(rx)) {
+				brud = individId;
+
+				// UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?"
+
+				statementu2.setInt(1, brud);
+				statementu2.setInt(2, familieId);
+				statementu2.executeUpdate();
+
+				if (fader != null && !fader.isBlank()) {
+					// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
+
+					statementi1.setString(1, rs1.getString("SEX").trim());
+					statementi1.setString(2, rs1.getString("PID").trim());
+					statementi1.setString(3, rs1.getString("FQODT").trim());
+					statementi1.setString(4, rs1.getString("FAM"));
+					statementi1.setString(5, rs1.getString("SLGT"));
+					statementi1.executeUpdate();
+					generatedKeys.close();
+					generatedKeys = statementi1.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						faderId = generatedKeys.getInt(1);
+					} else {
+						faderId = 0;
+					}
+					generatedKeys.close();
+
+					// INSERT3 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
+
+					statementi3.setInt(1, faderId);
+					statementi3.executeUpdate();
+					generatedKeys = statementi3.getGeneratedKeys();
+
+					if (generatedKeys.next()) {
+						faderFamilieId = generatedKeys.getInt(1);
+					} else {
+						faderFamilieId = 0;
+					}
+					generatedKeys.close();
+
+					// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
+
+					statementu1.setInt(1, faderFamilieId);
+					statementu1.setInt(2, faderId);
+					statementu1.executeUpdate();
+				}
+			} else {
+				// forl1 eller forl2
+				// INSERT4 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES
+
+				statementi4.setInt(1, individId);
+				statementi4.setString(2, rolle);
+				statementi4.setInt(3, familieBegivenhedId);
+				statementi4.executeUpdate();
 			}
 
 		}
 
+		statements1.close();
+		statementi1.close();
+		statementi2.close();
+		statementi3.close();
+		statementi4.close();
+		statementi5.close();
+		statementu1.close();
+		statementu2.close();
 		conn.commit();
 		conn.close();
 		return taeller;
