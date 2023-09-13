@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 9. sep. 2023
+ * @version 13. sep. 2023
  *
  */
 public abstract class AbstractLoader {

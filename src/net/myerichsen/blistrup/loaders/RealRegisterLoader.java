@@ -14,12 +14,12 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 11. sep. 2023
+ * @version 13. sep. 2023
  *
  */
 
 public class RealRegisterLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N'";
+	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N' ORDER BY PID";
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, NOTE, DETALJER) "
@@ -63,19 +63,19 @@ public class RealRegisterLoader extends AbstractLoader {
 		kModel.setAarInterval("1795-1914");
 		final int kildeId = kModel.insert(conn);
 
-		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
-
 		final PreparedStatement statement0 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statement3 = conn.prepareStatement(INSERT2);
 		final PreparedStatement statement4 = conn.prepareStatement(INSERT3);
+
+		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
 
 		final ResultSet rs1 = statement0.executeQuery();
 
 		while (rs1.next()) {
 			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N'
 
-			blistrupId = afQ(rs1.getString("BEGIV"));
+			blistrupId = afQ(rs1.getString("PID"));
 			stedNavn = afQ(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));
 

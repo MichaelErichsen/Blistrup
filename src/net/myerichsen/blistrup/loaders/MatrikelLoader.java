@@ -72,7 +72,7 @@ public class MatrikelLoader extends AbstractLoader {
 			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' AND BEGIV = ? AND STEDNAVN =
 			// ? ORDER BY PID";
 
-			blistrupId = afQ(rs0.getString("BEGIV"));
+			blistrupId = afQ(rs0.getString("PID"));
 			statement1.setString(1, blistrupId);
 			stedNavn = rs0.getString("STEDNAVN");
 			statement1.setString(2, stedNavn);

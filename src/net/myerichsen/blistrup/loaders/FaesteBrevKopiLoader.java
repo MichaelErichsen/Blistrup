@@ -72,7 +72,7 @@ public class FaesteBrevKopiLoader extends AbstractLoader {
 		while (rs1.next()) {
 			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
 
-			blistrupId = afQ(rs1.getString("BEGIV"));
+			blistrupId = afQ(rs1.getString("PID"));
 			stedNavn = afQ(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));
 

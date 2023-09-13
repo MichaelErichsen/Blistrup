@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  *
  */
 public class VielseLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' AND BEGIV = '1802C10k25' ORDER BY BEGIV, RX";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
@@ -44,22 +44,22 @@ public class VielseLoader extends AbstractLoader {
 	 * @throws Exception
 	 */
 	public int load() throws Exception {
-		String rolle = "";
 		ResultSet generatedKeys = null;
-		int individId = 0;
 		String aar = "";
+		String fader = "";
+		String navn = "";
+		String rolle = "";
+		String rx = "";
+		String stdnavn = "";
+		StringBuilder sb;
+		int brud = 0;
+		int faderFamilieId = 0;
+		int faderId = 0;
 		int familieBegivenhedId = 0;
 		int familieId = 0;
-		int taeller = 0;
-		StringBuilder sb;
-		String navn = "";
-		String fader = "";
 		int gom = 0;
-		int brud = 0;
-		int faderId = 0;
-		int faderFamilieId = 0;
-		String stdnavn = "";
-		String rx = "";
+		int individId = 0;
+		int taeller = 0;
 
 		final Connection conn = connect("BLISTRUP");
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
@@ -72,20 +72,19 @@ public class VielseLoader extends AbstractLoader {
 		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 
 		// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER
-		// BY PID";
+		// BY BEGIV, RX";
 
 		final ResultSet rs1 = statements1.executeQuery();
 
-		sb = new StringBuilder();
-
 		while (rs1.next()) {
-			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
-
+			sb = new StringBuilder();
 			rx = rs1.getString("RX").trim();
 			rolle = rs1.getString("ROLLE").trim();
 			navn = rs1.getString("NAVN").trim();
 			fader = rs1.getString("FADER");
 			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
+
+			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
 
 			statementi1.setString(1, rs1.getString("SEX").trim());
 			statementi1.setString(2, rs1.getString("PID").trim());
@@ -103,7 +102,7 @@ public class VielseLoader extends AbstractLoader {
 			generatedKeys.close();
 
 			// INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN,
-			// PRIMAERNAVN, FONETISKNAVN) VALUES (?, ?, ?, ?, ?)";
+			// PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
 
 			statementi2.setInt(1, individId);
 			statementi2.setString(2, afQ(rs1.getString("FORNVN")));
@@ -147,8 +146,6 @@ public class VielseLoader extends AbstractLoader {
 					familieId = 0;
 				}
 				generatedKeys.close();
-
-				System.out.println("Familieid " + familieId);
 
 				if (fader != null && !fader.isBlank()) {
 					// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
@@ -201,7 +198,7 @@ public class VielseLoader extends AbstractLoader {
 					statementi5.setString(3, "0001-01-01");
 				}
 
-				statementi5.setString(4, afQ(rs1.getString("BEGIV")));
+				statementi5.setString(4, afQ(rs1.getString("PID")));
 				statementi5.setInt(5, kildeId);
 				statementi5.setString(6, "Blistrup, Holbo, Frederiksborg");
 				statementi5.setString(7, afQ(rs1.getString("BEM")));
