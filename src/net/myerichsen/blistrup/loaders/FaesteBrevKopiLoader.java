@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstebrevkopier
  *
  * @author Michael Erichsen
- * @version 10. sep. 2023
+ * @version 13. sep. 2023
  *
  */
 public class FaesteBrevKopiLoader extends AbstractLoader {
@@ -60,18 +60,16 @@ public class FaesteBrevKopiLoader extends AbstractLoader {
 		kModel.setAarInterval("1807-52");
 		final int kildeId = kModel.insert(conn);
 
-		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'L'
-
 		final PreparedStatement statement0 = conn.prepareStatement(SELECT1);
 		final PreparedStatement statement2 = conn.prepareStatement(INSERT1, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statement3 = conn.prepareStatement(INSERT2);
 		final PreparedStatement statement4 = conn.prepareStatement(INSERT3);
 
+		// SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'L'";
+
 		final ResultSet rs1 = statement0.executeQuery();
 
 		while (rs1.next()) {
-			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
-
 			blistrupId = afQ(rs1.getString("PID"));
 			stedNavn = afQ(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));

@@ -175,11 +175,14 @@ public class FT1834Loader extends AbstractLoader {
 		int ftId = 0;
 		int individId = 0;
 		int nrIHusstand = 0;
+
 		final Connection conn = connect("APP");
+
 		final KildeModel kModel = new KildeModel();
 		kModel.setKbNr("Folketælling");
 		kModel.setAarInterval("1834");
 		final int kildeId = kModel.insert(conn);
+
 		statements1 = conn.prepareStatement(SELECT1);
 		statementi1 = conn.prepareStatement(INSERT1);
 		final ResultSet rs = statements1.executeQuery();
@@ -199,7 +202,13 @@ public class FT1834Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1834-02-18"));
-					fbModel.setStedNavn(matrNrAdresse + ",,,");
+					final String[] mnaParts = matrNrAdresse.split(",");
+
+					if (mnaParts.length > 1) {
+						matrNrAdresse = mnaParts[1].trim() + ", " + mnaParts[0].trim();
+					}
+
+					fbModel.setStedNavn(fixStedNavn(matrNrAdresse));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

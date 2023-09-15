@@ -19,12 +19,12 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1787 tabel
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 15. sep. 2023
  *
  */
 public class FT1787Loader extends AbstractLoader {
 	private static final long FIRST_DATE = -62135773200000L;
-	private static final String SELECT1 = "SELECT * FROM FT1787";
+	private static final String SELECT1 = "SELECT * FROM FT1787 ORDER BY LØBENR";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.VIDNE (INDIVIDID, ROLLE, FAMILIEBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static PreparedStatement statements1;
 	private static PreparedStatement statementi1;
@@ -35,7 +35,7 @@ public class FT1787Loader extends AbstractLoader {
 	public static void main(String[] args) {
 		try {
 			final int taeller = new FT1787Loader().load();
-			System.out.println("Har indlæst " + taeller + " folketællingslinier");
+			System.out.println("Har indlæst " + taeller + " folketællingslinier for 1787");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -160,7 +160,7 @@ public class FT1787Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1787-07-01"));
-					fbModel.setStedNavn(rs.getString("KILDESTEDNAVN") + ",,,");
+					fbModel.setStedNavn(fixStedNavn(rs.getString("KILDESTEDNAVN")));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");
@@ -226,4 +226,5 @@ public class FT1787Loader extends AbstractLoader {
 		conn.close();
 		return count;
 	}
+
 }

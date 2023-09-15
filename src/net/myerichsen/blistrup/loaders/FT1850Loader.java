@@ -19,7 +19,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1850 tabel
  *
  * @author Michael Erichsen
- * @version 2. sep. 2023
+ * @version 15. sep. 2023
  *
  */
 public class FT1850Loader extends AbstractLoader {
@@ -73,18 +73,6 @@ public class FT1850Loader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException
 	 */
-
-//	Kildestednavn
-//	Husstands/familienr.
-//	Matr.nr./Adresse
-//	Kildenavn
-//	Køn
-//	Alder
-//	Civilstand
-//	Kildeerhverv
-//	Kildefødested
-//	Kildehenvisning
-
 	private IndividData insertIndividual(Connection conn, ResultSet rs, int kildeId, int familieId)
 			throws SQLException {
 		boolean found = false;
@@ -223,7 +211,7 @@ public class FT1850Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1850-02-01"));
-					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
+					fbModel.setStedNavn(fixStedNavn(matrNrAdresse + ", " + kildeStedNavn));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

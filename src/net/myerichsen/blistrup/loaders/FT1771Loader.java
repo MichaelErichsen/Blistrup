@@ -17,7 +17,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1771 tabel
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 15. sep. 2023
  *
  */
 public class FT1771Loader extends AbstractLoader {
@@ -118,6 +118,7 @@ public class FT1771Loader extends AbstractLoader {
 			ibModel.setKildeId(kildeId);
 			ibModel.setBegType("Erhverv");
 			ibModel.setNote(rs.getString("MANDENS_ERHVERV"));
+			ibModel.setStedNavn("Blistrup, Holbo, Frederiksborg");
 			ibModel.insert(conn);
 
 			/**
@@ -184,7 +185,7 @@ public class FT1771Loader extends AbstractLoader {
 			fbModel.setBegType("Folketælling");
 			fbModel.setKildeId(kildeId);
 			fbModel.setDato(Date.valueOf("1771-02-01"));
-			fbModel.setStedNavn("Blistrup,,,");
+			fbModel.setStedNavn("Blistrup, Holbo, Frederiksborg");
 			fbModel.setDetaljer(get1771TableRow(rs));
 			fbModel.insert(conn);
 

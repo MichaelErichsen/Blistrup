@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 15. sep. 2023
  *
  */
 public abstract class AbstractLoader {
@@ -151,6 +151,19 @@ public abstract class AbstractLoader {
 	}
 
 	/**
+	 * @param stedNavn
+	 * @return
+	 */
+	protected String fixStedNavn(String stedNavn) {
+		if (stedNavn.contains("Blistrup") || stedNavn.contains("Blidstrup")) {
+			stedNavn = stedNavn + ", Holbo, Frederiksborg";
+		} else {
+			stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg";
+		}
+		return stedNavn;
+	}
+
+	/**
 	 * Tilføj kommaer efter stednavn for at passe i stednavnestrukturen
 	 *
 	 * @param placeName
@@ -201,6 +214,21 @@ public abstract class AbstractLoader {
 		return streng;
 	}
 
+//	/**
+//	 * Indsæt folketællingens kilde
+//	 *
+//	 * @param conn
+//	 * @return
+//	 *
+//	 * @throws SQLException
+//	 */
+//	protected int insertSource(Connection conn, String aar) throws SQLException {
+//		final KildeModel kModel = new KildeModel();
+//		kModel.setKbNr("0");
+//		kModel.setAarInterval(aar);
+//		return kModel.insert(conn);
+//	}
+
 	/**
 	 * Formatter en tabelrække som tekst
 	 *
@@ -220,21 +248,6 @@ public abstract class AbstractLoader {
 		}
 		return "4 CONT " + sb.toString();
 	}
-
-//	/**
-//	 * Indsæt folketællingens kilde
-//	 *
-//	 * @param conn
-//	 * @return
-//	 *
-//	 * @throws SQLException
-//	 */
-//	protected int insertSource(Connection conn, String aar) throws SQLException {
-//		final KildeModel kModel = new KildeModel();
-//		kModel.setKbNr("0");
-//		kModel.setAarInterval(aar);
-//		return kModel.insert(conn);
-//	}
 
 	/**
 	 * Indsæt kilde

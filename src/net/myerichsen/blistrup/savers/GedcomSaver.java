@@ -75,7 +75,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Dåb";
+	private static final String titel = "1870";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -448,7 +448,6 @@ public class GedcomSaver {
 				if (!note.isBlank()) {
 					writeLine("1 OCCU " + note);
 					writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
-					writeLine("2 NOTE " + note);
 				}
 
 				continue;
@@ -571,11 +570,14 @@ public class GedcomSaver {
 		writeLine("2 SOUR @S" + kildeId + "@");
 
 		if (detaljer == null || detaljer.isBlank()) {
-			if (text != null && !"".equals(text)) {
+			if (text != null && !text.isBlank()) {
 				writeLine("3 PAGE " + text);
 			}
+		} else if (text != null && !text.isBlank()) {
+			writeLine(("3 PAGE " + text + "\r\n4 CONT " + detaljer).replace("4 CONT 4 CONT", "4 CONT"));
+
 		} else {
-			writeLine("3 PAGE " + text + "\r\n4 CONT " + detaljer);
+			writeLine(("3 PAGE " + detaljer).replace("3 PAGE 4 CONT", "3 PAGE"));
 		}
 	}
 

@@ -19,7 +19,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1860 tabel
  *
  * @author Michael Erichsen
- * @version 2. sep. 2023
+ * @version 15. sep. 2023
  *
  */
 public class FT1860Loader extends AbstractLoader {
@@ -190,6 +190,8 @@ public class FT1860Loader extends AbstractLoader {
 		List<IndividData> list = new ArrayList<>();
 		int ftId = 0;
 		int individId = 0;
+		String[] sa;
+
 		final Connection conn = connect("APP");
 		final KildeModel kModel = new KildeModel();
 		kModel.setKbNr("Folketælling");
@@ -215,7 +217,13 @@ public class FT1860Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1860-02-01"));
-					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
+					sa = kildeStedNavn.split(",");
+
+					if (sa.length > 1) {
+						kildeStedNavn = sa[1].trim();
+					}
+
+					fbModel.setStedNavn(fixStedNavn(matrNrAdresse + ", " + kildeStedNavn));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

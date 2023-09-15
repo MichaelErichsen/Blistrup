@@ -22,7 +22,6 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * @version 5. sep. 2023
  *
  */
-
 public class FT1801Loader extends AbstractLoader {
 	private static final String[] famsArrayM = new String[] { "Hosbonde", "Huusbonde og National Soldat", "Huusbonde" };
 	private static final String[] famsArrayF = new String[] { "hans Kone", "Hosbondinde", "Huusbondinde", "Konen",
@@ -179,7 +178,7 @@ public class FT1801Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1801-02-01"));
-					fbModel.setStedNavn(rs.getString("KILDESTEDNAVN") + ",,,");
+					fbModel.setStedNavn(fixStedNavn(rs.getString("KILDESTEDNAVN")));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");
