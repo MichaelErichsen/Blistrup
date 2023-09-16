@@ -19,7 +19,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1901 tabel
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 16. sep. 2023
  *
  */
 public class FT1901Loader extends AbstractLoader {
@@ -33,6 +33,14 @@ public class FT1901Loader extends AbstractLoader {
 	private static PreparedStatement statementi1;
 	private static boolean primary = true;
 	private static int nrIHusstand = 0;
+
+	// FIXME 18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler
+	// pointer : I1091985.
+//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092029.
+//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092458.
+//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092512.
+//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092837.
+//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092904.
 
 	/**
 	 * @return the primary
@@ -226,7 +234,7 @@ public class FT1901Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1901-02-01"));
-					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
+					fbModel.setStedNavn(fixStedNavn(matrNrAdresse + ", " + kildeStedNavn));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

@@ -19,20 +19,9 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1890 tabel
  *
  * @author Michael Erichsen
- * @version 3. sep. 2023
+ * @version 16. sep. 2023
  *
  */
-
-//Kildestednavn
-//Husstands/familienr.
-//Matr.nr./Adresse
-//Kildenavn
-//Køn
-//Alder
-//Civilstand
-//Kildeerhverv
-//Stilling_i_husstanden
-//Kildefødested
 
 public class FT1890Loader extends AbstractLoader {
 	private static final String[] famsArrayF = { "Husmoder" };
@@ -223,7 +212,7 @@ public class FT1890Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1890-02-01"));
-					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
+					fbModel.setStedNavn(fixStedNavn(matrNrAdresse + ", " + kildeStedNavn));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

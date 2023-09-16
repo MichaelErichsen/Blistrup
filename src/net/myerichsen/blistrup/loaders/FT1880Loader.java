@@ -227,7 +227,7 @@ public class FT1880Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1880-02-01"));
-					fbModel.setStedNavn(matrNrAdresse + "," + kildeStedNavn + ",,,");
+					fbModel.setStedNavn(fixStedNavn(matrNrAdresse + ", " + kildeStedNavn));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

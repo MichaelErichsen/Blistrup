@@ -75,7 +75,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Vielser";
+	private static final String titel = "1901";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -622,7 +622,10 @@ public class GedcomSaver {
 			} else {
 				writeLine("1 TITL Kirkebog Blistrup " + aarinterval);
 				writeLine("1 ABBR Kirkebog Blistrup " + aarinterval);
+
 			}
+
+			writeLine("1 AUTH Statens Arkiver");
 		}
 	}
 
