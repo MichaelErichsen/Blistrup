@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 1. sep. 2023
+ * @version 16. sep. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
@@ -58,6 +58,9 @@ public class IndividModel {
 					model.setFoedt(rs1.getString("FOEDT").trim());
 				} catch (final Exception e) {
 				}
+
+				model.setFam(rs1.getString("FAM"));
+				model.setSlgt(rs1.getString("SLGT"));
 
 				model.setStdNavn(rs2.getString("STDNAVN").trim());
 				model.setFonetiskNavn(rs2.getString("FONETISKNAVN").trim());

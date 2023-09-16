@@ -22,10 +22,10 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 16. sep. 2023
  *
  */
-// TODO Hele svadaen skal med i detaljerne
+// FIXME Hele svadaen skal med i detaljerne
 public class GedcomSaver {
 	/**
 	 * Privat klasse, der repræsenterer en kildehenvisning
@@ -75,7 +75,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "1870";
+	private static final String titel = "Vielser";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -472,6 +472,7 @@ public class GedcomSaver {
 		String sex = "";
 		String foedt = "";
 		LocalDate localDate;
+		String fam = "";
 
 		// SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 		final ResultSet rs1 = statementi1.executeQuery();
@@ -493,6 +494,12 @@ public class GedcomSaver {
 
 			for (final Integer aFams : model.getFams()) {
 				writeLine("1 FAMS @F" + aFams + "@");
+			}
+
+			fam = model.getFam();
+
+			if (fam != null && !fam.isBlank()) {
+				writeLine("1 REFN " + fam.trim() + ", " + model.getSlgt().trim());
 			}
 
 			foedt = model.getFoedt();

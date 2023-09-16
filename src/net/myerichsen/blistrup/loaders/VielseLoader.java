@@ -11,9 +11,15 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 16. sep. 2023
  *
  */
+// FIXME 41332 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I823892.
+//41332 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I823892.
+//41332 Advarsel: Barn # tilhører en 'familie' hvor far og mor er ukendte.
+
+// TODO Indsæt data i DETALJER
+
 public class VielseLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER BY PID";
 
