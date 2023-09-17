@@ -12,11 +12,11 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs dåbsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 16. sep. 2023
  *
  */
 public class DaabLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' ORDER BY PID FETCH FIRST 10 ROWS ONLY";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' ORDER BY PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";

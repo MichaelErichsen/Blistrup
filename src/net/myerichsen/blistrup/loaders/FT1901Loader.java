@@ -34,14 +34,6 @@ public class FT1901Loader extends AbstractLoader {
 	private static boolean primary = true;
 	private static int nrIHusstand = 0;
 
-	// FIXME 18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler
-	// pointer : I1091985.
-//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092029.
-//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092458.
-//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092512.
-//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092837.
-//    18603 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I1092904.
-
 	/**
 	 * @return the primary
 	 */

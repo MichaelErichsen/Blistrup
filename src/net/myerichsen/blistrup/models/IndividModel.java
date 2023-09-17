@@ -149,6 +149,7 @@ public class IndividModel {
 	private String fam = "";
 	private String slgt = "";
 	private boolean primary = false;
+	private String detaljer = "";
 
 	/**
 	 * @return the begivenheder
@@ -169,6 +170,13 @@ public class IndividModel {
 	 */
 	public String getBlistrupId() {
 		return BlistrupId;
+	}
+
+	/**
+	 * @return the detaljer
+	 */
+	public String getDetaljer() {
+		return detaljer;
 	}
 
 	/**
@@ -322,6 +330,13 @@ public class IndividModel {
 	 */
 	public void setBlistrupId(String blistrupId) {
 		BlistrupId = blistrupId;
+	}
+
+	/**
+	 * @param detaljer the detaljer to set
+	 */
+	public void setDetaljer(String detaljer) {
+		this.detaljer = detaljer;
 	}
 
 	/**

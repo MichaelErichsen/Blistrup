@@ -1,7 +1,6 @@
 package net.myerichsen.blistrup.views;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -32,7 +31,7 @@ import net.myerichsen.blistrup.models.IndividModel;
 
 /**
  * @author Michael Erichsen
- * @version 22. aug. 2023
+ * @version 16. sep. 2023
  *
  */
 public class IndividView extends Composite {
@@ -170,16 +169,16 @@ public class IndividView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn4 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnBlistrupId = tableViewerColumn4.getColumn();
-		tblclmnBlistrupId.setWidth(100);
-		tblclmnBlistrupId.setText("Blistrup ID");
-		tableViewerColumn4.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return ((IndividModel) element).getBlistrupId();
-			}
-		});
+//		final TableViewerColumn tableViewerColumn4 = new TableViewerColumn(tableViewer, SWT.NONE);
+//		final TableColumn tblclmnBlistrupId = tableViewerColumn4.getColumn();
+//		tblclmnBlistrupId.setWidth(100);
+//		tblclmnBlistrupId.setText("Blistrup ID");
+//		tableViewerColumn4.setLabelProvider(new ColumnLabelProvider() {
+//			@Override
+//			public String getText(Object element) {
+//				return ((IndividModel) element).getBlistrupId();
+//			}
+//		});
 
 		final TableViewerColumn tableViewerColumn5 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFon = tableViewerColumn5.getColumn();
@@ -212,22 +211,22 @@ public class IndividView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmngteflle = tableViewerColumn_1.getColumn();
-		tblclmngteflle.setWidth(166);
-		tblclmngteflle.setText("\u00C6gtef\u00E6lle");
-		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				final List<String> liste = ((IndividModel) element).getSpouseNames();
-
-				if (liste.size() > 0) {
-					return liste.get(0);
-				}
-				return "";
-			}
-		});
+//		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+//		final TableColumn tblclmngteflle = tableViewerColumn_1.getColumn();
+//		tblclmngteflle.setWidth(166);
+//		tblclmngteflle.setText("\u00C6gtef\u00E6lle");
+//		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
+//
+//			@Override
+//			public String getText(Object element) {
+//				final List<String> liste = ((IndividModel) element).getSpouseNames();
+//
+//				if (liste.size() > 0) {
+//					return liste.get(0);
+//				}
+//				return "";
+//			}
+//		});
 
 		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFdt = tableViewerColumn_2.getColumn();

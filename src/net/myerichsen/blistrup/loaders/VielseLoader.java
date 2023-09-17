@@ -11,17 +11,12 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 16. sep. 2023
+ * @version 17. sep. 2023
  *
  */
-// FIXME 41332 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I823892.
-//41332 Advarsel: GEDCOM-filen ser ud til at være ødelagt. Mangler pointer : I823892.
-//41332 Advarsel: Barn # tilhører en 'familie' hvor far og mor er ukendte.
-
-// TODO Indsæt data i DETALJER
 
 public class VielseLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER BY PID";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER BY BEGIV, PID";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
@@ -32,6 +27,7 @@ public class VielseLoader extends AbstractLoader {
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 	private static final String UPDATE2 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
+	private static final String UPDATE3 = "UPDATE FAMILIEBEGIVENHED SET DETALJER = ? WHERE ID = ?";
 
 	/**
 	 * @param args
@@ -53,11 +49,10 @@ public class VielseLoader extends AbstractLoader {
 		ResultSet generatedKeys = null;
 		String aar = "";
 		String fader = "";
-		String navn = "";
+//		String navn = "";
 		String rolle = "";
 		String rx = "";
 		String stdnavn = "";
-		StringBuilder sb;
 		int brud = 0;
 		int faderFamilieId = 0;
 		int faderId = 0;
@@ -66,6 +61,7 @@ public class VielseLoader extends AbstractLoader {
 		int gom = 0;
 		int individId = 0;
 		int taeller = 0;
+		StringBuilder sb = new StringBuilder();
 
 		final Connection conn = connect("BLISTRUP");
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
@@ -76,6 +72,7 @@ public class VielseLoader extends AbstractLoader {
 		final PreparedStatement statementi5 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
 		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
+		final PreparedStatement statementu3 = conn.prepareStatement(UPDATE3);
 
 		// SELECT1 = "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER
 		// BY BEGIV, RX";
@@ -83,12 +80,12 @@ public class VielseLoader extends AbstractLoader {
 		final ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
-			sb = new StringBuilder();
+//			sb = new StringBuilder();
 			rx = rs1.getString("RX").trim();
 			rolle = rs1.getString("ROLLE").trim();
-			navn = rs1.getString("NAVN").trim();
+//			navn = rs1.getString("NAVN").trim();
 			fader = rs1.getString("FADER");
-			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
+//			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
 			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
 
@@ -125,10 +122,21 @@ public class VielseLoader extends AbstractLoader {
 			statementi2.setString(6, cleanName(stdnavn));
 			statementi2.executeUpdate();
 
+//			sb.append("4 CONT " + rolle + ": " + stdnavn);
+
 			taeller++;
 
 			// gom
 			if ("1".equals(rx)) {
+				if (!sb.toString().isBlank()) {
+					// UPDATE3 = "UPDATE FAMILIEBEGIVENHED SET DETALJER = ? WHERE ID = ?";
+
+					statementu3.setString(1, sb.toString());
+					statementu3.setInt(2, familieBegivenhedId);
+					statementu3.executeUpdate();
+				}
+
+				sb = new StringBuilder();
 				gom = individId;
 
 				final KildeModel kModel = new KildeModel();
@@ -275,17 +283,9 @@ public class VielseLoader extends AbstractLoader {
 				statementi4.setInt(3, familieBegivenhedId);
 				statementi4.executeUpdate();
 			}
-
+			sb.append(rolle + ": " + stdnavn + "\r\n4 CONT ");
 		}
 
-		statements1.close();
-		statementi1.close();
-		statementi2.close();
-		statementi3.close();
-		statementi4.close();
-		statementi5.close();
-		statementu1.close();
-		statementu2.close();
 		conn.commit();
 		conn.close();
 		return taeller;

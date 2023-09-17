@@ -22,10 +22,9 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 16. sep. 2023
+ * @version 17. sep. 2023
  *
  */
-// FIXME Hele svadaen skal med i detaljerne
 public class GedcomSaver {
 	/**
 	 * Privat klasse, der repræsenterer en kildehenvisning
@@ -75,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "1901";
+	private static final String titel = "Vielser";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -338,9 +337,7 @@ public class GedcomSaver {
 			}
 
 			writeSourceReference(rs1.getString("KILDEID"), rs1.getString("DETALJER"));
-
 		}
-
 	}
 
 	/**
@@ -626,6 +623,7 @@ public class GedcomSaver {
 			}
 
 			writeLine("1 AUTH Statens Arkiver");
+			writeLine("1 PUBL Statens Arkiver, København, " + aarinterval);
 		}
 	}
 
