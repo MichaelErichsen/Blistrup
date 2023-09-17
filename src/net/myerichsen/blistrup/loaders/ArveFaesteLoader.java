@@ -20,9 +20,9 @@ import net.myerichsen.blistrup.models.KildeModel;
 public class ArveFaesteLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'M' ORDER BY PID";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (BLISTRUPID, KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
-	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER, BLISTRUPID, KILDEID, STEDNAVN, DETALJER) "
+	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER, KILDEID, STEDNAVN, DETALJER) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final DateTimeFormatter date8Format = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -47,7 +47,6 @@ public class ArveFaesteLoader extends AbstractLoader {
 		int individId = 0;
 		int taeller = 0;
 		String stdnavn = "";
-		String blistrupId = "";
 		String stedNavn = "";
 		int alder = 0;
 		LocalDate localDate;
@@ -70,15 +69,13 @@ public class ArveFaesteLoader extends AbstractLoader {
 		final ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
-			// INSERT1 = "INSERT INTO INDIVID (BLISTRUPID, KOEN, FOEDT, FAM, SLGT) VALUES
+			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES
 
 			stedNavn = afQ(rs1.getString("STEDNAVN"));
-			blistrupId = afQ(rs1.getString("PID"));
-			statementi1.setString(1, blistrupId);
-			statementi1.setString(2, "m".equals(rs1.getString("SEX")) ? "M" : "F");
-			statementi1.setString(3, rs1.getString("FQODT"));
-			statementi1.setString(4, rs1.getString("FAM"));
-			statementi1.setString(5, rs1.getString("SLGT"));
+			statementi1.setString(1, "m".equals(rs1.getString("SEX")) ? "M" : "F");
+			statementi1.setString(2, rs1.getString("FQODT"));
+			statementi1.setString(3, rs1.getString("FAM"));
+			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
 			generatedKeys = statementi1.getGeneratedKeys();
 
@@ -105,7 +102,7 @@ public class ArveFaesteLoader extends AbstractLoader {
 			statementi2.executeUpdate();
 
 			// INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER,
-			// BLISTRUPID, KILDEID, STEDNAVN, DETALJER) "
+			// KILDEID, STEDNAVN, DETALJER) "
 
 			statementi3.setInt(1, individId);
 			statementi3.setString(2, "Arvefæste");
@@ -119,8 +116,7 @@ public class ArveFaesteLoader extends AbstractLoader {
 			}
 
 			statementi3.setString(4, Integer.toString(alder));
-			statementi3.setString(5, blistrupId);
-			statementi3.setInt(6, kildeId);
+			statementi3.setInt(5, kildeId);
 			sb = new StringBuilder();
 			matr = rs1.getString("MATR_");
 
@@ -129,8 +125,8 @@ public class ArveFaesteLoader extends AbstractLoader {
 			}
 
 			sb.append(afQ(rs1.getString("GAARD")) + ", " + stedNavn + ", Blistrup, Holbo, Frederiksborg, ");
-			statementi3.setString(7, sb.toString());
-			statementi3.setString(8, "Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG") + ", "
+			statementi3.setString(6, sb.toString());
+			statementi3.setString(7, "Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG") + ", "
 					+ rs1.getString("CIVILSTAND"));
 			statementi3.executeUpdate();
 

@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Vielser";
+	private static final String titel = "Vielse";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -332,7 +332,9 @@ public class GedcomSaver {
 							sb.append(rs4.getString("STDNAVN").replace("/", "").trim());
 						}
 					}
-					writeLine("2 NOTE " + sb.toString());
+					if (sb.toString() != null && sb.length() > 0) {
+						writeLine("2 NOTE " + sb.toString());
+					}
 				}
 			}
 
@@ -376,8 +378,8 @@ public class GedcomSaver {
 	 * @throws IOException
 	 */
 	public void writeIndividualEvent(int individId, boolean primary) throws SQLException, IOException {
-		String type;
-		String note;
+		String type = "";
+		String note = "";
 		String stedNavn = "";
 
 		// SELECTI2 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE INDIVIDID = ?";
@@ -387,55 +389,37 @@ public class GedcomSaver {
 		while (rs2.next()) {
 			type = rs2.getString("BEGTYPE").trim();
 			stedNavn = rs2.getString("STEDNAVN");
+			note = rs2.getString("NOTE");
 
 			if ("Dåb".equals(type)) {
 				writeLine("1 CHR");
 				if (stedNavn != null && !stedNavn.isBlank()) {
 					writeLine("2 PLAC " + stedNavn);
 				}
-				if (primary) {
-					writeLine("2 NOTE " + rs2.getString("NOTE"));
-				} else {
-					writeLine("2 NOTE Vidne");
-				}
+				writeNote(primary, note);
 			} else if ("Konfirmation".equals(type)) {
 				writeLine("1 CONF");
 				if (stedNavn != null && !stedNavn.isBlank()) {
 					writeLine("2 PLAC " + stedNavn);
 				}
-				if (primary) {
-					writeLine("2 NOTE " + rs2.getString("NOTE"));
-				} else {
-					writeLine("2 NOTE Vidne");
-				}
+				writeNote(primary, note);
 			} else if ("Begravelse".equals(type)) {
 				writeLine("1 BURI");
 				if (stedNavn != null && !stedNavn.isBlank()) {
 					writeLine("2 PLAC " + stedNavn);
 				}
-				if (primary) {
-					writeLine("2 NOTE " + rs2.getString("NOTE"));
-				} else {
-					writeLine("2 NOTE Vidne");
-				}
+				writeNote(primary, note);
 			} else if ("Folketælling".equals(type)) {
 				writeLine("1 CENS");
 				if (stedNavn != null && !stedNavn.isBlank()) {
 					writeLine("2 PLAC " + stedNavn);
 				}
-				if (primary) {
-					writeLine("2 NOTE " + rs2.getString("NOTE"));
-				} else {
-					writeLine("2 NOTE Vidne");
-				}
+				writeNote(primary, note);
 			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
 					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
-				note = rs2.getString("NOTE");
-				if (note != null && !note.isBlank()) {
-					writeLine("2 NOTE " + note);
-				}
+				writeNote(primary, note);
 			} else if ("Bolig".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");
@@ -538,6 +522,19 @@ public class GedcomSaver {
 	private void writeLine(String string) throws IOException {
 		fw.write(string + "\n");
 		System.out.println(string);
+	}
+
+	/**
+	 * @param primary
+	 * @param note
+	 * @throws IOException
+	 */
+	public void writeNote(boolean primary, String note) throws IOException {
+		if (primary && note != null) {
+			writeLine("2 NOTE " + note);
+		} else if (!primary) {
+			writeLine("2 NOTE Vidne");
+		}
 	}
 
 	/**

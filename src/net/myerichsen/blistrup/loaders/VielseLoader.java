@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  */
 
 public class VielseLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER BY BEGIV, PID";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'C' ORDER BY BEGIV, RX";
 
 	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
@@ -80,12 +80,9 @@ public class VielseLoader extends AbstractLoader {
 		final ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
-//			sb = new StringBuilder();
 			rx = rs1.getString("RX").trim();
 			rolle = rs1.getString("ROLLE").trim();
-//			navn = rs1.getString("NAVN").trim();
 			fader = rs1.getString("FADER");
-//			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
 			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
 
@@ -121,8 +118,6 @@ public class VielseLoader extends AbstractLoader {
 
 			statementi2.setString(6, cleanName(stdnavn));
 			statementi2.executeUpdate();
-
-//			sb.append("4 CONT " + rolle + ": " + stdnavn);
 
 			taeller++;
 

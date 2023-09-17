@@ -12,16 +12,16 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs begravelser
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 17. sep. 2023
  *
  */
 public class BegravelseLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' ORDER BY PID";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'D' ORDER BY BEGIV, RX";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
-	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, ROLLE, KILDEID, STEDNAVN, BEM, FOEDT) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 	private static final String INSERT7 = "INSERT INTO FAMILIE (HUSMODER) VALUES(?)";
@@ -58,11 +58,8 @@ public class BegravelseLoader extends AbstractLoader {
 		int familieId = 0;
 		int doedId = 0;
 		int taeller = 0;
-		StringBuilder sb = null;
+		StringBuilder sb = new StringBuilder();
 		String navn = "";
-		String fader = "";
-		String moder = "";
-		String faelle = "";
 		String stdnavn = "";
 		int aefaelleId = 0;
 		String koen = "";
@@ -76,7 +73,7 @@ public class BegravelseLoader extends AbstractLoader {
 		final PreparedStatement statementi6 = conn.prepareStatement(INSERT6, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statementi7 = conn.prepareStatement(INSERT7, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statementi8 = conn.prepareStatement(INSERT8);
-		PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
+		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
 		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 		final PreparedStatement statementu3 = conn.prepareStatement(UPDATE3);
 
@@ -85,21 +82,17 @@ public class BegravelseLoader extends AbstractLoader {
 		final ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
-			sb = new StringBuilder("4 CONT ");
-			fader = "";
-			moder = "";
 			rolle = afQ(rs1.getString("ROLLE"));
 			navn = afQ(rs1.getString("NAVN"));
-			sb.append(rolle + ": " + navn + ", \r\n4 CONT ");
+
 			koen = rs1.getString("SEX").trim();
 
-			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
+			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES
 
 			statementi1.setString(1, koen);
-			statementi1.setString(2, rs1.getString("PID").trim());
-			statementi1.setString(3, rs1.getString("FQODT").trim());
-			statementi1.setString(4, rs1.getString("FAM"));
-			statementi1.setString(5, rs1.getString("SLGT"));
+			statementi1.setString(2, rs1.getString("FQODT").trim());
+			statementi1.setString(3, rs1.getString("FAM"));
+			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
 			generatedKeys = statementi1.getGeneratedKeys();
 
@@ -130,6 +123,13 @@ public class BegravelseLoader extends AbstractLoader {
 
 			// død, barn, far, mor, æfælle
 			if ("død".equals(rolle)) {
+				// UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
+
+				statementu2.setString(1, afQ(sb.toString()));
+				statementu2.setInt(2, individBegivenhedsId);
+				statementu2.executeUpdate();
+
+				sb = new StringBuilder();
 				doedId = individId;
 
 				final KildeModel kModel = new KildeModel();
@@ -142,7 +142,7 @@ public class BegravelseLoader extends AbstractLoader {
 				kildeId = kModel.insert(conn);
 
 				// INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
-				// NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
+				// ROLLE, KILDEID, STEDNAVN, BEM, FOEDT) "
 
 				statementi4.setInt(1, individId);
 
@@ -154,19 +154,18 @@ public class BegravelseLoader extends AbstractLoader {
 
 				statementi4.setString(3, "Begravelse");
 				statementi4.setString(4, rs1.getString("AAR").trim() + "-01-01");
-				fader = afQ(rs1.getString("FADER"));
-				fader = fader.length() > 0 ? "Fader: " + fader : "";
-				moder = afQ(rs1.getString("MODER"));
-				moder = moder.length() > 0 ? "Moder: " + moder : "";
-				faelle = afQ(rs1.getString("FQELLE"));
-				faelle = faelle.length() > 0 ? "Ægtefælle: " + faelle : "";
-				statementi4.setString(5, (fader + " " + moder + " " + faelle).trim());
-				statementi4.setString(6, rolle);
-				statementi4.setString(7, afQ(rs1.getString("BEGIV")));
-				statementi4.setInt(8, kildeId);
-				statementi4.setString(9, formatPlaceName(afQ(rs1.getString("STEDNAVN"))));
-				statementi4.setString(10, afQ(rs1.getString("BEM")));
-				statementi4.setString(11, rs1.getString("FQODT").trim());
+//				fader = afQ(rs1.getString("FADER"));
+//				fader = fader.length() > 0 ? "Fader: " + fader : "";
+//				moder = afQ(rs1.getString("MODER"));
+//				moder = moder.length() > 0 ? "Moder: " + moder : "";
+//				faelle = afQ(rs1.getString("FQELLE"));
+//				faelle = faelle.length() > 0 ? "Ægtefælle: " + faelle : "";
+//				statementi4.setString(5, (fader + " " + moder + " " + faelle).trim());
+				statementi4.setString(5, rolle);
+				statementi4.setInt(6, kildeId);
+				statementi4.setString(7, fixStedNavn(afQ(rs1.getString("STEDNAVN"))));
+				statementi4.setString(8, afQ(rs1.getString("BEM")));
+				statementi4.setString(9, rs1.getString("FQODT").trim());
 				statementi4.executeUpdate();
 				generatedKeys = statementi4.getGeneratedKeys();
 
@@ -235,7 +234,6 @@ public class BegravelseLoader extends AbstractLoader {
 
 					// UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 
-					statementu1 = conn.prepareStatement(UPDATE1);
 					statementu1.setInt(1, familieId);
 					statementu1.setInt(2, doedId);
 					statementu1.executeUpdate();
@@ -269,13 +267,8 @@ public class BegravelseLoader extends AbstractLoader {
 
 				statementi8.executeUpdate();
 			}
+			sb.append(rolle + ": " + navn + ", \r\n4 CONT ");
 		}
-
-		// UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
-
-		statementu2.setString(1, afQ(sb.toString()));
-		statementu2.setInt(2, individBegivenhedsId);
-		statementu2.executeUpdate();
 
 		conn.commit();
 		conn.close();

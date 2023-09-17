@@ -12,20 +12,19 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 12. sep. 2023
+ * @version 17. sep. 2023
  *
  */
 public class KonfirmationLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' ORDER BY BEGIV, RX";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) "
 			+ "VALUES (?, ?, ?, ?, ?, ?)";
-	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, ROLLE, KILDEID, STEDNAVN, BEM) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT4 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT5 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
-	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSMODER) VALUES(?)";
 
 	private static final String UPDATE1 = "UPDATE INDIVID SET FAMC = ? WHERE ID = ?";
 	private static final String UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
@@ -59,12 +58,9 @@ public class KonfirmationLoader extends AbstractLoader {
 		int familieId = 0;
 		int barnId = 0;
 		int taeller = 0;
-		StringBuilder sb;
+		StringBuilder sb = new StringBuilder();
 		String navn = "";
-		String fader = "";
-		String moder = "";
 		String stdnavn = "";
-		String stedNavn = "";
 		String rx = "";
 
 		final Connection conn = connect("BLISTRUP");
@@ -74,7 +70,6 @@ public class KonfirmationLoader extends AbstractLoader {
 		final PreparedStatement statementi3 = conn.prepareStatement(INSERT3, Statement.RETURN_GENERATED_KEYS);
 		final PreparedStatement statementi4 = conn.prepareStatement(INSERT4);
 		final PreparedStatement statementi5 = conn.prepareStatement(INSERT5, Statement.RETURN_GENERATED_KEYS);
-		final PreparedStatement statementi6 = conn.prepareStatement(INSERT6);
 		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
 		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 		final PreparedStatement statementu3 = conn.prepareStatement(UPDATE3);
@@ -84,19 +79,16 @@ public class KonfirmationLoader extends AbstractLoader {
 		final ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
-			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES
+			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES
 
-			sb = new StringBuilder();
 			rx = rs1.getString("RX");
 			rolle = rs1.getString("ROLLE").trim();
 			navn = rs1.getString("NAVN").trim();
-			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
 			statementi1.setString(1, rs1.getString("SEX").trim());
-			statementi1.setString(2, rs1.getString("PID").trim());
-			statementi1.setString(3, rs1.getString("FQODT").trim());
-			statementi1.setString(4, rs1.getString("FAM"));
-			statementi1.setString(5, rs1.getString("SLGT"));
+			statementi1.setString(2, rs1.getString("FQODT").trim());
+			statementi1.setString(3, rs1.getString("FAM"));
+			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
 			generatedKeys = statementi1.getGeneratedKeys();
 
@@ -129,6 +121,13 @@ public class KonfirmationLoader extends AbstractLoader {
 
 			// Barn eller konf
 			if ("1".equals(rx)) {
+				// UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
+
+				statementu2.setString(1, afQ(sb.toString()));
+				statementu2.setInt(2, individBegivenhedsId);
+				statementu2.executeUpdate();
+
+				sb = new StringBuilder();
 				barnId = individId;
 
 				final KildeModel kModel = new KildeModel();
@@ -141,7 +140,7 @@ public class KonfirmationLoader extends AbstractLoader {
 				kildeId = kModel.insert(conn);
 
 				// INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
-				// NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM) "
+				// ROLLE, KILDEID, STEDNAVN, BEM) "
 
 				statementi3.setInt(1, individId);
 				statementi3.setString(2, "0");
@@ -157,25 +156,10 @@ public class KonfirmationLoader extends AbstractLoader {
 					statementi3.setString(4, "0001-01-01");
 				}
 
-				fader = afQ(rs1.getString("FADER"));
-				fader = fader.length() > 0 ? "Fader: " + fader : "";
-				moder = afQ(rs1.getString("MODER"));
-				moder = moder.length() > 0 ? "Moder: " + moder : "";
-				statementi3.setString(5, (fader + " " + moder).trim());
-				statementi3.setString(6, rolle);
-				statementi3.setString(7, afQ(rs1.getString("BEGIV")));
-				statementi3.setInt(8, kildeId);
-
-				stedNavn = afQ(rs1.getString("STEDNAVN"));
-
-				if (stedNavn.contains("Blistrup")) {
-					stedNavn = stedNavn + ", Holbo, Frederiksborg, ";
-				} else {
-					stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg, ";
-				}
-
-				statementi3.setString(9, stedNavn);
-				statementi3.setString(10, afQ(rs1.getString("BEM")));
+				statementi3.setString(5, rolle);
+				statementi3.setInt(6, kildeId);
+				statementi3.setString(7, fixStedNavn(afQ(rs1.getString("STEDNAVN"))));
+				statementi3.setString(8, afQ(rs1.getString("BEM")));
 				statementi3.executeUpdate();
 				generatedKeys = statementi3.getGeneratedKeys();
 
@@ -230,24 +214,10 @@ public class KonfirmationLoader extends AbstractLoader {
 				statementu3.executeUpdate();
 
 			}
+			sb.append(rolle + ": " + navn + "\r\n4 CONT ");
 
-			// UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
-
-			statementu2.setString(1, afQ(sb.toString()));
-			statementu2.setInt(2, individBegivenhedsId);
-			statementu2.executeUpdate();
 		}
 
-		statements1.close();
-		statementi1.close();
-		statementi2.close();
-		statementi3.close();
-		statementi4.close();
-		statementi5.close();
-		statementi6.close();
-		statementu1.close();
-		statementu2.close();
-		statementu3.close();
 		conn.commit();
 		conn.close();
 		return taeller;

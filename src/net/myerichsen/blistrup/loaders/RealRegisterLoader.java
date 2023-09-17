@@ -14,16 +14,16 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 17. sep. 2023
  *
  */
 
 public class RealRegisterLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N' ORDER BY PID";
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT) VALUES (?, ?, ?, ?, ?)";
+	private static final String SELECT1 = "SELECT  * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N' ORDER BY BEGIV";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FAM, SLGT, FOEDT) VALUES (?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
-	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, BLISTRUPID, KILDEID, STEDNAVN, NOTE, DETALJER) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, KILDEID, STEDNAVN, NOTE, DETALJER) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 	private static final DateTimeFormatter date8Format = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	/**
@@ -48,7 +48,6 @@ public class RealRegisterLoader extends AbstractLoader {
 		int taeller = 0;
 		String stdnavn = "";
 		String jordlod = "";
-		String blistrupId = "";
 		String stedNavn = "";
 		String matr = "";
 		String gaard = "";
@@ -68,24 +67,17 @@ public class RealRegisterLoader extends AbstractLoader {
 		final PreparedStatement statement3 = conn.prepareStatement(INSERT2);
 		final PreparedStatement statement4 = conn.prepareStatement(INSERT3);
 
-		// "SELECT DISTINCT BEGIV FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
+		// SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N' ORDER BY PID";
 
 		final ResultSet rs1 = statement0.executeQuery();
 
 		while (rs1.next()) {
-			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'N'
-
-			blistrupId = afQ(rs1.getString("PID"));
-			stedNavn = afQ(rs1.getString("STEDNAVN"));
-			gaard = afQ(rs1.getString("GAARD"));
-
-			// "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT)
+			// "INSERT INTO INDIVID (KOEN, FAM, SLGT, FOEDT)
 
 			statement2.setString(1, "m".equals(rs1.getString("SEX")) ? "M" : "F");
-			statement2.setString(2, blistrupId);
-			statement2.setString(3, rs1.getString("FAM"));
-			statement2.setString(4, rs1.getString("SLGT"));
-			statement2.setString(5, rs1.getString("FQODT"));
+			statement2.setString(2, rs1.getString("FAM"));
+			statement2.setString(3, rs1.getString("SLGT"));
+			statement2.setString(4, rs1.getString("FQODT"));
 			statement2.executeUpdate();
 			generatedKeys = statement2.getGeneratedKeys();
 
@@ -113,7 +105,7 @@ public class RealRegisterLoader extends AbstractLoader {
 			statement3.executeUpdate();
 
 			// "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO,
-			// BLISTRUPID, KILDEID, STEDNAVN, NOTE, DETALJER) "
+			// KILDEID, STEDNAVN, NOTE, DETALJER) "
 
 			statement4.setInt(1, individId);
 			statement4.setString(2, "Realregister");
@@ -126,36 +118,30 @@ public class RealRegisterLoader extends AbstractLoader {
 				statement4.setString(3, "0001-01-01");
 			}
 
-			statement4.setString(4, blistrupId);
-			statement4.setInt(5, kildeId);
-
-			if (stedNavn.contains("Blistrup")) {
-				stedNavn = stedNavn + ", Holbo, Frederiksborg, ";
-			} else {
-				stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg, ";
-			}
-
+			statement4.setInt(4, kildeId);
+			stedNavn = fixStedNavn(afQ(rs1.getString("STEDNAVN")));
+			gaard = afQ(rs1.getString("GAARD"));
 			matr = afQ(rs1.getString("MATR_"));
 
 			if (matr.isBlank()) {
-				jordlod = afQ(gaard) + ", " + stedNavn;
+				jordlod = gaard + ", " + stedNavn;
 			} else {
-				jordlod = "Matr. " + matr + ", " + afQ(gaard) + ", " + stedNavn;
+				jordlod = "Matr. " + matr + ", " + gaard + ", " + stedNavn;
 			}
 
-			statement4.setString(6, jordlod);
+			statement4.setString(5, jordlod);
 			til = rs1.getString("TIL");
 			fra = rs1.getString("FRA");
 
 			if (!til.isBlank()) {
-				statement4.setString(7, rs1.getString("ROLLE") + " " + afQ(til));
+				statement4.setString(6, rs1.getString("ROLLE") + " " + afQ(til));
 			} else if (!fra.isBlank()) {
-				statement4.setString(7, rs1.getString("ROLLE") + " " + afQ(fra));
+				statement4.setString(6, rs1.getString("ROLLE") + " " + afQ(fra));
 			} else {
-				statement4.setString(7, "");
+				statement4.setString(6, "");
 			}
 
-			statement4.setString(8,
+			statement4.setString(7,
 					"4 CONT Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG") + ", "
 							+ afQ(rs1.getString("STILLING")) + ", " + rs1.getString("CIVILSTAND") + ", "
 							+ afQ(rs1.getString("ERHVERV")));
@@ -165,10 +151,6 @@ public class RealRegisterLoader extends AbstractLoader {
 
 		}
 
-		statement0.close();
-		statement2.close();
-		statement3.close();
-		statement4.close();
 		conn.commit();
 		conn.close();
 		return taeller;

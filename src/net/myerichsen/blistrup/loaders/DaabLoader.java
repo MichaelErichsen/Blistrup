@@ -12,16 +12,16 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs dåbsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 16. sep. 2023
+ * @version 17. sep. 2023
  *
  */
 public class DaabLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' ORDER BY PID";
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' ORDER BY BEGIV, RX";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN, STDNAVN) VALUES (?, ?, ?, ?, ?, ?)";
-	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO, ROLLE, KILDEID, STEDNAVN, BEM, FOEDT) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT5 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES (?, ?, ?)";
 	private static final String INSERT6 = "INSERT INTO FAMILIE (HUSFADER) VALUES(?)";
 
@@ -59,10 +59,8 @@ public class DaabLoader extends AbstractLoader {
 		int familieId;
 		int barnId = 0;
 		int taeller = 0;
-		StringBuilder sb;
-		String navn = "";
-		String fader = "";
-		String moder = "";
+		StringBuilder sb = new StringBuilder();
+//		String navn = "";
 		String stdnavn = "";
 		String barnenavn = "";
 		boolean first = true;
@@ -77,24 +75,21 @@ public class DaabLoader extends AbstractLoader {
 		final PreparedStatement statementu1 = conn.prepareStatement(UPDATE1);
 		final PreparedStatement statementu2 = conn.prepareStatement(UPDATE2);
 
-		// SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' ORDER BY PID";
+		// SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'A' ORDER BY BEGIV,
+		// RX";
 
 		final ResultSet rs1 = statements1.executeQuery();
 
 		while (rs1.next()) {
-			sb = new StringBuilder("4 CONT ");
-
 			rolle = rs1.getString("ROLLE").trim();
-			navn = rs1.getString("NAVN").trim();
-			sb.append(rolle + ": " + navn + ", \r\n4 CONT ");
+//			navn = rs1.getString("NAVN").trim();
 
-			// INSERT1 = "INSERT INTO INDIVID (KOEN, BLISTRUPID) VALUES (?, ?)";
+			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT)
 
 			statementi1.setString(1, rs1.getString("SEX").trim());
-			statementi1.setString(2, rs1.getString("PID").trim());
-			statementi1.setString(3, rs1.getString("FQODT").trim());
-			statementi1.setString(4, rs1.getString("FAM"));
-			statementi1.setString(5, rs1.getString("SLGT"));
+			statementi1.setString(2, rs1.getString("FQODT").trim());
+			statementi1.setString(3, rs1.getString("FAM"));
+			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
 			generatedKeys = statementi1.getGeneratedKeys();
 
@@ -128,17 +123,17 @@ public class DaabLoader extends AbstractLoader {
 			taeller++;
 
 			if ("barn".equals(rolle)) {
-
-				if (first) {
+				if (!first) {
 					// UPDATE2 = "UPDATE INDIVIDBEGIVENHED SET DETALJER = ? WHERE ID = ?";
 
 					statementu2.setString(1, afQ(sb.toString()));
 					statementu2.setInt(2, individBegivenhedsId);
 					statementu2.executeUpdate();
+				} else {
 					first = false;
 				}
 
-				sb = new StringBuilder("");
+				sb = new StringBuilder();
 				barnId = individId;
 				barnenavn = stdnavn;
 
@@ -152,7 +147,7 @@ public class DaabLoader extends AbstractLoader {
 				kildeId = kModel.insert(conn);
 
 				// INSERT4 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
-				// NOTE, ROLLE, BLISTRUPID, KILDEID, STEDNAVN, BEM, FOEDT) "
+				// ROLLE, KILDEID, STEDNAVN, BEM, FOEDT) "
 
 				statementi4.setInt(1, individId);
 				statementi4.setInt(2, 0);
@@ -168,17 +163,11 @@ public class DaabLoader extends AbstractLoader {
 					statementi4.setString(4, "0001-01-01");
 				}
 
-				fader = afQ(rs1.getString("FADER"));
-				fader = fader.length() > 0 ? "Fader: " + fader : "";
-				moder = afQ(rs1.getString("MODER"));
-				moder = moder.length() > 0 ? "Moder: " + moder : "";
-				statementi4.setString(5, (fader + " " + moder).trim());
-				statementi4.setString(6, rolle);
-				statementi4.setString(7, afQ(rs1.getString("PID")));
-				statementi4.setInt(8, kildeId);
-				statementi4.setString(9, (afQ(rs1.getString("STEDNAVN"))) + ", Blistrup, Holbo, Frederiksborg, ");
-				statementi4.setString(10, afQ(rs1.getString("BEM")));
-				statementi4.setString(11, rs1.getString("FQODT").trim());
+				statementi4.setString(5, rolle);
+				statementi4.setInt(6, kildeId);
+				statementi4.setString(7, fixStedNavn(afQ(rs1.getString("STEDNAVN"))));
+				statementi4.setString(8, afQ(rs1.getString("BEM")));
+				statementi4.setString(9, rs1.getString("FQODT").trim());
 				statementi4.executeUpdate();
 				generatedKeys = statementi4.getGeneratedKeys();
 
@@ -226,7 +215,7 @@ public class DaabLoader extends AbstractLoader {
 				statementi5.setInt(3, individBegivenhedsId);
 				statementi5.executeUpdate();
 			}
-
+			sb.append(rolle + ": " + stdnavn + ", \r\n4 CONT ");
 		}
 
 		conn.commit();
