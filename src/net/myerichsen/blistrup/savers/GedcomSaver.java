@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 24. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Vielse";
+	private static final String titel = "Lægdsruller";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -391,7 +391,12 @@ public class GedcomSaver {
 			stedNavn = rs2.getString("STEDNAVN");
 			note = rs2.getString("NOTE");
 
-			if ("Dåb".equals(type)) {
+			if ("Fødsel".equals(type)) {
+				writeLine("1 BIRT");
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
+			} else if ("Dåb".equals(type)) {
 				writeLine("1 CHR");
 				if (stedNavn != null && !stedNavn.isBlank()) {
 					writeLine("2 PLAC " + stedNavn);
@@ -418,8 +423,14 @@ public class GedcomSaver {
 			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
 					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type)) {
 				writeLine("1 RESI");
-				writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
+				writeLine("2 PLAC " + stedNavn);
 				writeNote(primary, note);
+			} else if ("Lægdsrulle".equals(type)) {
+				writeLine("1 EVEN");
+				writeLine("2 TYPE " + type);
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
 			} else if ("Bolig".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");
@@ -428,7 +439,7 @@ public class GedcomSaver {
 
 				if (!note.isBlank()) {
 					writeLine("1 OCCU " + note);
-					writeLine("2 PLAC " + rs2.getString("STEDNAVN"));
+					writeLine("2 PLAC " + stedNavn);
 				}
 
 				continue;
@@ -645,14 +656,15 @@ public class GedcomSaver {
 	private void writeWitnessedEvents(int individId) throws SQLException, IOException {
 		int begId = 0;
 		ResultSet rs2, rs3;
-
-		// SELECTV1 = "SELECT * FROM BLISTRUP.VIDNE WHERE INDIVIDID = ?";
+		String type = "";
+		String stedNavn = "";
+		String note = "";
 
 		statementv1.setInt(1, individId);
 		final ResultSet rs1 = statementv1.executeQuery();
 
 		while (rs1.next()) {
-			begId = rs1.getInt("INDIVIDBEGIVENHEDID");
+			begId = rs1.getInt("INDIVIDBEGIVENHEDID"); // 250604
 
 			if (begId > 0) {
 				// SELECTI3 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED WHERE ID = ?";
@@ -661,7 +673,71 @@ public class GedcomSaver {
 				rs2 = statementi3.executeQuery();
 
 				if (rs2.next()) {
-					writeIndividualEvent(rs2.getInt("INDIVIDID"), false);
+//					writeIndividualEvent(rs2.getInt("INDIVIDID"), false);
+					type = rs2.getString("BEGTYPE").trim();
+					stedNavn = rs2.getString("STEDNAVN");
+					note = rs2.getString("NOTE");
+
+					if ("Fødsel".equals(type)) {
+						writeLine("1 BIRT");
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(false, note);
+					} else if ("Dåb".equals(type)) {
+						writeLine("1 CHR");
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(false, note);
+					} else if ("Konfirmation".equals(type)) {
+						writeLine("1 CONF");
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(false, note);
+					} else if ("Begravelse".equals(type)) {
+						writeLine("1 BURI");
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(false, note);
+					} else if ("Folketælling".equals(type)) {
+						writeLine("1 CENS");
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(false, note);
+					} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
+							|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type)) {
+						writeLine("1 RESI");
+						writeLine("2 PLAC " + stedNavn);
+						writeNote(false, note);
+					} else if ("Lægdsrulle".equals(type)) {
+						writeLine("1 EVEN");
+						writeLine("2 TYPE " + type);
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(false, note);
+					} else if ("Bolig".equals(type)) {
+						writeLine("1 RESI");
+						writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");
+					} else if ("Erhverv".equals(type)) {
+						note = rs2.getString("NOTE");
+
+						if (!note.isBlank()) {
+							writeLine("1 OCCU " + note);
+							writeLine("2 PLAC " + stedNavn);
+						}
+
+						continue;
+					}
+
+					writeDate(rs2);
+
+					writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
+
 				}
 
 			} else {
