@@ -11,14 +11,14 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 31. aug. 2023
+ * @version 26. sep. 2023
  *
  */
 public class IndividBegivenhedModel extends Begivenhedsmodel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVIDBEGIVENHED";
 	private static final String SELECT2 = "SELECT STDNAVN FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVIDBEGIVENHED "
-			+ " (INDIVIDID, ALDER, KILDEID, BEGTYPE, DATO, NOTE, FOEDT, STEDNAVN) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			+ " (INDIVIDID, ALDER, KILDEID, BEGTYPE, DATO, NOTE, FOEDT, STEDNAVN, DETALJER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	/**
 	 * @param dbPath
@@ -93,11 +93,12 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 		return array;
 	}
 
-	private int individId;
-	private int alder;
-	private String rolle;
-	private String foedt;
-	private String bem;
+	private int individId = 0;
+	private int alder = 0;
+	private String rolle = "";
+	private String foedt = "";
+	private String bem = "";
+	private String detaljer = "";
 
 	/**
 	 * @return the alder
@@ -111,6 +112,14 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	 */
 	public String getBem() {
 		return bem;
+	}
+
+	/**
+	 * @return the detaljer
+	 */
+	@Override
+	public String getDetaljer() {
+		return detaljer;
 	}
 
 	/**
@@ -135,13 +144,6 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @return the stdNavn
-	 */
-//	public String getStdNavn() {
-//		return stdNavn;
-//	}
-
-	/**
 	 * @param conn
 	 * @throws SQLException
 	 */
@@ -158,6 +160,7 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 		statement.setString(6, note);
 		statement.setString(7, foedt);
 		statement.setString(8, stedNavn);
+		statement.setString(9, detaljer);
 
 		statement.executeUpdate();
 
@@ -174,6 +177,13 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
+	 * @return the stdNavn
+	 */
+//	public String getStdNavn() {
+//		return stdNavn;
+//	}
+
+	/**
 	 * @param alder the alder to set
 	 */
 	public void setAlder(int alder) {
@@ -185,6 +195,14 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	 */
 	public void setBem(String bem) {
 		this.bem = bem;
+	}
+
+	/**
+	 * @param detaljer the detaljer to set
+	 */
+	@Override
+	public void setDetaljer(String detaljer) {
+		this.detaljer = detaljer;
 	}
 
 	/**

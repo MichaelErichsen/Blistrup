@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 24. sep. 2023
+ * @version 26. sep. 2023
  *
  */
 public class GedcomSaver {
@@ -30,7 +30,7 @@ public class GedcomSaver {
 	 * Privat klasse, der repræsenterer en kildehenvisning
 	 *
 	 * @author Michael Erichsen
-	 * @version 27. aug. 2023
+	 * @version 26. sep. 2023
 	 *
 	 */
 	private static class SourceReference {
@@ -217,7 +217,7 @@ public class GedcomSaver {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public void writeDate(ResultSet rs) throws IOException, SQLException {
+	public void writeDate(ResultSet rs) throws Exception {
 		final LocalDate localDate = LocalDate.parse(rs.getString("DATO"));
 		final String date = dateFormat.format(localDate).toUpperCase();
 		if (!"01 JAN 0001".equals(date)) {
@@ -289,7 +289,10 @@ public class GedcomSaver {
 
 			}
 
-			writeDate(rs1);
+			try {
+				writeDate(rs1);
+			} catch (final Exception e) {
+			}
 
 			stedNavn = rs1.getString("STEDNAVN");
 
@@ -421,7 +424,7 @@ public class GedcomSaver {
 				}
 				writeNote(primary, note);
 			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
-					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type)) {
+					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type) || "Tilgang".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC " + stedNavn);
 				writeNote(primary, note);
@@ -445,7 +448,10 @@ public class GedcomSaver {
 				continue;
 			}
 
-			writeDate(rs2);
+			try {
+				writeDate(rs2);
+			} catch (final Exception e) {
+			}
 
 			writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
 		}
@@ -614,7 +620,7 @@ public class GedcomSaver {
 			aarinterval = rs1.getString("AARINTERVAL").trim();
 
 			if ("Arvefæste".equals(kbNr) || "Matrikel".equals(kbNr) || "Fæstedesignation".equals(kbNr)
-					|| "Fæstebrevkopier".equals(kbNr) || "Realregister".equals(kbNr)) {
+					|| "Fæstebrevkopier".equals(kbNr) || "Realregister".equals(kbNr) || "Tilgangsliste".equals(kbNr)) {
 				writeLine("1 TITL " + kbNr + " Blistrup " + aarinterval);
 				writeLine("1 ABBR " + kbNr + " Blistrup " + aarinterval);
 			} else if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)
@@ -734,7 +740,10 @@ public class GedcomSaver {
 						continue;
 					}
 
-					writeDate(rs2);
+					try {
+						writeDate(rs2);
+					} catch (final Exception e) {
+					}
 
 					writeSourceReference(rs2.getString("KILDEID"), rs2.getString("DETALJER"));
 
