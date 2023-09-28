@@ -74,7 +74,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Afgang";
+	private static final String titel = "Tilgang";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -421,7 +421,8 @@ public class GedcomSaver {
 				}
 				writeNote(primary, note);
 			} else if ("Matrikel".equals(type) || "Arvefæste".equals(type) || "Fæstedesignation".equals(type)
-					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type) || "Afgang".equals(type)) {
+					|| "Fæstebrevkopier".equals(type) || "Realregister".equals(type) || "Afgang".equals(type)
+					|| "Tilgang".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC " + stedNavn);
 				writeNote(primary, note);
@@ -501,18 +502,21 @@ public class GedcomSaver {
 
 				if (!"0 0000".equals(foedt)) {
 					writeLine("1 BIRT");
-					if (foedt.length() == 8) {
-						if ("0000".equals(foedt.substring(4, 8))) {
-							foedt = foedt.replace("0000", "0101");
-						}
+					try {
+						if (foedt.length() == 8) {
+							if ("0000".equals(foedt.substring(4, 8))) {
+								foedt = foedt.replace("0000", "0101");
+							}
 
-						localDate = LocalDate.parse(foedt, date8Format);
-						writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
-					} else if (foedt.length() > 4) {
-						localDate = LocalDate.parse(foedt);
-						writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
-					} else {
-						writeLine("2 DATE " + model.getFoedt());
+							localDate = LocalDate.parse(foedt, date8Format);
+							writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
+						} else if (foedt.length() > 4) {
+							localDate = LocalDate.parse(foedt);
+							writeLine("2 DATE " + dateFormat.format(localDate).toUpperCase());
+						} else {
+							writeLine("2 DATE " + model.getFoedt());
+						}
+					} catch (Exception e) {
 					}
 				}
 			}
@@ -614,7 +618,8 @@ public class GedcomSaver {
 			aarinterval = rs1.getString("AARINTERVAL").trim();
 
 			if ("Arvefæste".equals(kbNr) || "Matrikel".equals(kbNr) || "Fæstedesignation".equals(kbNr)
-					|| "Fæstebrevkopier".equals(kbNr) || "Realregister".equals(kbNr) || "Afgang".equals(kbNr)) {
+					|| "Fæstebrevkopier".equals(kbNr) || "Realregister".equals(kbNr) || "Afgang".equals(kbNr)
+					|| "Tilgang".equals(kbNr)) {
 				writeLine("1 TITL " + kbNr + " Blistrup " + aarinterval);
 				writeLine("1 ABBR " + kbNr + " Blistrup " + aarinterval);
 			} else if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)

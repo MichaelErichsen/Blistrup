@@ -15,12 +15,12 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs tilgangslister
  *
  * @author Michael Erichsen
- * @version 28. sep. 2023
+ * @version 26. sep. 2023
  *
  */
 
-public class TilgangsListeLoader extends AbstractLoader {
-	private static final String SELECT1 = "SELECT * FROM APP.TILAFGANGSLISTE WHERE Ï__TYPE = 'T' ORDER BY AAR, NR";
+public class TilgangsListeLoaderOld extends AbstractLoader {
+	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'T' ORDER BY AAR, LBNR";
 
 	/**
 	 * @param args
@@ -28,7 +28,7 @@ public class TilgangsListeLoader extends AbstractLoader {
 	public static void main(String[] args) {
 		try {
 			new ClearTables().clear();
-			final int taeller = new TilgangsListeLoader().load();
+			final int taeller = new TilgangsListeLoaderOld().load();
 			System.out.println("Har indlæst " + taeller + " tilgange");
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -48,22 +48,19 @@ public class TilgangsListeLoader extends AbstractLoader {
 		IndividModel iModel;
 		PersonNavneModel pnModel;
 		IndividBegivenhedModel ibModel;
-		String foedt = "";
 		String fra = "";
-		String haandtering = "";
-		String til = "";
 
 		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
 		kModel.setKbNr("Tilgangsliste");
-		kModel.setAarInterval("1816-76");
+		kModel.setAarInterval("1815-75");
 		final int kildeId = kModel.insert(conn);
 
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
 
 		// Hent en linie
-		// SELECT1 = "SELECT * FROM APP.TILAFGANGSLISTEILIEQ WHERE TYPE = 'T' ORDER BY
-		// AAR, NR
+		// SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'T' ORDER BY AAR,
+		// LBNR"
 
 		final ResultSet rs = statements1.executeQuery();
 
@@ -71,9 +68,10 @@ public class TilgangsListeLoader extends AbstractLoader {
 			// Indsæt person
 
 			iModel = new IndividModel();
-			foedt = rs.getString("FQODT");
-			iModel.setFoedt(foedt);
-			iModel.setKoen("M".equals(rs.getString("KQON").toUpperCase()) ? "M" : "F");
+			iModel.setFoedt(rs.getString("FQODT"));
+			iModel.setFam(rs.getString("FAM"));
+			iModel.setSlgt(rs.getString("SLGT"));
+			iModel.setKoen("M".equals(rs.getString("SEX").toUpperCase()) ? "M" : "F");
 			individId = iModel.insert(conn);
 
 			// Indsæt navn
@@ -93,13 +91,10 @@ public class TilgangsListeLoader extends AbstractLoader {
 
 			ibModel = new IndividBegivenhedModel();
 			ibModel.setIndividId(individId);
-			alder = rs.getString("ALDER").replace("?", "");
+			alder = rs.getString("ALDER");
 
 			if (alder != null && !alder.isBlank()) {
-				try {
-					ibModel.setAlder(Integer.parseInt(alder.trim()));
-				} catch (final NumberFormatException e) {
-				}
+				ibModel.setAlder(Integer.parseInt(alder.trim()));
 			}
 
 			ibModel.setKildeId(kildeId);
@@ -107,27 +102,16 @@ public class TilgangsListeLoader extends AbstractLoader {
 			ibModel.setDato(Date.valueOf(rs.getString("AAR") + "-01-01"));
 			fra = rs.getString("FRA");
 
-			if (!fra.isBlank()) {
-				ibModel.setNote("fra " + afQ(fra));
+			if (fra.isBlank()) {
+				fra = rs.getString("STEDNAVN");
 			}
 
-			haandtering = rs.getString("HAANDTERING");
-
-			haandtering = haandtering == null || haandtering.isBlank() ? "" : "Håndtering: " + afQ(haandtering) + ", ";
-			detaljer = "Kirkebog " + rs.getString("KIRKEBOG") + ", Opslag " + rs.getString("OPSLAG") + "\r\n4 CONT "
-					+ haandtering + afQ(rs.getString("BEM"));
-
+			ibModel.setNote("fra " + (fra.isBlank() ? "Blistrup" : fra));
+			detaljer = "Kbnr " + rs.getString("KBNR") + ", " + rs.getString("KILDE") + ", kbdel "
+					+ rs.getString("KBDEL") + ", opslag " + rs.getString("OPSLAG") + ", " + afQ(rs.getString("BEM"));
 			ibModel.setDetaljer(detaljer);
-			ibModel.setFoedt(foedt + "-01-01");
-			til = rs.getString("TIL");
-
-			if (til.isBlank() || "Blistrup".equals(til)) {
-				til = "Blistrup, Holbo, Frederiksborg";
-			} else {
-				til = fixStedNavn(afQ(fra));
-			}
-
-			ibModel.setStedNavn(til);
+			ibModel.setFoedt(rs.getString("FQODT") + "-01-01");
+			ibModel.setStedNavn(fixStedNavn(afQ(rs.getString("TIL"))));
 			ibModel.insert(conn);
 
 			taeller++;

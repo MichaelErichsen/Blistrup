@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.models.KildeModel;
 import net.myerichsen.blistrup.models.PersonNavneModel;
 
 /**
- * Indlæs til- og afgangslister
+ * Indlæs afgangslister
  *
  * @author Michael Erichsen
  * @version 28. sep. 2023
