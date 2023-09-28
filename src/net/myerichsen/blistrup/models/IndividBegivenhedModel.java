@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 26. sep. 2023
+ * @version 28. sep. 2023
  *
  */
 public class IndividBegivenhedModel extends Begivenhedsmodel {
@@ -93,12 +93,11 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 		return array;
 	}
 
-	private int individId = 0;
-	private int alder = 0;
-	private String rolle = "";
-	private String foedt = "";
-	private String bem = "";
-	private String detaljer = "";
+	private int individId;
+	private int alder;
+	private String rolle;
+	private String foedt;
+	private String bem;
 
 	/**
 	 * @return the alder
@@ -112,14 +111,6 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	 */
 	public String getBem() {
 		return bem;
-	}
-
-	/**
-	 * @return the detaljer
-	 */
-	@Override
-	public String getDetaljer() {
-		return detaljer;
 	}
 
 	/**
@@ -142,6 +133,13 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	public String getRolle() {
 		return rolle;
 	}
+
+	/**
+	 * @return the stdNavn
+	 */
+//	public String getStdNavn() {
+//		return stdNavn;
+//	}
 
 	/**
 	 * @param conn
@@ -177,13 +175,6 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	}
 
 	/**
-	 * @return the stdNavn
-	 */
-//	public String getStdNavn() {
-//		return stdNavn;
-//	}
-
-	/**
 	 * @param alder the alder to set
 	 */
 	public void setAlder(int alder) {
@@ -195,14 +186,6 @@ public class IndividBegivenhedModel extends Begivenhedsmodel {
 	 */
 	public void setBem(String bem) {
 		this.bem = bem;
-	}
-
-	/**
-	 * @param detaljer the detaljer to set
-	 */
-	@Override
-	public void setDetaljer(String detaljer) {
-		this.detaljer = detaljer;
 	}
 
 	/**

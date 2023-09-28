@@ -99,7 +99,7 @@ public class PersonNavneModel {
 	 */
 	public int insert(Connection conn) throws SQLException {
 		final String INSERT1 = "INSERT INTO BLISTRUP.PERSONNAVN "
-				+ "(INDIVIDID, STDNAVN, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) " + "VALUES(?, ?, ?, ?, ?, ?)";
+				+ "(INDIVIDID, STDNAVN, FORNAVN, EFTERNAVN, PRIMAERNAVN, FONETISKNAVN) VALUES(?, ?, ?, ?, ?, ?)";
 
 		int nameId = 0;
 
