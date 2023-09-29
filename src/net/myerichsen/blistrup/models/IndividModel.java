@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 16. sep. 2023
+ * @version 29. sep. 2023
  */
 public class IndividModel {
 	private static final String SELECT1 = "SELECT * FROM BLISTRUP.INDIVID";
@@ -19,6 +19,7 @@ public class IndividModel {
 	private static final String SELECT3 = "SELECT * FROM BLISTRUP.FAMILIE WHERE HUSFADER = ? OR HUSMODER = ?";
 	private static final String SELECT4 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String INSERT1 = "INSERT INTO BLISTRUP.INDIVID (KOEN, FOEDT, FAMC) VALUES (?, ?, ?)";
+	private static final String UPDATEFAMC = "UPDATE BLISTRUP.INDIVID SET FAMC = ? WHERE ID = ?";
 
 	/**
 	 * Get a model from an SQL result set
@@ -31,6 +32,7 @@ public class IndividModel {
 		final PreparedStatement statement2 = conn.prepareStatement(SELECT2);
 		final PreparedStatement statement3 = conn.prepareStatement(SELECT3);
 		final PreparedStatement statement4 = conn.prepareStatement(SELECT4);
+
 		ResultSet rs2, rs3, rs4;
 		int husfader = 0;
 		int husmoder = 0;
@@ -133,7 +135,7 @@ public class IndividModel {
 
 	private int id = 0;
 	private int famc = 0;
-	private String koen = "";
+	private String koen = "?";
 	private String BlistrupId = "";
 	private List<PersonNavneModel> personNavneListe = new ArrayList<>();
 	private String fonetiskNavn = "";
@@ -302,6 +304,21 @@ public class IndividModel {
 		generatedKeys.close();
 
 		return individId;
+	}
+
+	/**
+	 * Opdater familie i hvilken personen er barn
+	 *
+	 * @param conn
+	 * @param familieId
+	 * @return
+	 * @throws SQLException
+	 */
+	public void updateFamc(Connection conn, int familieId) throws SQLException {
+		final PreparedStatement statement = conn.prepareStatement(UPDATEFAMC);
+		statement.setInt(1, familieId);
+		statement.setInt(2, id);
+		statement.executeUpdate();
 	}
 
 	/**

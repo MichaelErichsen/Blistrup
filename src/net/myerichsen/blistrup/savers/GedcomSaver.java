@@ -22,9 +22,10 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 28. sep. 2023
+ * @version 29. sep. 2023
  *
  */
+
 public class GedcomSaver {
 	/**
 	 * Privat klasse, der repræsenterer en kildehenvisning
@@ -74,7 +75,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Tilgang";
+	private static final String titel = "Skiftesager";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -432,6 +433,11 @@ public class GedcomSaver {
 				if (stedNavn != null && !stedNavn.isBlank()) {
 					writeLine("2 PLAC " + stedNavn);
 				}
+			} else if ("Skifte".equals(type)) {
+				writeLine("1 PROB");
+				if (stedNavn != null && !stedNavn.isBlank()) {
+					writeLine("2 PLAC " + stedNavn);
+				}
 			} else if ("Bolig".equals(type)) {
 				writeLine("1 RESI");
 				writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");
@@ -478,7 +484,12 @@ public class GedcomSaver {
 
 			writeLine("0 @I" + model.getId() + "@ INDI");
 			writeLine("1 NAME " + model.getStdNavn());
-			sex = "M".equals(model.getKoen().toUpperCase()) ? "M" : "F";
+			sex = model.getKoen().trim();
+
+			if (!"?".equals(sex)) {
+				sex = "M".equals(sex.toUpperCase()) ? "M" : "F";
+			}
+
 			writeLine("1 SEX " + sex);
 
 			if (model.getFamc() > 0) {
@@ -516,7 +527,7 @@ public class GedcomSaver {
 						} else {
 							writeLine("2 DATE " + model.getFoedt());
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 				}
 			}
@@ -619,7 +630,7 @@ public class GedcomSaver {
 
 			if ("Arvefæste".equals(kbNr) || "Matrikel".equals(kbNr) || "Fæstedesignation".equals(kbNr)
 					|| "Fæstebrevkopier".equals(kbNr) || "Realregister".equals(kbNr) || "Afgang".equals(kbNr)
-					|| "Tilgang".equals(kbNr)) {
+					|| "Tilgang".equals(kbNr) || "Skiftesager".equals(kbNr)) {
 				writeLine("1 TITL " + kbNr + " Blistrup " + aarinterval);
 				writeLine("1 ABBR " + kbNr + " Blistrup " + aarinterval);
 			} else if ("1771".equals(aarinterval) || "1787".equals(aarinterval) || "1801".equals(aarinterval)
@@ -678,7 +689,6 @@ public class GedcomSaver {
 				rs2 = statementi3.executeQuery();
 
 				if (rs2.next()) {
-//					writeIndividualEvent(rs2.getInt("INDIVIDID"), false);
 					type = rs2.getString("BEGTYPE").trim();
 					stedNavn = rs2.getString("STEDNAVN");
 					note = rs2.getString("NOTE");
@@ -725,6 +735,12 @@ public class GedcomSaver {
 							writeLine("2 PLAC " + stedNavn);
 						}
 						writeNote(false, note);
+					} else if ("Skifte".equals(type)) {
+						writeLine("1 PROB");
+						if (stedNavn != null && !stedNavn.isBlank()) {
+							writeLine("2 PLAC " + stedNavn);
+						}
+						writeNote(true, note);
 					} else if ("Bolig".equals(type)) {
 						writeLine("1 RESI");
 						writeLine("2 PLAC Blistrup, Holbo, Frederiksborg, ");

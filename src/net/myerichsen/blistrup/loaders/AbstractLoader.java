@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 15. sep. 2023
+ * @version 29. sep. 2023
  *
  */
 public abstract class AbstractLoader {
@@ -213,21 +213,6 @@ public abstract class AbstractLoader {
 		streng = streng.substring(0, streng.length() - 2);
 		return streng;
 	}
-
-//	/**
-//	 * Indsæt folketællingens kilde
-//	 *
-//	 * @param conn
-//	 * @return
-//	 *
-//	 * @throws SQLException
-//	 */
-//	protected int insertSource(Connection conn, String aar) throws SQLException {
-//		final KildeModel kModel = new KildeModel();
-//		kModel.setKbNr("0");
-//		kModel.setAarInterval(aar);
-//		return kModel.insert(conn);
-//	}
 
 	/**
 	 * Formatter en tabelrække som tekst
