@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs tilgangslister
  *
  * @author Michael Erichsen
- * @version 28. sep. 2023
+ * @version 30. sep. 2023
  *
  */
 
@@ -52,6 +52,7 @@ public class TilgangsListeLoader extends AbstractLoader {
 		String fra = "";
 		String haandtering = "";
 		String til = "";
+		Date fullDate;
 
 		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
@@ -104,7 +105,8 @@ public class TilgangsListeLoader extends AbstractLoader {
 
 			ibModel.setKildeId(kildeId);
 			ibModel.setBegType("Tilgang");
-			ibModel.setDato(Date.valueOf(rs.getString("AAR") + "-01-01"));
+			fullDate = findFuldDato(rs);
+			ibModel.setDato(fullDate);
 			fra = rs.getString("FRA");
 
 			if (!fra.isBlank()) {

@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs skifteregistre
  *
  * @author Michael Erichsen
- * @version 29. sep. 2023
+ * @version 30. sep. 2023
  *
  */
 
@@ -56,9 +56,8 @@ public class SkiftesagsLoader extends AbstractLoader {
 		String relnavn = "";
 		String relerhverv = "";
 		int ibModelId = 0;
-		String formatted = "";
-		String dato = "";
 		String primaerNavn = "";
+		Date fullDate;
 
 		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
@@ -201,18 +200,8 @@ public class SkiftesagsLoader extends AbstractLoader {
 			ibModel.setIndividId(individId);
 			ibModel.setKildeId(kildeId);
 			ibModel.setBegType("Skifte");
-			dato = rs.getString("DATO");
-			if (dato != null && !dato.isBlank()) {
-				formatted = String.format("%04d", Integer.parseInt(dato.trim()));
-			} else {
-				formatted = "0101";
-			}
-			formatted = rs.getString("ÅR") + "-" + formatted.substring(0, 2) + "-" + formatted.substring(2, 4);
-			try {
-				ibModel.setDato(Date.valueOf(formatted));
-			} catch (final Exception e) {
-				ibModel.setDato(Date.valueOf(rs.getString("ÅR") + "-01-01"));
-			}
+			fullDate = findFuldDato(rs);
+			ibModel.setDato(fullDate);
 			ibModel.setStedNavn(rs.getString("STEDNAVN") + ", " + rs.getString("SOGN") + ", " + rs.getString("HERRED")
 					+ ", Frederiksborg");
 			detaljer = "Kilde " + rs.getString("KILDE").trim() + ", Opslag " + rs.getString("OPSLAG").trim() + "\r\n"

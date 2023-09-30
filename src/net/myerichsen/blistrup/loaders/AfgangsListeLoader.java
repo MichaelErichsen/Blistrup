@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs afgangslister
  *
  * @author Michael Erichsen
- * @version 28. sep. 2023
+ * @version 30. sep. 2023
  *
  */
 
@@ -51,6 +51,7 @@ public class AfgangsListeLoader extends AbstractLoader {
 		String foedt = "";
 		String fra = "";
 		String haandtering = "";
+		Date fullDate;
 
 		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
@@ -100,7 +101,8 @@ public class AfgangsListeLoader extends AbstractLoader {
 
 			ibModel.setKildeId(kildeId);
 			ibModel.setBegType("Afgang");
-			ibModel.setDato(Date.valueOf(rs.getString("AAR") + "-01-01"));
+			fullDate = findFuldDato(rs);
+			ibModel.setDato(fullDate);
 			fra = rs.getString("FRA");
 
 			if (fra.isBlank() || "Blistrup".equals(fra)) {

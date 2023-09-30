@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 10. sep. 2023
+ * @version 30. sep. 2023
  *
  */
 public class FaesteDesignationLoader extends AbstractLoader {

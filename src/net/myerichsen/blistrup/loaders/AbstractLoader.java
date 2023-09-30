@@ -1,6 +1,7 @@
 package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +16,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 29. sep. 2023
+ * @version 30. sep. 2023
  *
  */
 public abstract class AbstractLoader {
@@ -148,6 +149,33 @@ public abstract class AbstractLoader {
 		statement.setString(1, schema);
 		statement.execute();
 		return conn;
+	}
+
+	/**
+	 * Find den fulde dato fra ÅR og DATO kolonnerne
+	 *
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 * @throws NumberFormatException
+	 */
+	public Date findFuldDato(final ResultSet rs) throws SQLException, NumberFormatException {
+		String formatted;
+		String dato;
+		Date fullDate;
+		dato = rs.getString("DATO");
+		if (dato != null && !dato.isBlank()) {
+			formatted = String.format("%04d", Integer.parseInt(dato.trim()));
+		} else {
+			formatted = "0101";
+		}
+		formatted = rs.getString("ÅR") + "-" + formatted.substring(0, 2) + "-" + formatted.substring(2, 4);
+		try {
+			fullDate = Date.valueOf(formatted);
+		} catch (final Exception e) {
+			fullDate = Date.valueOf(rs.getString("ÅR") + "-01-01");
+		}
+		return fullDate;
 	}
 
 	/**
