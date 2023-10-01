@@ -27,7 +27,6 @@ public class AfgangsListeLoader extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			new ClearTables().clear();
 			final int taeller = new AfgangsListeLoader().load();
 			System.out.println("Har indlæst " + taeller + " afgange");
 		} catch (final SQLException e) {

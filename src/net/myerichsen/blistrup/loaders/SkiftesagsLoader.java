@@ -29,7 +29,6 @@ public class SkiftesagsLoader extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			new ClearTables().clear();
 			final int taeller = new SkiftesagsLoader().load();
 			System.out.println("Har indlæst " + taeller + " skifter");
 		} catch (final SQLException e) {

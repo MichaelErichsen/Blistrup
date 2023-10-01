@@ -22,7 +22,7 @@ import net.myerichsen.blistrup.models.IndividModel;
  * Udskriv Blistrup databasen som GEDCOM
  *
  * @author Michael Erichsen
- * @version 29. sep. 2023
+ * @version 1. okt. 2023
  *
  */
 
@@ -75,7 +75,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "Skiftesager";
+	private static final String titel = "Test";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
@@ -472,18 +472,27 @@ public class GedcomSaver {
 		String foedt = "";
 		LocalDate localDate;
 		String fam = "";
+		ResultSet rs4;
 
 		// SELECTI1 = "SELECT * FROM BLISTRUP.INDIVID";
 		final ResultSet rs1 = statementi1.executeQuery();
 
 		while (rs1.next()) {
 			model = IndividModel.getData(conn, rs1);
-			if (model.getStdNavn().contains("ubeboet")) {
+			if (model.getStdNavn().contains("ubeboet") || (model.getId() == 0)) {
 				continue;
 			}
 
 			writeLine("0 @I" + model.getId() + "@ INDI");
-			writeLine("1 NAME " + model.getStdNavn());
+
+			// SELECTP1 = "SELECT * FROM BLISTRUP.PERSONNAVN WHERE INDIVIDID = ?";
+			statementp1.setInt(1, model.getId());
+			rs4 = statementp1.executeQuery();
+
+			while (rs4.next()) {
+				writeLine("1 NAME " + rs4.getString("STDNAVN").trim());
+			}
+
 			sex = model.getKoen().trim();
 
 			if (!"?".equals(sex)) {

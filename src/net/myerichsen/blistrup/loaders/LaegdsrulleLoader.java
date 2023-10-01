@@ -33,7 +33,6 @@ public class LaegdsrulleLoader extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			new ClearTables().clear();
 			final int taeller = new LaegdsrulleLoader().load();
 			System.out.println("Har indlæst " + taeller + " lægdsrullelinier");
 		} catch (final SQLException e) {

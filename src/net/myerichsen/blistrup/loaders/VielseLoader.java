@@ -11,7 +11,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 1. okt. 2023
  *
  */
 
@@ -209,7 +209,7 @@ public class VielseLoader extends AbstractLoader {
 
 				statementi5.setString(4, afQ(rs1.getString("PID")));
 				statementi5.setInt(5, kildeId);
-				statementi5.setString(6, "Blistrup, Holbo, Frederiksborg");
+				statementi5.setString(6, "Blistrup, Holbo, Frederiksborg,");
 				statementi5.setString(7, afQ(rs1.getString("BEM")));
 				statementi5.executeUpdate();
 				generatedKeys = statementi5.getGeneratedKeys();

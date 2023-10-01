@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs tilgangslister
  *
  * @author Michael Erichsen
- * @version 30. sep. 2023
+ * @version 1. okt. 2023
  *
  */
 
@@ -27,7 +27,6 @@ public class TilgangsListeLoader extends AbstractLoader {
 	 */
 	public static void main(String[] args) {
 		try {
-			new ClearTables().clear();
 			final int taeller = new TilgangsListeLoader().load();
 			System.out.println("Har indlæst " + taeller + " tilgange");
 		} catch (final SQLException e) {
@@ -124,7 +123,7 @@ public class TilgangsListeLoader extends AbstractLoader {
 			til = rs.getString("TIL");
 
 			if (til.isBlank() || "Blistrup".equals(til)) {
-				til = "Blistrup, Holbo, Frederiksborg";
+				til = "Blistrup, Holbo, Frederiksborg,";
 			} else {
 				til = fixStedNavn(afQ(fra));
 			}

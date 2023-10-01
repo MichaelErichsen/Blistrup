@@ -184,9 +184,9 @@ public abstract class AbstractLoader {
 	 */
 	protected String fixStedNavn(String stedNavn) {
 		if (stedNavn.contains("Blistrup") || stedNavn.contains("Blidstrup")) {
-			stedNavn = stedNavn + ", Holbo, Frederiksborg";
+			stedNavn = stedNavn + ", Holbo, Frederiksborg,";
 		} else {
-			stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg";
+			stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg,";
 		}
 		return stedNavn;
 	}
