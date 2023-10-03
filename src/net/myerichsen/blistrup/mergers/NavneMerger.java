@@ -50,7 +50,7 @@ public class NavneMerger extends AbstractLoader {
 		ResultSet rsc;
 		int individId = 0;
 		String navn = "";
-		Set<String> navne = new HashSet<String>();
+		Set<String> navne = new HashSet<>();
 		boolean addSucceeded = false;
 		int count = 0;
 

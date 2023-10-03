@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 3. okt. 2023
  *
  */
 public class KonfirmationLoader extends AbstractLoader {
@@ -50,9 +50,6 @@ public class KonfirmationLoader extends AbstractLoader {
 		String rolle = "";
 		ResultSet generatedKeys;
 		int individId = 0;
-		String dato = "";
-		String mm = "";
-		String dd = "";
 		int kildeId = 0;
 		int individBegivenhedsId = 0;
 		int familieId = 0;
@@ -62,6 +59,10 @@ public class KonfirmationLoader extends AbstractLoader {
 		String navn = "";
 		String stdnavn = "";
 		String rx = "";
+		int alder = 0;
+		String foedtDato = "";
+		String doebtDato = "";
+		String konf = "";
 
 		final Connection conn = connect("BLISTRUP");
 		final PreparedStatement statements1 = conn.prepareStatement(SELECT1);
@@ -143,17 +144,20 @@ public class KonfirmationLoader extends AbstractLoader {
 				// ROLLE, KILDEID, STEDNAVN, BEM) "
 
 				statementi3.setInt(1, individId);
-				statementi3.setString(2, "0");
-				statementi3.setString(3, "Konfirmation");
 
 				try {
-					dato = rs1.getString("FQODTDATO").trim();
-					mm = dato.substring(4, 6);
-					dd = dato.substring(6, 8);
-					statementi3.setString(4, dato.substring(0, 4) + "-" + ("00".equals(mm) ? "01" : mm) + "-"
-							+ ("00".equals(dd) ? "01" : dd));
-				} catch (final Exception e) {
-					statementi3.setString(4, "0001-01-01");
+					alder = Integer.parseInt(rs1.getString("AAR")) - Integer.parseInt(rs1.getString("FQODT"));
+				} catch (final Exception e1) {
+					alder = 0;
+				}
+				statementi3.setString(2, Integer.toString(alder));
+				statementi3.setString(3, "Konfirmation");
+				konf = rs1.getString("KONF");
+
+				if (konf != null && !konf.isBlank() && konf.matches("[0-9]+")) {
+					statementi3.setString(4, rs1.getString("KONF"));
+				} else {
+					statementi3.setString(4, rs1.getString("AAR"));
 				}
 
 				statementi3.setString(5, rolle);
@@ -169,6 +173,40 @@ public class KonfirmationLoader extends AbstractLoader {
 					individBegivenhedsId = 0;
 				}
 				generatedKeys.close();
+
+				// Indsæt fødsel
+				// INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
+				// ROLLE, KILDEID, STEDNAVN, BEM
+				foedtDato = rs1.getString("FQODTDATO");
+
+				if (foedtDato != null && !foedtDato.isBlank() && foedtDato.matches("[0-9]+")) {
+					statementi3.setInt(1, individId);
+					statementi3.setString(2, "0");
+					statementi3.setString(3, "Fødsel");
+					statementi3.setString(4, foedtDato);
+					statementi3.setString(5, "Barn");
+					statementi3.setInt(6, kildeId);
+					statementi3.setString(7, "");
+					statementi3.setString(8, "");
+					statementi3.executeUpdate();
+				}
+
+				// Indsæt dåb
+				// INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, ALDER, BEGTYPE, DATO,
+				// ROLLE, KILDEID, STEDNAVN, BEM
+				doebtDato = rs1.getString("DQOBT");
+
+				if (doebtDato != null && !doebtDato.isBlank() && doebtDato.matches("[0-9]+")) {
+					statementi3.setInt(1, individId);
+					statementi3.setString(2, "0");
+					statementi3.setString(3, "Dåb");
+					statementi3.setString(4, doebtDato);
+					statementi3.setString(5, "Barn");
+					statementi3.setInt(6, kildeId);
+					statementi3.setString(7, rs1.getString("DQOBTSTED"));
+					statementi3.setString(8, "");
+					statementi3.executeUpdate();
+				}
 
 				// Far eller stedfar
 			} else if ("2".equals(rx)) {

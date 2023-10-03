@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs dåbsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 3. okt. 2023
  *
  */
 public class DaabLoader extends AbstractLoader {
@@ -82,12 +82,11 @@ public class DaabLoader extends AbstractLoader {
 
 		while (rs1.next()) {
 			rolle = rs1.getString("ROLLE").trim();
-//			navn = rs1.getString("NAVN").trim();
 
 			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT)
 
 			statementi1.setString(1, rs1.getString("SEX").trim());
-			statementi1.setString(2, rs1.getString("FQODT").trim());
+			statementi1.setString(2, getFoedtDoebtDato(rs1));
 			statementi1.setString(3, rs1.getString("FAM"));
 			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();

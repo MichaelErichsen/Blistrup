@@ -307,21 +307,6 @@ public class IndividModel {
 	}
 
 	/**
-	 * Opdater familie i hvilken personen er barn
-	 *
-	 * @param conn
-	 * @param familieId
-	 * @return
-	 * @throws SQLException
-	 */
-	public void updateFamc(Connection conn, int familieId) throws SQLException {
-		final PreparedStatement statement = conn.prepareStatement(UPDATEFAMC);
-		statement.setInt(1, familieId);
-		statement.setInt(2, id);
-		statement.executeUpdate();
-	}
-
-	/**
 	 * @return the primary
 	 */
 	public boolean isPrimary() {
@@ -545,6 +530,21 @@ public class IndividModel {
 		}
 		builder.append("Primary: " + isPrimary());
 		return builder.toString();
+	}
+
+	/**
+	 * Opdater familie i hvilken personen er barn
+	 *
+	 * @param conn
+	 * @param familieId
+	 * @return
+	 * @throws SQLException
+	 */
+	public void updateFamc(Connection conn, int familieId) throws SQLException {
+		final PreparedStatement statement = conn.prepareStatement(UPDATEFAMC);
+		statement.setInt(1, familieId);
+		statement.setInt(2, id);
+		statement.executeUpdate();
 	}
 
 }

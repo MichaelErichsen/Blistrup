@@ -8,16 +8,17 @@ import java.sql.SQLException;
 import net.myerichsen.blistrup.loaders.AbstractLoader;
 
 /**
- * Flet individer med samme SLGT i rådataene
+ * Flet individer med samme navn, samme FAM og ingen SLGT i rådataene
  *
  * @author Michael Erichsen
- * @version 30. sep. 2023
+ * @version 2. okt. 2023
  *
  */
 
-public class SlgtMerger extends AbstractLoader {
-	private static final String SELECTI = "SELECT * FROM INDIVID WHERE SLGT IS NOT NULL "
-			+ "AND TRIM(SLGT) <> ''  AND SLGT NOT LIKE '?%' ORDER BY SLGT";
+public class FamMerger extends AbstractLoader {
+	private static final String SELECTI = "SELECT * FROM INDIVID WHERE FAM IS NOT NULL "
+			+ "AND TRIM(FAM) <> ''  AND (SLGT IS NULL OR TRIM(SLGT) = '') ORDER BY FAM";
+	private static final String SELECTP = "SELECT * FORM PERSONNAVN WHERE INDIVIDID = ?";
 	private static final String SELECTC = "SELECT COUNT(*) AS CT FROM INDIVID";
 	private static final String DELETEI = "DELETE FROM INDIVID WHERE ID = ?";
 	private static final String UPDATEP = "UPDATE PERSONNAVN SET INDIVIDID = ?, PRIMAERNAVN = 'FALSE' WHERE INDIVIDID = ?";
@@ -26,6 +27,7 @@ public class SlgtMerger extends AbstractLoader {
 	private static final String UPDATEF = "UPDATE FAMILIE SET HUSFADER = ? WHERE HUSFADER = ?";
 	private static final String UPDATEM = "UPDATE FAMILIE SET HUSMODER = ? WHERE HUSMODER = ?";
 	private static PreparedStatement statementsi;
+	private static PreparedStatement statementsp;
 	private static PreparedStatement statementsc;
 	private static PreparedStatement statementdi;
 	private static PreparedStatement statementup;
@@ -38,7 +40,7 @@ public class SlgtMerger extends AbstractLoader {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final SlgtMerger merger = new SlgtMerger();
+		final FamMerger merger = new FamMerger();
 		try {
 			merger.execute();
 		} catch (final SQLException e) {
@@ -52,15 +54,18 @@ public class SlgtMerger extends AbstractLoader {
 	 * @throws SQLException
 	 */
 	private void execute() throws SQLException {
-		ResultSet rsc;
-		String slgt = "";
-		String senesteSlgt = "";
+		ResultSet rsc, rsp;
+		String fam = "";
+		String senesteFam = "";
 		int individId = 0;
 		int samleIndividId = 0;
 		int count = 0;
+		String navn = "";
+		String senesteNavn = "";
 
 		final Connection conn = connect("BLISTRUP");
 		statementsi = conn.prepareStatement(SELECTI);
+		statementsc = conn.prepareStatement(SELECTP);
 		statementsc = conn.prepareStatement(SELECTC);
 		statementdi = conn.prepareStatement(DELETEI);
 		statementup = conn.prepareStatement(UPDATEP);
@@ -77,19 +82,19 @@ public class SlgtMerger extends AbstractLoader {
 			System.out.println("Count: " + count);
 		}
 
-		// Find hvert slgt-registreret individ
-		// SELECTI = "SELECT * FROM INDIVID WHERE SLGT IS NOT NULL AND
-		// TRIM(SLGT) <> '' AND SLGT NOT LIKE '?%' ORDER BY SLGT"
+		// Find hvert fam-registreret individ
+		// SELECTI = "SELECT * FROM INDIVID WHERE FAM IS NOT NULL AND TRIM(FAM) <> ''
+		// AND (SLGT IS NULL OR TRIM(SLGT) = '') ORDER BY FAM";
 
 		final ResultSet rsi = statementsi.executeQuery();
 
 		while (rsi.next()) {
-			slgt = rsi.getString("SLGT");
+			fam = rsi.getString("FAM");
 
 			// Søg efter dubletter til sammenlægning
 
-			if (!slgt.equals(senesteSlgt)) {
-				senesteSlgt = slgt;
+			if (!fam.equals(senesteFam)) {
+				senesteFam = fam;
 				samleIndividId = 0;
 				continue;
 			}
@@ -104,44 +109,57 @@ public class SlgtMerger extends AbstractLoader {
 				continue;
 			}
 
-			// For hvert personnavn
-			// UPDATEP = "UPDATE PERSONNAVN SET INDIVIDID = ?, PRIMAERNAVN =
-			// 'FALSE' WHERE INDIVIDID = ?";
-			statementup.setInt(1, samleIndividId);
-			statementup.setInt(2, individId);
-			statementup.executeUpdate();
+			// SELECTP = "SELECT * FORM PERSONNAVN WHERE INDIVIDID = ?";
+			statementsp.setInt(1, individId);
+			rsp = statementsp.executeQuery();
 
-			// For hver individbegivenhed
-			// UPDATEB = "UPDATE INDIVIDBEGIVENHED SET INDIVIDID = ? WHERE
-			// INDIVIDID = ?";
-			statementub.setInt(1, samleIndividId);
-			statementub.setInt(2, individId);
-			statementub.executeUpdate();
+			// TODO Debug
 
-			// For hvert vidne
-			// UPDATEV = "UPDATE VIDNE SET INDIVIDID = ? WHERE INDIVIDID = ?";
-			statementuv.setInt(1, samleIndividId);
-			statementuv.setInt(2, individId);
-			statementuv.executeUpdate();
+			if (rsp.next()) {
+				navn = rsp.getString("STDNAVN");
 
-			// For hver familie
-			// UPDATEF = "UPDATE FAMILIE SET HUSFADER = ? WHERE HUSFADER = ?";
-			statementuf.setInt(1, samleIndividId);
-			statementuf.setInt(2, individId);
-			statementuf.executeUpdate();
+				if (navn.equals(senesteNavn)) {
+					// For hvert personnavn
+					// UPDATEP = "UPDATE PERSONNAVN SET INDIVIDID = ?, PRIMAERNAVN =
+					// 'FALSE' WHERE INDIVIDID = ?";
+					statementup.setInt(1, samleIndividId);
+					statementup.setInt(2, individId);
+					statementup.executeUpdate();
 
-			// UPDATEM = "UPDATE FAMILIE SET HUSMODER = ? WHERE HUSMODER = ?";
-			statementum.setInt(1, samleIndividId);
-			statementum.setInt(2, individId);
-			statementum.executeUpdate();
+					// For hver individbegivenhed
+					// UPDATEB = "UPDATE INDIVIDBEGIVENHED SET INDIVIDID = ? WHERE
+					// INDIVIDID = ?";
+					statementub.setInt(1, samleIndividId);
+					statementub.setInt(2, individId);
+					statementub.executeUpdate();
 
-			// For hvert dubletindivid
-			// DELETEI = "DELETE FROM INDIVID WHERE ID = ?";
-			statementdi.setInt(1, individId);
-			statementdi.executeUpdate();
+					// For hvert vidne
+					// UPDATEV = "UPDATE VIDNE SET INDIVIDID = ? WHERE INDIVIDID = ?";
+					statementuv.setInt(1, samleIndividId);
+					statementuv.setInt(2, individId);
+					statementuv.executeUpdate();
 
-			conn.commit();
+					// For hver familie
+					// UPDATEF = "UPDATE FAMILIE SET HUSFADER = ? WHERE HUSFADER = ?";
+					statementuf.setInt(1, samleIndividId);
+					statementuf.setInt(2, individId);
+					statementuf.executeUpdate();
 
+					// UPDATEM = "UPDATE FAMILIE SET HUSMODER = ? WHERE HUSMODER = ?";
+					statementum.setInt(1, samleIndividId);
+					statementum.setInt(2, individId);
+					statementum.executeUpdate();
+
+					// For hvert dubletindivid
+					// DELETEI = "DELETE FROM INDIVID WHERE ID = ?";
+					statementdi.setInt(1, individId);
+					statementdi.executeUpdate();
+
+					conn.commit();
+
+					senesteNavn = navn;
+				}
+			}
 		}
 
 		// Count records
@@ -151,6 +169,7 @@ public class SlgtMerger extends AbstractLoader {
 			System.out.println("Count before: " + count + ", after: " + rsc.getInt("CT"));
 		}
 
+		conn.commit();
 		conn.close();
 
 	}

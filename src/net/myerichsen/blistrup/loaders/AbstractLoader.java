@@ -16,9 +16,10 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 30. sep. 2023
+ * @version 3. okt. 2023
  *
  */
+
 public abstract class AbstractLoader {
 	protected static class IndividData {
 		protected int id = 0;
@@ -185,37 +186,14 @@ public abstract class AbstractLoader {
 	protected String fixStedNavn(String stedNavn) {
 		if (stedNavn.contains("Blistrup") || stedNavn.contains("Blidstrup")) {
 			stedNavn = stedNavn + ", Holbo, Frederiksborg,";
-		} else {
+		} else if (stedNavn.contains("Bakkebjerg") || stedNavn.contains("Hesselbjerg") || stedNavn.contains("Højelt")
+				|| stedNavn.contains("Kolsbæk") || stedNavn.contains("Ludshøj") || stedNavn.contains("Rågeleje")
+				|| stedNavn.contains("Smidstrup") || stedNavn.contains("Udsholt")) {
 			stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg,";
+		} else {
+			stedNavn = stedNavn + ",,,";
 		}
 		return stedNavn;
-	}
-
-	/**
-	 * Tilføj kommaer efter stednavn for at passe i stednavnestrukturen
-	 *
-	 * @param placeName
-	 * @return
-	 */
-	protected String formatPlaceName(String placeName) {
-		final String[] parts = placeName.split(",");
-
-		switch (parts.length) {
-		case 1: {
-			placeName = placeName + ",,,";
-			break;
-		}
-		case 2: {
-			placeName = placeName + ",,";
-			break;
-		}
-		case 3: {
-			placeName = placeName + ",";
-			break;
-		}
-		}
-		return placeName;
-
 	}
 
 	/**
@@ -240,6 +218,25 @@ public abstract class AbstractLoader {
 		String streng = sb.toString();
 		streng = streng.substring(0, streng.length() - 2);
 		return streng;
+	}
+
+	/**
+	 * @param rs1
+	 * @return
+	 * @throws SQLException
+	 * @throws NumberFormatException
+	 */
+	// TODO Test og indføj i loadere
+	public String getFoedtDoebtDato(final ResultSet rs1) throws SQLException, NumberFormatException {
+		String foedt = rs1.getString("FQODT");
+		if (foedt != null && !foedt.isBlank()) {
+			String doebt = rs1.getString("DQOBT");
+			if (doebt != null && !doebt.isBlank() && doebt.matches("[0-9]+")) {
+				doebt = String.format("%04d", Integer.parseInt(doebt.trim()));
+				foedt = foedt + doebt;
+			}
+		}
+		return foedt;
 	}
 
 	/**

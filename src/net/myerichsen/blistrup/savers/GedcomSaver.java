@@ -479,7 +479,7 @@ public class GedcomSaver {
 
 		while (rs1.next()) {
 			model = IndividModel.getData(conn, rs1);
-			if (model.getStdNavn().contains("ubeboet") || (model.getId() == 0)) {
+			if (model.getStdNavn().contains("ubeboet") || model.getId() == 0) {
 				continue;
 			}
 

@@ -14,16 +14,16 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs arvefæster
  *
  * @author Michael Erichsen
- * @version 13. sep. 2023
+ * @version 3. okt. 2023
  *
  */
 public class ArveFaesteLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'M' ORDER BY PID";
 
-	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?, ?)";
+	private static final String INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES (?, ?, ?, ?)";
 	private static final String INSERT2 = "INSERT INTO PERSONNAVN (INDIVIDID, STDNAVN, FONETISKNAVN, PRIMAERNAVN) VALUES (?, ?, ?, 'TRUE')";
 	private static final String INSERT3 = "INSERT INTO INDIVIDBEGIVENHED (INDIVIDID, BEGTYPE, DATO, ALDER, KILDEID, STEDNAVN, DETALJER) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 	private static final DateTimeFormatter date8Format = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	/**
@@ -73,7 +73,8 @@ public class ArveFaesteLoader extends AbstractLoader {
 
 			stedNavn = afQ(rs1.getString("STEDNAVN"));
 			statementi1.setString(1, "m".equals(rs1.getString("SEX")) ? "M" : "F");
-			statementi1.setString(2, rs1.getString("FQODT"));
+			String foedt = getFoedtDoebtDato(rs1);
+			statementi1.setString(2, foedt);
 			statementi1.setString(3, rs1.getString("FAM"));
 			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
