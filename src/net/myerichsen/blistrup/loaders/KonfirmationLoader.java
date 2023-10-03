@@ -1,6 +1,7 @@
 package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,9 +13,11 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 3. okt. 2023
+ * @version 4. okt. 2023
  *
  */
+// FIXME Dobbelt fødsel 2034
+
 public class KonfirmationLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' ORDER BY BEGIV, RX";
 
@@ -87,7 +90,13 @@ public class KonfirmationLoader extends AbstractLoader {
 			navn = rs1.getString("NAVN").trim();
 
 			statementi1.setString(1, rs1.getString("SEX").trim());
-			statementi1.setString(2, rs1.getString("FQODT").trim());
+
+			if (!rx.equals("1")) {
+				statementi1.setString(2, rs1.getString("FQODT").trim());
+			} else {
+				statementi1.setString(2, "");
+			}
+
 			statementi1.setString(3, rs1.getString("FAM"));
 			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
@@ -155,9 +164,14 @@ public class KonfirmationLoader extends AbstractLoader {
 				konf = rs1.getString("KONF");
 
 				if (konf != null && !konf.isBlank() && konf.matches("[0-9]+")) {
-					statementi3.setString(4, rs1.getString("KONF"));
+					konf = dashDato(konf);
+					try {
+						statementi3.setDate(4, Date.valueOf(konf));
+					} catch (final Exception e) {
+						statementi3.setDate(4, Date.valueOf(konf.substring(0, 4) + "-01-01"));
+					}
 				} else {
-					statementi3.setString(4, rs1.getString("AAR"));
+					statementi3.setDate(4, Date.valueOf(rs1.getString("AAR") + "-01-01"));
 				}
 
 				statementi3.setString(5, rolle);
@@ -183,7 +197,12 @@ public class KonfirmationLoader extends AbstractLoader {
 					statementi3.setInt(1, individId);
 					statementi3.setString(2, "0");
 					statementi3.setString(3, "Fødsel");
-					statementi3.setString(4, foedtDato);
+					foedtDato = dashDato(foedtDato);
+					try {
+						statementi3.setDate(4, Date.valueOf(foedtDato));
+					} catch (final Exception e) {
+						statementi3.setDate(4, Date.valueOf(foedtDato.substring(0, 4) + "-01-01"));
+					}
 					statementi3.setString(5, "Barn");
 					statementi3.setInt(6, kildeId);
 					statementi3.setString(7, "");
@@ -200,10 +219,15 @@ public class KonfirmationLoader extends AbstractLoader {
 					statementi3.setInt(1, individId);
 					statementi3.setString(2, "0");
 					statementi3.setString(3, "Dåb");
-					statementi3.setString(4, doebtDato);
+					doebtDato = dashDato(doebtDato);
+					try {
+						statementi3.setDate(4, Date.valueOf(doebtDato));
+					} catch (final Exception e) {
+						statementi3.setDate(4, Date.valueOf(doebtDato.substring(0, 4) + "-01-01"));
+					}
 					statementi3.setString(5, "Barn");
 					statementi3.setInt(6, kildeId);
-					statementi3.setString(7, rs1.getString("DQOBTSTED"));
+					statementi3.setString(7, afQ(rs1.getString("DQOBTSTED")));
 					statementi3.setString(8, "");
 					statementi3.executeUpdate();
 				}
@@ -238,7 +262,7 @@ public class KonfirmationLoader extends AbstractLoader {
 				statementu1.executeUpdate();
 
 				// mor eller Hans Kone
-			} else if ("2".equals(rx)) {
+			} else if ("3".equals(rx)) {
 				// INSERT4 = "INSERT INTO VIDNE (INDIVIDID, ROLLE, INDIVIDBEGIVENHEDID) VALUES
 
 				statementi4.setInt(1, individId);
@@ -249,6 +273,7 @@ public class KonfirmationLoader extends AbstractLoader {
 				// UPDATE3 = "UPDATE FAMILIE SET HUSMODER = ? WHERE ID = ?";
 
 				statementu3.setInt(1, individId);
+				statementu3.setInt(2, familieId);
 				statementu3.executeUpdate();
 
 			}
