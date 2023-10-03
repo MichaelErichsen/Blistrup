@@ -153,6 +153,15 @@ public abstract class AbstractLoader {
 	}
 
 	/**
+	 * @param doebtDato
+	 * @return
+	 */
+	public String dashDato(String doebtDato) {
+		doebtDato = doebtDato.substring(0, 4) + "-" + doebtDato.substring(4, 6) + "-" + doebtDato.substring(6, 8);
+		return doebtDato;
+	}
+
+	/**
 	 * Find den fulde dato fra ÅR og DATO kolonnerne
 	 *
 	 * @param rs

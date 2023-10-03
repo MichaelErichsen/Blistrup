@@ -1,6 +1,7 @@
 package net.myerichsen.blistrup.loaders;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -155,9 +156,14 @@ public class KonfirmationLoader extends AbstractLoader {
 				konf = rs1.getString("KONF");
 
 				if (konf != null && !konf.isBlank() && konf.matches("[0-9]+")) {
-					statementi3.setString(4, rs1.getString("KONF"));
+					konf = dashDato(konf);
+					try {
+						statementi3.setDate(4, Date.valueOf(konf));
+					} catch (Exception e) {
+						statementi3.setDate(4, Date.valueOf(konf.substring(0, 4) + "-01-01"));
+					}
 				} else {
-					statementi3.setString(4, rs1.getString("AAR"));
+					statementi3.setDate(4, Date.valueOf(rs1.getString("AAR") + "-01-01"));
 				}
 
 				statementi3.setString(5, rolle);
@@ -183,7 +189,12 @@ public class KonfirmationLoader extends AbstractLoader {
 					statementi3.setInt(1, individId);
 					statementi3.setString(2, "0");
 					statementi3.setString(3, "Fødsel");
-					statementi3.setString(4, foedtDato);
+					foedtDato = dashDato(foedtDato);
+					try {
+						statementi3.setDate(4, Date.valueOf(foedtDato));
+					} catch (Exception e) {
+						statementi3.setDate(4, Date.valueOf(foedtDato.substring(0, 4) + "-01-01"));
+					}
 					statementi3.setString(5, "Barn");
 					statementi3.setInt(6, kildeId);
 					statementi3.setString(7, "");
@@ -200,7 +211,12 @@ public class KonfirmationLoader extends AbstractLoader {
 					statementi3.setInt(1, individId);
 					statementi3.setString(2, "0");
 					statementi3.setString(3, "Dåb");
-					statementi3.setString(4, doebtDato);
+					doebtDato = dashDato(doebtDato);
+					try {
+						statementi3.setDate(4, Date.valueOf(doebtDato));
+					} catch (Exception e) {
+						statementi3.setDate(4, Date.valueOf(doebtDato.substring(0, 4) + "-01-01"));
+					}
 					statementi3.setString(5, "Barn");
 					statementi3.setInt(6, kildeId);
 					statementi3.setString(7, rs1.getString("DQOBTSTED"));
