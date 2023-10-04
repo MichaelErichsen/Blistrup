@@ -16,8 +16,6 @@ import net.myerichsen.blistrup.models.KildeModel;
  * @version 4. okt. 2023
  *
  */
-// FIXME Dobbelt fødsel 2034
-
 public class KonfirmationLoader extends AbstractLoader {
 	private static final String SELECT1 = "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'B' ORDER BY BEGIV, RX";
 
