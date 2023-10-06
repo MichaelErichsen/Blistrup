@@ -11,7 +11,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs vielsesdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 1. okt. 2023
+ * @version 4. okt. 2023
  *
  */
 
@@ -49,7 +49,6 @@ public class VielseLoader extends AbstractLoader {
 		ResultSet generatedKeys = null;
 		String aar = "";
 		String fader = "";
-//		String navn = "";
 		String rolle = "";
 		String rx = "";
 		String stdnavn = "";
@@ -88,7 +87,7 @@ public class VielseLoader extends AbstractLoader {
 
 			statementi1.setString(1, rs1.getString("SEX").trim());
 			statementi1.setString(2, rs1.getString("PID").trim());
-			statementi1.setString(3, rs1.getString("FQODT").trim());
+			statementi1.setString(3, getFoedtDoebtDato(rs1));
 			statementi1.setString(4, rs1.getString("FAM"));
 			statementi1.setString(5, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
@@ -161,7 +160,7 @@ public class VielseLoader extends AbstractLoader {
 
 					statementi1.setString(1, rs1.getString("SEX").trim());
 					statementi1.setString(2, rs1.getString("PID").trim());
-					statementi1.setString(3, rs1.getString("FQODT").trim());
+					statementi1.setString(3, getFoedtDoebtDato(rs1));
 					statementi1.setString(4, rs1.getString("FAM"));
 					statementi1.setString(5, rs1.getString("SLGT"));
 					statementi1.executeUpdate();
@@ -236,7 +235,7 @@ public class VielseLoader extends AbstractLoader {
 
 					statementi1.setString(1, rs1.getString("SEX").trim());
 					statementi1.setString(2, rs1.getString("PID").trim());
-					statementi1.setString(3, rs1.getString("FQODT").trim());
+					statementi1.setString(3, getFoedtDoebtDato(rs1));
 					statementi1.setString(4, rs1.getString("FAM"));
 					statementi1.setString(5, rs1.getString("SLGT"));
 					statementi1.executeUpdate();

@@ -13,7 +13,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Læs konfirmationsdata fra grundtabellen ind i GEDCOM-tabeller
  *
  * @author Michael Erichsen
- * @version 4. okt. 2023
+ * @version 5. okt. 2023
  *
  */
 public class KonfirmationLoader extends AbstractLoader {
@@ -90,7 +90,7 @@ public class KonfirmationLoader extends AbstractLoader {
 			statementi1.setString(1, rs1.getString("SEX").trim());
 
 			if (!rx.equals("1")) {
-				statementi1.setString(2, rs1.getString("FQODT").trim());
+				statementi1.setString(2, getFoedtDoebtDato(rs1));
 			} else {
 				statementi1.setString(2, "");
 			}
@@ -174,7 +174,7 @@ public class KonfirmationLoader extends AbstractLoader {
 
 				statementi3.setString(5, rolle);
 				statementi3.setInt(6, kildeId);
-				statementi3.setString(7, fixStedNavn(afQ(rs1.getString("STEDNAVN"))));
+				statementi3.setString(7, fixStedNavn(rs1.getString("STEDNAVN")));
 				statementi3.setString(8, afQ(rs1.getString("BEM")));
 				statementi3.executeUpdate();
 				generatedKeys = statementi3.getGeneratedKeys();
@@ -225,7 +225,7 @@ public class KonfirmationLoader extends AbstractLoader {
 					}
 					statementi3.setString(5, "Barn");
 					statementi3.setInt(6, kildeId);
-					statementi3.setString(7, afQ(rs1.getString("DQOBTSTED")));
+					statementi3.setString(7, fixStedNavn(rs1.getString("DQOBTSTED")));
 					statementi3.setString(8, "");
 					statementi3.executeUpdate();
 				}

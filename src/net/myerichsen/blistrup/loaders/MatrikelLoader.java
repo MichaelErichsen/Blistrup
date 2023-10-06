@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs matrikler
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 5. okt. 2023
  *
  */
 public class MatrikelLoader extends AbstractLoader {
@@ -106,7 +106,7 @@ public class MatrikelLoader extends AbstractLoader {
 			statement4.setString(2, "Matrikel");
 			statement4.setString(3, "1844-01-01");
 			statement4.setInt(4, kildeId);
-			stedNavn = fixStedNavn(afQ(rs0.getString("STEDNAVN")));
+			stedNavn = fixStedNavn(rs0.getString("STEDNAVN"));
 
 			matr = afQ(rs0.getString("MATR_"));
 

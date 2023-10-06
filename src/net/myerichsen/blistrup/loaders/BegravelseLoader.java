@@ -12,7 +12,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs begravelser
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 5. okt. 2023
  *
  */
 public class BegravelseLoader extends AbstractLoader {
@@ -90,7 +90,7 @@ public class BegravelseLoader extends AbstractLoader {
 			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES
 
 			statementi1.setString(1, koen);
-			statementi1.setString(2, rs1.getString("FQODT").trim());
+			statementi1.setString(2, getFoedtDoebtDato(rs1));
 			statementi1.setString(3, rs1.getString("FAM"));
 			statementi1.setString(4, rs1.getString("SLGT"));
 			statementi1.executeUpdate();
@@ -154,16 +154,9 @@ public class BegravelseLoader extends AbstractLoader {
 
 				statementi4.setString(3, "Begravelse");
 				statementi4.setString(4, rs1.getString("AAR").trim() + "-01-01");
-//				fader = afQ(rs1.getString("FADER"));
-//				fader = fader.length() > 0 ? "Fader: " + fader : "";
-//				moder = afQ(rs1.getString("MODER"));
-//				moder = moder.length() > 0 ? "Moder: " + moder : "";
-//				faelle = afQ(rs1.getString("FQELLE"));
-//				faelle = faelle.length() > 0 ? "Ægtefælle: " + faelle : "";
-//				statementi4.setString(5, (fader + " " + moder + " " + faelle).trim());
 				statementi4.setString(5, rolle);
 				statementi4.setInt(6, kildeId);
-				statementi4.setString(7, fixStedNavn(afQ(rs1.getString("STEDNAVN"))));
+				statementi4.setString(7, fixStedNavn(rs1.getString("STEDNAVN")));
 				statementi4.setString(8, afQ(rs1.getString("BEM")));
 				statementi4.setString(9, rs1.getString("FQODT").trim());
 				statementi4.executeUpdate();

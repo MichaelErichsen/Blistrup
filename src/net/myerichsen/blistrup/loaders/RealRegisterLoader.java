@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 17. sep. 2023
+ * @version 5. okt. 2023
  *
  */
 
@@ -77,7 +77,7 @@ public class RealRegisterLoader extends AbstractLoader {
 			statement2.setString(1, "m".equals(rs1.getString("SEX")) ? "M" : "F");
 			statement2.setString(2, rs1.getString("FAM"));
 			statement2.setString(3, rs1.getString("SLGT"));
-			statement2.setString(4, rs1.getString("FQODT"));
+			statement2.setString(4, getFoedtDoebtDato(rs1));
 			statement2.executeUpdate();
 			generatedKeys = statement2.getGeneratedKeys();
 
@@ -119,7 +119,7 @@ public class RealRegisterLoader extends AbstractLoader {
 			}
 
 			statement4.setInt(4, kildeId);
-			stedNavn = fixStedNavn(afQ(rs1.getString("STEDNAVN")));
+			stedNavn = fixStedNavn(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));
 			matr = afQ(rs1.getString("MATR_"));
 

@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 3. okt. 2023
+ * @version 5. okt. 2023
  *
  */
 
@@ -202,7 +202,7 @@ public abstract class AbstractLoader {
 		} else {
 			stedNavn = stedNavn + ",,,";
 		}
-		return stedNavn;
+		return afQ(stedNavn);
 	}
 
 	/**
@@ -235,7 +235,6 @@ public abstract class AbstractLoader {
 	 * @throws SQLException
 	 * @throws NumberFormatException
 	 */
-	// TODO Test og indføj i loadere
 	public String getFoedtDoebtDato(final ResultSet rs1) throws SQLException, NumberFormatException {
 		String foedt = rs1.getString("FQODT");
 		if (foedt != null && !foedt.isBlank()) {

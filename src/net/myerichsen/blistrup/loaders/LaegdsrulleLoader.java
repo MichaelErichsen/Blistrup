@@ -13,7 +13,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs lægdsruller
  *
  * @author Michael Erichsen
- * @version 24. sep. 2023
+ * @version 5. okt. 2023
  *
  */
 
@@ -161,9 +161,9 @@ public class LaegdsrulleLoader extends AbstractLoader {
 			statementi4.setString(2, "0");
 			statementi4.setInt(3, kildeId);
 			statementi4.setString(4, "Fødsel");
-			statementi4.setDate(5, Date.valueOf(rss1.getString("FQODT") + "-01-01"));
+			statementi4.setDate(5, Date.valueOf(getFoedtDoebtDato(rss1)));
 			statementi4.setString(6, "Lægdsrulleoplysninger");
-			statementi4.setString(7, fixStedNavn(afQ(rss1.getString("FQODESTED"))));
+			statementi4.setString(7, fixStedNavn(rss1.getString("FQODESTED")));
 			statementi4.executeUpdate();
 
 			// Indsæt lægdsrulle som hændelse
@@ -187,7 +187,7 @@ public class LaegdsrulleLoader extends AbstractLoader {
 
 			statementi4.setString(6, detaljer);
 
-			statementi4.setString(7, fixStedNavn(afQ(rss1.getString("STEDNAVN"))));
+			statementi4.setString(7, fixStedNavn(rss1.getString("STEDNAVN")));
 			statementi4.executeUpdate();
 			generatedKeys = statementi4.getGeneratedKeys();
 

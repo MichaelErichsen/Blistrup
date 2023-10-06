@@ -19,7 +19,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1901 tabel
  *
  * @author Michael Erichsen
- * @version 16. sep. 2023
+ * @version 4. okt. 2023
  *
  */
 public class FT1901Loader extends AbstractLoader {
@@ -226,7 +226,7 @@ public class FT1901Loader extends AbstractLoader {
 					fbModel.setBegType("Folketælling");
 					fbModel.setKildeId(kildeId);
 					fbModel.setDato(Date.valueOf("1901-02-01"));
-					fbModel.setStedNavn(fixStedNavn(matrNrAdresse + ", " + kildeStedNavn));
+					fbModel.setStedNavn(fixStedNavn("Matr. " + matrNrAdresse + ", " + kildeStedNavn));
 					sb = new StringBuilder();
 					for (int i = 0; i < list.size() - 1; i++) {
 						sb.append(list.get(i).getDetaljer() + "\r\n");

@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs tilgangslister
  *
  * @author Michael Erichsen
- * @version 1. okt. 2023
+ * @version 5. okt. 2023
  *
  */
 
@@ -125,7 +125,7 @@ public class TilgangsListeLoader extends AbstractLoader {
 			if (til.isBlank() || "Blistrup".equals(til)) {
 				til = "Blistrup, Holbo, Frederiksborg,";
 			} else {
-				til = fixStedNavn(afQ(fra));
+				til = fixStedNavn(fra);
 			}
 
 			ibModel.setStedNavn(til);

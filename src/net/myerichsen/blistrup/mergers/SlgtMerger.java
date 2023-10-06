@@ -150,7 +150,7 @@ public class SlgtMerger extends AbstractLoader {
 		if (rsc.next()) {
 			System.out.println("Count before: " + count + ", after: " + rsc.getInt("CT"));
 		}
-
+		conn.commit();
 		conn.close();
 
 	}

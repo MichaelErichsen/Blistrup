@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 30. sep. 2023
+ * @version 4. okt. 2023
  *
  */
 public class FaesteDesignationLoader extends AbstractLoader {
@@ -84,7 +84,7 @@ public class FaesteDesignationLoader extends AbstractLoader {
 			statement2.setString(2, blistrupId);
 			statement2.setString(3, rs1.getString("FAM"));
 			statement2.setString(4, rs1.getString("SLGT"));
-			statement2.setString(5, rs1.getString("FQODT"));
+			statement2.setString(5, getFoedtDoebtDato(rs1));
 			statement2.executeUpdate();
 			generatedKeys = statement2.getGeneratedKeys();
 
