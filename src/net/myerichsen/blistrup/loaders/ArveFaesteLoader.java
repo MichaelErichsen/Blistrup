@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs arvefæster
  *
  * @author Michael Erichsen
- * @version 3. okt. 2023
+ * @version 6. okt. 2023
  *
  */
 public class ArveFaesteLoader extends AbstractLoader {
@@ -71,7 +71,7 @@ public class ArveFaesteLoader extends AbstractLoader {
 		while (rs1.next()) {
 			// INSERT1 = "INSERT INTO INDIVID (KOEN, FOEDT, FAM, SLGT) VALUES
 
-			stedNavn = afQ(rs1.getString("STEDNAVN"));
+			stedNavn = fixStedNavn(rs1.getString("STEDNAVN"));
 			statementi1.setString(1, "m".equals(rs1.getString("SEX")) ? "M" : "F");
 			String foedt = getFoedtDoebtDato(rs1);
 			statementi1.setString(2, foedt);
@@ -125,7 +125,7 @@ public class ArveFaesteLoader extends AbstractLoader {
 				sb.append("Matr. " + afQ(matr) + ", ");
 			}
 
-			sb.append(afQ(rs1.getString("GAARD")) + ", " + stedNavn + ", Blistrup, Holbo, Frederiksborg, ");
+			sb.append(afQ(rs1.getString("GAARD")) + ", " + stedNavn);
 			statementi3.setString(6, sb.toString());
 			statementi3.setString(7, "Side " + rs1.getString("SIDE") + ", opslag " + rs1.getString("OPSLAG") + ", "
 					+ rs1.getString("CIVILSTAND"));

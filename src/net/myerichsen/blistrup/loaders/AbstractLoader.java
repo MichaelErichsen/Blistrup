@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 5. okt. 2023
+ * @version 6. okt. 2023
  *
  */
 
@@ -179,11 +179,19 @@ public abstract class AbstractLoader {
 		} else {
 			formatted = "0101";
 		}
-		formatted = rs.getString("ÅR") + "-" + formatted.substring(0, 2) + "-" + formatted.substring(2, 4);
+		try {
+			formatted = rs.getString("ÅR") + "-" + formatted.substring(0, 2) + "-" + formatted.substring(2, 4);
+		} catch (final SQLException e1) {
+			formatted = rs.getString("AAR") + "-" + formatted.substring(0, 2) + "-" + formatted.substring(2, 4);
+		}
 		try {
 			fullDate = Date.valueOf(formatted);
 		} catch (final Exception e) {
-			fullDate = Date.valueOf(rs.getString("ÅR") + "-01-01");
+			try {
+				fullDate = Date.valueOf(rs.getString("ÅR") + "-01-01");
+			} catch (final SQLException e1) {
+				fullDate = Date.valueOf(rs.getString("AAR") + "-01-01");
+			}
 		}
 		return fullDate;
 	}
@@ -193,16 +201,18 @@ public abstract class AbstractLoader {
 	 * @return
 	 */
 	protected String fixStedNavn(String stedNavn) {
+		stedNavn = afQ(stedNavn);
+
 		if (stedNavn.contains("Blistrup") || stedNavn.contains("Blidstrup")) {
 			stedNavn = stedNavn + ", Holbo, Frederiksborg,";
 		} else if (stedNavn.contains("Bakkebjerg") || stedNavn.contains("Hesselbjerg") || stedNavn.contains("Højelt")
 				|| stedNavn.contains("Kolsbæk") || stedNavn.contains("Ludshøj") || stedNavn.contains("Rågeleje")
-				|| stedNavn.contains("Smidstrup") || stedNavn.contains("Udsholt")) {
-			stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg,";
+				|| stedNavn.contains("Raageleje") || stedNavn.contains("Smidstrup") || stedNavn.contains("Udsholt")) {
+			stedNavn = stedNavn.replace(",", "") + ", Blistrup, Holbo, Frederiksborg,";
 		} else {
 			stedNavn = stedNavn + ",,,";
 		}
-		return afQ(stedNavn);
+		return stedNavn;
 	}
 
 	/**

@@ -15,7 +15,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs afgangslister
  *
  * @author Michael Erichsen
- * @version 30. sep. 2023
+ * @version 6. okt. 2023
  *
  */
 
@@ -120,7 +120,7 @@ public class AfgangsListeLoader extends AbstractLoader {
 
 			ibModel.setDetaljer(detaljer);
 			ibModel.setFoedt(foedt + "-01-01");
-			ibModel.setStedNavn(afQ(rs.getString("TIL")));
+			ibModel.setStedNavn(fixStedNavn(rs.getString("TIL")));
 			ibModel.insert(conn);
 
 			taeller++;

@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstebrevkopier
  *
  * @author Michael Erichsen
- * @version 4. okt. 2023
+ * @version 6. okt. 2023
  *
  */
 public class FaesteBrevKopiLoader extends AbstractLoader {
@@ -71,7 +71,7 @@ public class FaesteBrevKopiLoader extends AbstractLoader {
 
 		while (rs1.next()) {
 			blistrupId = afQ(rs1.getString("PID"));
-			stedNavn = afQ(rs1.getString("STEDNAVN"));
+			stedNavn = fixStedNavn(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));
 
 			// "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT)
@@ -121,12 +121,6 @@ public class FaesteBrevKopiLoader extends AbstractLoader {
 			}
 			statement4.setString(4, blistrupId);
 			statement4.setInt(5, kildeId);
-			if (stedNavn.contains("Blistrup")) {
-				stedNavn = stedNavn + ", Holbo, Frederiksborg, ";
-			} else {
-				stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg, ";
-			}
-
 			matr = afQ(rs1.getString("MATR_"));
 
 			if (matr.isBlank()) {

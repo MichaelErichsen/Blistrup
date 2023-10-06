@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 4. okt. 2023
+ * @version 6. okt. 2023
  *
  */
 public class FaesteDesignationLoader extends AbstractLoader {
@@ -75,7 +75,7 @@ public class FaesteDesignationLoader extends AbstractLoader {
 			// "SELECT * FROM F9PERSONFAMILIEQ WHERE TYPE = 'K'
 
 			blistrupId = afQ(rs1.getString("PID"));
-			stedNavn = afQ(rs1.getString("STEDNAVN"));
+			stedNavn = fixStedNavn(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));
 
 			// "INSERT INTO INDIVID (KOEN, BLISTRUPID, FAM, SLGT, FOEDT)
@@ -125,11 +125,6 @@ public class FaesteDesignationLoader extends AbstractLoader {
 			}
 			statement4.setString(4, blistrupId);
 			statement4.setInt(5, kildeId);
-			if (stedNavn.contains("Blistrup")) {
-				stedNavn = stedNavn + ", Holbo, Frederiksborg, ";
-			} else {
-				stedNavn = stedNavn + ", Blistrup, Holbo, Frederiksborg, ";
-			}
 
 			matr = afQ(rs1.getString("MATR_"));
 

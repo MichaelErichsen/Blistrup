@@ -84,7 +84,7 @@ public class VielsesMerge extends AbstractLoader {
 			// DELETE1 = "DELETE FROM FAMILIE WHERE ID = ?";
 			statementd1.setInt(1, familieId);
 			statementd1.executeUpdate();
-			System.out.println("Slettet familie " + familieId + " uden forældre");
+//			System.out.println("Slettet familie " + familieId + " uden forældre");
 		}
 
 		// Hent alle familier med højst en forælder
