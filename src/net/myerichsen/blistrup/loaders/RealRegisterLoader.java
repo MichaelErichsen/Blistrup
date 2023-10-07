@@ -14,7 +14,7 @@ import net.myerichsen.blistrup.models.KildeModel;
  * Indlæs fæstedesignationer
  *
  * @author Michael Erichsen
- * @version 5. okt. 2023
+ * @version 7. okt. 2023
  *
  */
 
@@ -121,12 +121,12 @@ public class RealRegisterLoader extends AbstractLoader {
 			statement4.setInt(4, kildeId);
 			stedNavn = fixStedNavn(rs1.getString("STEDNAVN"));
 			gaard = afQ(rs1.getString("GAARD"));
-			matr = afQ(rs1.getString("MATR_"));
+			matr = afQ(rs1.getString("MATR_").replace(".", ""));
 
 			if (matr.isBlank()) {
 				jordlod = gaard + ", " + stedNavn;
 			} else {
-				jordlod = "Matr. " + matr + ", " + gaard + ", " + stedNavn;
+				jordlod = "Matr. " + matr + " " + gaard + ", " + stedNavn;
 			}
 
 			statement4.setString(5, jordlod);

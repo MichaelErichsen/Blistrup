@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.util.Fonkod;
  * Abstrakt overklasse for Blistrup loader programmer
  *
  * @author Michael Erichsen
- * @version 6. okt. 2023
+ * @version 7. okt. 2023
  *
  */
 
@@ -252,6 +252,8 @@ public abstract class AbstractLoader {
 			if (doebt != null && !doebt.isBlank() && doebt.matches("[0-9]+")) {
 				doebt = String.format("%04d", Integer.parseInt(doebt.trim()));
 				foedt = foedt + doebt;
+			} else {
+				foedt = foedt + "-01-01";
 			}
 		}
 		return foedt;

@@ -16,7 +16,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Indlæs skifteregistre
  *
  * @author Michael Erichsen
- * @version 30. sep. 2023
+ * @version 7. okt. 2023
  *
  */
 
@@ -57,6 +57,8 @@ public class SkiftesagsLoader extends AbstractLoader {
 		int ibModelId = 0;
 		String primaerNavn = "";
 		Date fullDate;
+		String herred = "";
+		String amt = "";
 
 		final Connection conn = connect("BLISTRUP");
 		final KildeModel kModel = new KildeModel();
@@ -201,8 +203,16 @@ public class SkiftesagsLoader extends AbstractLoader {
 			ibModel.setBegType("Skifte");
 			fullDate = findFuldDato(rs);
 			ibModel.setDato(fullDate);
-			ibModel.setStedNavn(rs.getString("STEDNAVN") + ", " + rs.getString("SOGN") + ", " + rs.getString("HERRED")
-					+ ", Frederiksborg");
+			herred = rs.getString("HERRED");
+
+			if ("Holbo Horns Lynge-Frederiksborg Lynge-Kronborg Strø Ølstykke".contains(herred)) {
+				amt = "Frederiksborg";
+			} else {
+				amt = "";
+			}
+
+			ibModel.setStedNavn(
+					rs.getString("STEDNAVN") + ", " + rs.getString("SOGN") + ", " + herred + ", " + amt + ",");
 			detaljer = "Kilde " + rs.getString("KILDE").trim() + ", Opslag " + rs.getString("OPSLAG").trim() + "\r\n"
 					+ getTableRow(rs);
 			ibModel.setDetaljer(detaljer);

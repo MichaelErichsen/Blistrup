@@ -75,7 +75,7 @@ public class GedcomSaver {
 		}
 	}
 
-	private static final String titel = "fæstedesignation";
+	private static final String titel = "Vielser";
 	private static final String SELECTF1 = "SELECT * FROM BLISTRUP.FAMILIE";
 	private static final String SELECTF2 = "SELECT * FROM BLISTRUP.FAMILIE WHERE ID = ?";
 	private static final String SELECTF4 = "SELECT * FROM BLISTRUP.FAMILIEBEGIVENHED WHERE FAMILIEID = ?";
