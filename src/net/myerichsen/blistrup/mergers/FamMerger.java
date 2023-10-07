@@ -13,7 +13,7 @@ import net.myerichsen.blistrup.loaders.AbstractLoader;
  * Flet individer med samme navn, samme FAM og ingen SLGT i rådataene
  *
  * @author Michael Erichsen
- * @version 6. okt. 2023
+ * @version 7. okt. 2023
  *
  */
 // FIXME Finder intet

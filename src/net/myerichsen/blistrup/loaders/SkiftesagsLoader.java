@@ -30,7 +30,7 @@ public class SkiftesagsLoader extends AbstractLoader {
 	public static void main(String[] args) {
 		try {
 			final int taeller = new SkiftesagsLoader().load();
-			System.out.println("Har indlæst " + taeller + " skifter");
+			System.out.println("Har indlæst " + taeller + " skiftesager");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}

@@ -19,7 +19,7 @@ import net.myerichsen.blistrup.models.PersonNavneModel;
  * Load en FT 1801 tabel
  *
  * @author Michael Erichsen
- * @version 5. sep. 2023
+ * @version 7. okt. 2023
  *
  */
 public class FT1801Loader extends AbstractLoader {
@@ -42,7 +42,7 @@ public class FT1801Loader extends AbstractLoader {
 	public static void main(String[] args) {
 		try {
 			final int taeller = new FT1801Loader().load();
-			System.out.println("Har indlæst " + taeller + " folketællingslinier");
+			System.out.println("Har indlæst " + taeller + " folketællingslinier for 1801");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}

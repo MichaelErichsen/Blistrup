@@ -11,7 +11,7 @@ import net.myerichsen.blistrup.loaders.AbstractLoader;
  * Fjern familier med kun et enkelt medlem
  *
  * @author Michael Erichsen
- * @version 1. okt. 2023
+ * @version 7. okt. 2023
  *
  */
 
@@ -106,8 +106,8 @@ public class VielsesMerge extends AbstractLoader {
 					// DELETE1 = "DELETE FROM FAMILIE WHERE ID = ?";
 					statementd1.setInt(1, familieId);
 					statementd1.executeUpdate();
-					System.out.println(
-							"Slettet familie " + familieId + " med en forælder og " + rs3.getInt("CT") + " børn");
+//					System.out.println(
+//							"Slettet familie " + familieId + " med en forælder og " + rs3.getInt("CT") + " børn");
 				}
 			}
 		}
